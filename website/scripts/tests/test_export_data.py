@@ -80,6 +80,14 @@ def test_headline_matches_aggregate_csv(regime, stem):
         assert set(cell) == {"mean", "sd", "n_sites"}  # no interval fields
 
 
+def test_mars_parameter_counts_match_runs():
+    pc = load("mars/headline.json")["parameter_counts"]
+    for model, run_dir in (("CNN", "model1_resnet18"), ("CNN_QCNN", "model2_qcnn")):
+        for f in (ex.MARS_RUNS_DIR / run_dir).glob("fold_*_seed_*/param_counts.json"):
+            assert json.loads(f.read_text(encoding="utf-8")) == pc[model], f
+    assert pc["CNN"]["total_trainable"] == 11242563 and pc["CNN_QCNN"]["total_trainable"] == 4152
+
+
 def test_no_interval_or_paired_fields_anywhere():
     for path in DATA.rglob("*.json"):
         text = path.read_text(encoding="utf-8")

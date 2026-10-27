@@ -234,8 +234,18 @@ def export_mars(written: list[Path]) -> None:
             }
             for model in MARS_MODELS
         }
+    # Parameter counts are identical for every fold/seed run; verify, then export one copy.
+    param_dirs = {"CNN": "model1_resnet18", "CNN_QCNN": "model2_qcnn"}
+    param_counts: dict[str, Any] = {}
+    for model, run_dir in param_dirs.items():
+        files = sorted((MARS_RUNS_DIR / run_dir).glob("fold_*_seed_*/param_counts.json"))
+        assert len(files) == 5 * len(SEEDS), f"{model}: expected 15 param_counts.json, found {len(files)}"
+        counts = [json.loads(f.read_text(encoding="utf-8")) for f in files]
+        assert all(c == counts[0] for c in counts), f"{model}: parameter counts differ between runs"
+        param_counts[model] = counts[0]
+        sources.append(files[0])
     path = OUT_DIR / "mars" / "headline.json"
-    write_json(path, {**stamp(sources), "models": MARS_MODELS, **headline})
+    write_json(path, {**stamp(sources), "models": MARS_MODELS, "parameter_counts": param_counts, **headline})
     written.append(path)
 
     # site_<id>.json: per-site means and per-seed rows, both regimes

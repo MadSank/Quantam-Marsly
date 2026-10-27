@@ -1,13 +1,27 @@
 {
  "source": [
   "runs/pipeline_repair_audit/retraining_seedset/metrics/fixed_threshold_aggregate.csv",
-  "runs/pipeline_repair_audit/retraining_seedset/metrics/validation_calibrated_test_aggregate.csv"
+  "runs/pipeline_repair_audit/retraining_seedset/metrics/validation_calibrated_test_aggregate.csv",
+  "runs/pipeline_repair_audit/retraining_seedset/runs/model1_resnet18/fold_0_seed_42/param_counts.json",
+  "runs/pipeline_repair_audit/retraining_seedset/runs/model2_qcnn/fold_0_seed_42/param_counts.json"
  ],
- "generated_at": "2026-10-27T17:22:23+00:00",
+ "generated_at": "2026-10-27T17:44:52+00:00",
  "models": [
   "CNN",
   "CNN_QCNN"
  ],
+ "parameter_counts": {
+  "CNN": {
+   "total_trainable": 11242563,
+   "total_frozen": 0,
+   "head_trainable": 66051
+  },
+  "CNN_QCNN": {
+   "total_trainable": 4152,
+   "total_frozen": 0,
+   "head_trainable": 48
+  }
+ },
  "fixed": {
   "CNN": {
    "TP": {

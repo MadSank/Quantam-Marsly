@@ -325,7 +325,7 @@ These rules are built into the components:
 - The Moon table: mean ± SD for all 4 models.
 - Counts: 15,233 tiles; 779 Moon test crops; 3,608 / 613 / 779 split sizes.
 - Parameter counts: 59,347 / 195; 11,242,563 / 4,152; heads 568 / 547.
-- Tolerances match the app's tests.
+- Tolerances are half a unit in the last digit the audit reports. That is stricter than the Streamlit app's tests (which allow 0.01 on RMSE).
 
 **`data.integrity.test.ts`**
 - Site tile counts sum to 15,233, and site_01 has 2,195.
