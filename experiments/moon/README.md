@@ -84,7 +84,7 @@ The images, class labels and train/validation/test split come from the LROCNet l
 - **Calibration:** none exists. Predictions are the argmax of the logits, and there's no threshold or temperature. The saved predictions equal the argmax of the saved logits (`runs/results_verification/results_audit.md`).
 - **The one known difference:** test embeddings were computed early. On its own, that can't change any result, as long as the encoder was frozen and in evaluation mode (no BatchNorm statistics updated) while embedding. Whether the old code embedded test data in evaluation mode can't be confirmed without the source.
 
-**Are the published Moon numbers valid as stated?** The arithmetic is verified: every reported metric was independently recomputed from the saved logits and labels. That the results are free of any test influence is very likely but not proven. Two re-checks would settle it; neither has been run.
+**Are the published Moon numbers valid as stated?** The arithmetic is verified: every reported metric was independently recomputed from the saved logits and labels. Two re-checks were planned to test whether the results are free of test influence; both were run on 2026-10-27 (results below).
 
 1. **Read-only checkpoint replay** (CPU, a few minutes, no training).
    - Load each seed's `cnn`, `hybrid` and `frozen_mlp` checkpoints.
@@ -96,4 +96,42 @@ The images, class labels and train/validation/test split come from the LROCNet l
    - Compare its metrics with the reported ones. Identical numbers settle the question.
    - Any difference should be judged against the seed-to-seed spread, because GPU and simulator nondeterminism can cause small changes.
 
-Until one of these is run, the website shows this note next to the Moon code excerpts and keeps the audit's test-embedding caveat.
+### Re-check results (2026-10-27)
+
+No published number, export or test was changed because of these results.
+
+**1. Checkpoint replay** (`replay_checkpoints.py`, CPU, read-only): **passed** for all 9 model × seed fits.
+- Recomputed test predictions are identical to the saved ones. Logits differ by at most 4.5 × 10⁻⁴, which is GPU-vs-CPU floating-point noise.
+- Recomputed validation macro-F1 equals the best logged epoch exactly.
+- So the reported predictions come from the saved, validation-selected weights.
+
+**2. Locked-test re-run** (current `train.py`, config `configs/rerun_locked_test.yaml`, output `data/raw/moon/lrocnet/experiment_lunar_cnn_qcnn/rerun_locked_test_20261027/`, same GPU and environment). The existing `runs/` was not touched.
+- **CNN:** bit-identical to the published run for all three seeds: the same logits, epochs and metrics. CUDA training here was therefore deterministic. (I had expected small differences from non-deterministic CUDA kernels; there were none.)
+- **Hybrid QCNN head and frozen-embedding MLP:** **not** reproduced. Both heads are trained on CPU from the identical frozen CNN embeddings, yet they already differ before training: the initial QCNN gradient norm is 0.198 / 0.378 / 0.209 against the published 0.413 / 0.523 / 0.381. Their training then takes different numbers of epochs.
+
+Mean ± sample SD over seeds 42/43/44 on the same 779-image test set:
+
+| Model | Metric | Published | Re-run | Difference | Re-run mean inside published seed range? |
+|---|---|---:|---:|---:|---|
+| CNN | accuracy | 0.530 ± 0.035 | 0.530 ± 0.035 | 0 | yes (identical) |
+| CNN | balanced accuracy | 0.558 ± 0.053 | 0.558 ± 0.053 | 0 | yes (identical) |
+| CNN | macro-F1 | 0.465 ± 0.024 | 0.465 ± 0.024 | 0 | yes (identical) |
+| Hybrid CNN–QCNN | accuracy | 0.529 ± 0.039 | 0.451 ± 0.041 | −0.078 | **no** (published range 0.488–0.565; difference is 2.0 SD) |
+| Hybrid CNN–QCNN | balanced accuracy | 0.608 ± 0.006 | 0.587 ± 0.032 | −0.021 | **no** (published range 0.604–0.615) |
+| Hybrid CNN–QCNN | macro-F1 | 0.497 ± 0.026 | 0.439 ± 0.035 | −0.058 | **no** (published range 0.469–0.519; difference is 2.2 SD) |
+| Frozen-embedding MLP | accuracy | 0.451 ± 0.037 | 0.502 ± 0.026 | +0.051 | no (published range 0.409–0.481; within 2 SD) |
+| Frozen-embedding MLP | balanced accuracy | 0.587 ± 0.021 | 0.606 ± 0.022 | +0.019 | yes |
+| Frozen-embedding MLP | macro-F1 | 0.440 ± 0.028 | 0.479 ± 0.019 | +0.039 | no (published range 0.408–0.463; within 2 SD) |
+| Majority baseline | all three | 0.684 / 0.333 / 0.271 | identical | 0 | yes |
+
+**What this means.**
+- **Most likely cause:** the CNN and its embeddings are identical, so the head results differ because the random-number state at the moment the heads are initialised differs. A `torch.utils.data.DataLoader` draws one value from PyTorch's global random generator every time it is iterated, even without shuffling. The old trainer iterated test-data loaders before fitting the heads (the change described above). That would shift the generator, and with it the head initialisation and the shuffling order.
+- **This is a random-state difference, not a data leak.** The numbers drawn are random, not test data. It is consistent with the replay result and with the absence of any test influence on training or selection. It has not yet been confirmed directly.
+- **The published hybrid and MLP figures are valid for the run that produced them** (re-check 1). They are not robust to an equivalent re-initialisation, and three seeds understate the variability of the frozen-embedding heads.
+- **The relative ordering is not stable.** Published balanced accuracy: hybrid 0.608 > MLP 0.587 > CNN 0.558. In the re-run: MLP 0.606 > hybrid 0.587 > CNN 0.558. On macro-F1 the re-run hybrid (0.439) falls below the CNN (0.465). Any statement that the hybrid head scores higher than the CNN or the MLP control is therefore not supported beyond the original three seeds.
+
+**Not yet done:**
+1. Confirm the random-state explanation. Re-create the old order by iterating the test loaders the same number of times before head initialisation, and check that the published initial gradient norms (0.4127 / 0.5228 / 0.3807) and head metrics are reproduced exactly.
+2. Decide whether the published Moon figures, the website caveats and `FINAL_READINESS_AUDIT.md` need an added disclosure or more seeds. That decision belongs to the project owner; nothing has been changed.
+
+The website shows this note next to the Moon code excerpts and keeps the audit's test-embedding caveat.
