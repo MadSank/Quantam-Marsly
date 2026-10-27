@@ -1,0 +1,3 @@
+epoch,train_loss,val_loss,lr,epoch_wall_time_sec,cumulative_wall_time_sec
+0,1.273009,1.420781,1.000000e-04,0.3592,0.3592
+1,1.112509,1.313261,5.000000e-05,0.3247,0.6839

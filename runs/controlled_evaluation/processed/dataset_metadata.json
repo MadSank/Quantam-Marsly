@@ -1,0 +1,249 @@
+{
+  "dataset": "real_hirise_v1",
+  "config": "runs\\controlled_evaluation\\base_config.yaml",
+  "sites": [
+    {
+      "site_id": "site_01",
+      "dtm_product_id": "DTEEC_062740_2150_062806_2150_A01",
+      "ortho_product_id": "ESP_062806_2150_RED_C_01_ORTHO",
+      "dimensions": [
+        7735,
+        6109
+      ],
+      "native_resolution_m": 1.0045020712681,
+      "selected_band": 1,
+      "selected_filter": "RED",
+      "radiometric_equation": "I/F = DN * scaling_factor + offset",
+      "scaling_factor": 0.0004298303596815,
+      "offset": 0.0667644186367895,
+      "display_stretch_dn": [
+        null,
+        null
+      ],
+      "core_null": 0,
+      "low_saturation_dn": 1,
+      "high_saturation_dn": 255,
+      "candidate_count_by_safe_class_capped": {
+        "0": 1983,
+        "1": 212
+      },
+      "accepted_before_class_cap_by_safe_label": {
+        "0": 1983,
+        "1": 212
+      },
+      "grid_candidates": 2820,
+      "excluded_joint_coverage": 3,
+      "excluded_dtm_coverage": 622,
+      "excluded_slope_support": 0,
+      "class_cap_excluded": 0,
+      "sitewise_image_stretch": false,
+      "valid_fraction_in_retained_patches": 0.9998183404666144,
+      "label_crs_and_transform_used": true
+    },
+    {
+      "site_id": "site_02",
+      "dtm_product_id": "DTEED_039245_1325_039944_1325_A01",
+      "ortho_product_id": "ESP_039245_1325_RED_D_01_ORTHO",
+      "dimensions": [
+        3835,
+        2682
+      ],
+      "native_resolution_m": 1.9986249395537,
+      "selected_band": 1,
+      "selected_filter": "RED",
+      "radiometric_equation": "I/F = DN * scaling_factor + offset",
+      "scaling_factor": 0.0001530196080466,
+      "offset": 0.0662857233520074,
+      "display_stretch_dn": [
+        null,
+        null
+      ],
+      "core_null": 0,
+      "low_saturation_dn": 1,
+      "high_saturation_dn": 255,
+      "candidate_count_by_safe_class_capped": {
+        "0": 1135,
+        "1": 750
+      },
+      "accepted_before_class_cap_by_safe_label": {
+        "0": 1135,
+        "1": 750
+      },
+      "grid_candidates": 2419,
+      "excluded_joint_coverage": 8,
+      "excluded_dtm_coverage": 526,
+      "excluded_slope_support": 0,
+      "class_cap_excluded": 0,
+      "sitewise_image_stretch": false,
+      "valid_fraction_in_retained_patches": 0.9996912301061008,
+      "label_crs_and_transform_used": true
+    },
+    {
+      "site_id": "site_03",
+      "dtm_product_id": "DTEEC_022774_1865_023051_1865_A01",
+      "ortho_product_id": "ESP_023051_1865_RED_C_01_ORTHO",
+      "dimensions": [
+        8530,
+        6244
+      ],
+      "native_resolution_m": 1.0116097897759,
+      "selected_band": 1,
+      "selected_filter": "RED",
+      "radiometric_equation": "I/F = DN * scaling_factor + offset",
+      "scaling_factor": 0.000371916374377,
+      "offset": 0.118311213710023,
+      "display_stretch_dn": [
+        null,
+        null
+      ],
+      "core_null": 0,
+      "low_saturation_dn": 1,
+      "high_saturation_dn": 255,
+      "candidate_count_by_safe_class_capped": {
+        "0": 1676,
+        "1": 808
+      },
+      "accepted_before_class_cap_by_safe_label": {
+        "0": 1676,
+        "1": 808
+      },
+      "grid_candidates": 3168,
+      "excluded_joint_coverage": 4,
+      "excluded_dtm_coverage": 680,
+      "excluded_slope_support": 0,
+      "class_cap_excluded": 0,
+      "sitewise_image_stretch": false,
+      "valid_fraction_in_retained_patches": 0.9998624988992049,
+      "label_crs_and_transform_used": true
+    },
+    {
+      "site_id": "site_04",
+      "dtm_product_id": "DTEEC_018347_1660_026417_1660_A01",
+      "ortho_product_id": "ESP_026417_1660_IRB_C_01_ORTHO",
+      "dimensions": [
+        15377,
+        6555
+      ],
+      "native_resolution_m": 1.0106411505385,
+      "selected_band": 2,
+      "selected_filter": "RED",
+      "radiometric_equation": "I/F = DN * scaling_factor + offset",
+      "scaling_factor": 0.0002350945840952,
+      "offset": 0.0233000631564038,
+      "display_stretch_dn": [
+        null,
+        null
+      ],
+      "core_null": 0,
+      "low_saturation_dn": 1,
+      "high_saturation_dn": 255,
+      "candidate_count_by_safe_class_capped": {
+        "0": 828,
+        "1": 151
+      },
+      "accepted_before_class_cap_by_safe_label": {
+        "0": 828,
+        "1": 151
+      },
+      "grid_candidates": 6120,
+      "excluded_joint_coverage": 3222,
+      "excluded_dtm_coverage": 1919,
+      "excluded_slope_support": 0,
+      "class_cap_excluded": 0,
+      "sitewise_image_stretch": false,
+      "valid_fraction_in_retained_patches": 0.9994828532981678,
+      "label_crs_and_transform_used": true
+    },
+    {
+      "site_id": "site_05",
+      "dtm_product_id": "DTEEC_003495_2065_003561_2065_A01",
+      "ortho_product_id": "PSP_003495_2065_RED_C_01_ORTHO",
+      "dimensions": [
+        27626,
+        8131
+      ],
+      "native_resolution_m": 1.0072186763504,
+      "selected_band": 1,
+      "selected_filter": "RED",
+      "radiometric_equation": "I/F = DN * scaling_factor + offset",
+      "scaling_factor": 0.0001330211849961,
+      "offset": 0.0854681021532689,
+      "display_stretch_dn": [
+        null,
+        null
+      ],
+      "core_null": 0,
+      "low_saturation_dn": 1,
+      "high_saturation_dn": 255,
+      "candidate_count_by_safe_class_capped": {
+        "0": 2765,
+        "1": 4925
+      },
+      "accepted_before_class_cap_by_safe_label": {
+        "0": 2765,
+        "1": 4925
+      },
+      "grid_candidates": 13545,
+      "excluded_joint_coverage": 10,
+      "excluded_dtm_coverage": 5845,
+      "excluded_slope_support": 0,
+      "class_cap_excluded": 0,
+      "sitewise_image_stretch": false,
+      "valid_fraction_in_retained_patches": 0.9998883747155397,
+      "label_crs_and_transform_used": true
+    }
+  ],
+  "patch_count": 15233,
+  "class_counts": {
+    "0": 8387,
+    "1": 6846
+  },
+  "site_class_counts": {
+    "site_01": {
+      "0": 1983,
+      "1": 212
+    },
+    "site_02": {
+      "0": 1135,
+      "1": 750
+    },
+    "site_03": {
+      "0": 1676,
+      "1": 808
+    },
+    "site_04": {
+      "0": 828,
+      "1": 151
+    },
+    "site_05": {
+      "0": 2765,
+      "1": 4925
+    }
+  },
+  "split_image_ids": {
+    "0": [
+      "site_01"
+    ],
+    "1": [
+      "site_02"
+    ],
+    "2": [
+      "site_03"
+    ],
+    "3": [
+      "site_04"
+    ],
+    "4": [
+      "site_05"
+    ]
+  },
+  "method": "native DTM derivatives, 128 m windows, mask-aware imagery averaging to 64x64 at nominal 2 m/px; model channels are calibrated image, DTM-valid coverage, image-valid coverage; no 0.5 m upsampling",
+  "controlled_evaluation": true,
+  "site_fold_order": [
+    "site_01",
+    "site_02",
+    "site_03",
+    "site_04",
+    "site_05"
+  ]
+}

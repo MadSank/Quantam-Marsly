@@ -1,0 +1,49 @@
+﻿# ---------- Python environments (recreate from pyproject.toml) ----------
+.venv*/
+venv/
+env/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# ---------- Archives ----------
+*.zip
+
+# ---------- Raw planetary data (public HiRISE / LRO downloads) ----------
+data/raw/
+*.tif
+*.tiff
+*.IMG
+*.img
+*.jp2
+*.LBL
+
+# ---------- Training artifacts ----------
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+**/shards/
+**/processed/shards/
+*.npy
+*.npz
+*.h5
+*.hdf5
+
+# ---------- Website build (for later) ----------
+node_modules/
+dist/
+
+# ---------- Secrets ----------
+.env
+*.env
+
+# ---------- Editor / OS ----------
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+path/to/the/file_or_folder

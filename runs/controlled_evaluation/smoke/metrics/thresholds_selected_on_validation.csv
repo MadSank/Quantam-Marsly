@@ -1,0 +1,3 @@
+model,fold,seed,test_site,risk_threshold,target_validation_fpr,validation_TP,validation_FP,validation_TN,validation_FN,validation_safe_precision,validation_safe_recall,validation_specificity,validation_false_positive_rate,validation_false_discovery_rate,validation_predicted_safe_fraction,validation_n_tiles,validation_n_actually_safe,validation_n_actually_unsafe
+CNN,0,42,site_01,9.304580688476562,0.05,27,56,1079,723,0.3253012048192771,0.036,0.9506607929515418,0.04933920704845815,0.6746987951807228,0.04403183023872679,1885,750,1135
+CNN_QCNN,0,42,site_01,1.5212082862854004,0.05,77,56,1079,673,0.5789473684210527,0.10266666666666667,0.9506607929515418,0.04933920704845815,0.42105263157894735,0.07055702917771883,1885,750,1135

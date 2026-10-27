@@ -1,0 +1,45 @@
+{
+  "planned_folds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "planned_seeds": [
+    42
+  ],
+  "completed": [
+    {
+      "fold": 0,
+      "seed": 42,
+      "test_site": "site_01"
+    },
+    {
+      "fold": 1,
+      "seed": 42,
+      "test_site": "site_02"
+    },
+    {
+      "fold": 2,
+      "seed": 42,
+      "test_site": "site_03"
+    },
+    {
+      "fold": 3,
+      "seed": 42,
+      "test_site": "site_04"
+    },
+    {
+      "fold": 4,
+      "seed": 42,
+      "test_site": "site_05"
+    }
+  ],
+  "status": "completed",
+  "last_completed": {
+    "fold": 4,
+    "seed": 42,
+    "test_site": "site_05"
+  }
+}

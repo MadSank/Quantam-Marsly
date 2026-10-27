@@ -1,0 +1,6 @@
+site_id,ortho_path,dtm_path,label_path,ortho_band
+site_01,data/raw/site_01/ESP_062806_2150_RED_C_01_ORTHO.JP2,data/raw/site_01/DTEEC_062740_2150_062806_2150_A01.IMG,%TEMP%/MarsQCNN_PhaseB1/site_01_ESP_062806_2150_RED_C_01_ORTHO.LBL,1
+site_02,data/raw/kaiser_crater/ESP_039245_1325_RED_D_01_ORTHO.JP2,data/raw/kaiser_crater/DTEED_039245_1325_039944_1325_A01.IMG,%TEMP%/MarsQCNN_PhaseB1/site_02_ESP_039245_1325_RED_D_01_ORTHO.LBL,1
+site_03,data/raw/layered_yardangs/ESP_023051_1865_RED_C_01_ORTHO.JP2,data/raw/layered_yardangs/DTEEC_022774_1865_023051_1865_A01.IMG,%TEMP%/MarsQCNN_PhaseB1/site_03_ESP_023051_1865_RED_C_01_ORTHO.LBL,1
+site_04,data/raw/Coprates_Chasma/ESP_026417_1660_IRB_C_01_ORTHO.JP2,data/raw/Coprates_Chasma/DTEEC_018347_1660_026417_1660_A01.IMG,%TEMP%/MarsQCNN_PhaseB1/site_04_ESP_026417_1660_IRB_C_01_ORTHO.LBL,2
+site_05,data/raw/Huo_Hsing_Vallis/PSP_003495_2065_RED_C_01_ORTHO.JP2,data/raw/Huo_Hsing_Vallis/DTEEC_003495_2065_003561_2065_A01.IMG,%TEMP%/MarsQCNN_PhaseB1/site_05_PSP_003495_2065_RED_C_01_ORTHO.LBL,1

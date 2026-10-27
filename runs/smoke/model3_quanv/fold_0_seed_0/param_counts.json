@@ -1,0 +1,5 @@
+{
+  "total_trainable": 26227,
+  "total_frozen": 0,
+  "head_trainable": 2275
+}

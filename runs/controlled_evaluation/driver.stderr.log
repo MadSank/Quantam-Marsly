@@ -1,0 +1,81 @@
+2026-10-19 18:17:04,694 [INFO] Starting run: model=model1, variant=resnet18, fold=0, seed=42 (torch=2.9.1+cu128, pennylane=0.45.1)
+2026-10-19 18:17:36,114 [INFO] Epoch [1/8] Train Loss: 0.6392 | Val Loss: 5.2568 | LR: 1.00e-04 | Time: 30.13s
+2026-10-19 18:17:59,224 [INFO] Epoch [2/8] Train Loss: 0.5025 | Val Loss: 3.6143 | LR: 9.62e-05 | Time: 22.18s
+2026-10-19 18:18:23,155 [INFO] Epoch [3/8] Train Loss: 0.4423 | Val Loss: 2.2463 | LR: 8.54e-05 | Time: 22.94s
+2026-10-19 18:18:48,655 [INFO] Epoch [4/8] Train Loss: 0.4205 | Val Loss: 0.9442 | LR: 6.91e-05 | Time: 24.63s
+2026-10-19 18:19:13,289 [INFO] Epoch [5/8] Train Loss: 0.3660 | Val Loss: 3.4564 | LR: 5.00e-05 | Time: 24.01s
+2026-10-19 18:19:32,747 [INFO] Epoch [6/8] Train Loss: 0.3282 | Val Loss: 1.9671 | LR: 3.09e-05 | Time: 18.42s
+2026-10-19 18:19:52,315 [INFO] Epoch [7/8] Train Loss: 0.2832 | Val Loss: 1.3457 | LR: 1.46e-05 | Time: 19.37s
+2026-10-19 18:19:52,513 [INFO] Early stopping triggered at epoch 7.
+2026-10-19 18:19:54,124 [INFO] Saved test fold predictions to D:\Mars-QCNN\runs\controlled_evaluation\runs\model1_resnet18\fold_0_seed_42\test_predictions.parquet
+2026-10-19 18:20:02,130 [INFO] Starting run: model=model2, variant=qcnn, fold=0, seed=42 (torch=2.9.1+cu128, pennylane=0.45.1)
+2026-10-19 18:21:18,065 [INFO] Epoch [1/8] Train Loss: 0.6385 | Val Loss: 1.2251 | LR: 1.00e-04 | Time: 75.19s
+2026-10-19 18:22:31,536 [INFO] Epoch [2/8] Train Loss: 0.5847 | Val Loss: 1.2954 | LR: 9.62e-05 | Time: 73.46s
+2026-10-19 18:23:44,808 [INFO] Epoch [3/8] Train Loss: 0.5593 | Val Loss: 1.3262 | LR: 8.54e-05 | Time: 73.27s
+2026-10-19 18:24:57,202 [INFO] Epoch [4/8] Train Loss: 0.5421 | Val Loss: 1.3686 | LR: 6.91e-05 | Time: 72.39s
+2026-10-19 18:24:57,208 [INFO] Early stopping triggered at epoch 4.
+2026-10-19 18:25:04,174 [INFO] Saved test fold predictions to D:\Mars-QCNN\runs\controlled_evaluation\runs\model2_qcnn\fold_0_seed_42\test_predictions.parquet
+2026-10-19 18:25:13,552 [INFO] Starting run: model=model1, variant=resnet18, fold=1, seed=42 (torch=2.9.1+cu128, pennylane=0.45.1)
+2026-10-19 18:25:33,874 [INFO] Epoch [1/8] Train Loss: 0.5762 | Val Loss: 1.8380 | LR: 1.00e-04 | Time: 19.50s
+2026-10-19 18:25:53,398 [INFO] Epoch [2/8] Train Loss: 0.4551 | Val Loss: 3.3060 | LR: 9.62e-05 | Time: 19.28s
+2026-10-19 18:26:12,528 [INFO] Epoch [3/8] Train Loss: 0.3975 | Val Loss: 2.8523 | LR: 8.54e-05 | Time: 18.95s
+2026-10-19 18:26:31,543 [INFO] Epoch [4/8] Train Loss: 0.3447 | Val Loss: 2.6811 | LR: 6.91e-05 | Time: 18.81s
+2026-10-19 18:26:31,757 [INFO] Early stopping triggered at epoch 4.
+2026-10-19 18:26:33,064 [INFO] Saved test fold predictions to D:\Mars-QCNN\runs\controlled_evaluation\runs\model1_resnet18\fold_1_seed_42\test_predictions.parquet
+2026-10-19 18:26:41,936 [INFO] Starting run: model=model2, variant=qcnn, fold=1, seed=42 (torch=2.9.1+cu128, pennylane=0.45.1)
+2026-10-19 18:27:55,166 [INFO] Epoch [1/8] Train Loss: 0.7431 | Val Loss: 1.7917 | LR: 1.00e-04 | Time: 72.46s
+2026-10-19 18:29:07,281 [INFO] Epoch [2/8] Train Loss: 0.6709 | Val Loss: 1.9013 | LR: 9.62e-05 | Time: 72.11s
+2026-10-19 18:30:19,471 [INFO] Epoch [3/8] Train Loss: 0.6362 | Val Loss: 1.9699 | LR: 8.54e-05 | Time: 72.18s
+2026-10-19 18:31:31,470 [INFO] Epoch [4/8] Train Loss: 0.6135 | Val Loss: 1.9988 | LR: 6.91e-05 | Time: 72.00s
+2026-10-19 18:31:31,480 [INFO] Early stopping triggered at epoch 4.
+2026-10-19 18:31:37,311 [INFO] Saved test fold predictions to D:\Mars-QCNN\runs\controlled_evaluation\runs\model2_qcnn\fold_1_seed_42\test_predictions.parquet
+2026-10-19 18:31:48,762 [INFO] Starting run: model=model1, variant=resnet18, fold=2, seed=42 (torch=2.9.1+cu128, pennylane=0.45.1)
+2026-10-19 18:32:09,378 [INFO] Epoch [1/8] Train Loss: 0.5784 | Val Loss: 1.0196 | LR: 1.00e-04 | Time: 19.74s
+2026-10-19 18:32:28,945 [INFO] Epoch [2/8] Train Loss: 0.4627 | Val Loss: 1.1914 | LR: 9.62e-05 | Time: 19.27s
+2026-10-19 18:32:49,706 [INFO] Epoch [3/8] Train Loss: 0.4093 | Val Loss: 1.1955 | LR: 8.54e-05 | Time: 20.57s
+2026-10-19 18:33:09,260 [INFO] Epoch [4/8] Train Loss: 0.3711 | Val Loss: 1.3375 | LR: 6.91e-05 | Time: 19.38s
+2026-10-19 18:33:09,467 [INFO] Early stopping triggered at epoch 4.
+2026-10-19 18:33:11,262 [INFO] Saved test fold predictions to D:\Mars-QCNN\runs\controlled_evaluation\runs\model1_resnet18\fold_2_seed_42\test_predictions.parquet
+2026-10-19 18:33:19,734 [INFO] Starting run: model=model2, variant=qcnn, fold=2, seed=42 (torch=2.9.1+cu128, pennylane=0.45.1)
+2026-10-19 18:34:32,795 [INFO] Epoch [1/8] Train Loss: 0.7560 | Val Loss: 1.4813 | LR: 1.00e-04 | Time: 72.77s
+2026-10-19 18:35:45,855 [INFO] Epoch [2/8] Train Loss: 0.6868 | Val Loss: 1.4476 | LR: 9.62e-05 | Time: 73.06s
+2026-10-19 18:36:58,914 [INFO] Epoch [3/8] Train Loss: 0.6570 | Val Loss: 1.3816 | LR: 8.54e-05 | Time: 73.05s
+2026-10-19 18:38:11,988 [INFO] Epoch [4/8] Train Loss: 0.6385 | Val Loss: 1.2510 | LR: 6.91e-05 | Time: 73.07s
+2026-10-19 18:39:25,578 [INFO] Epoch [5/8] Train Loss: 0.6255 | Val Loss: 1.2713 | LR: 5.00e-05 | Time: 73.58s
+2026-10-19 18:40:38,497 [INFO] Epoch [6/8] Train Loss: 0.6180 | Val Loss: 1.3053 | LR: 3.09e-05 | Time: 72.92s
+2026-10-19 18:41:51,216 [INFO] Epoch [7/8] Train Loss: 0.6133 | Val Loss: 1.3199 | LR: 1.46e-05 | Time: 72.71s
+2026-10-19 18:41:51,221 [INFO] Early stopping triggered at epoch 7.
+2026-10-19 18:41:58,322 [INFO] Saved test fold predictions to D:\Mars-QCNN\runs\controlled_evaluation\runs\model2_qcnn\fold_2_seed_42\test_predictions.parquet
+2026-10-19 18:42:04,549 [INFO] Starting run: model=model1, variant=resnet18, fold=3, seed=42 (torch=2.9.1+cu128, pennylane=0.45.1)
+2026-10-19 18:42:20,869 [INFO] Epoch [1/8] Train Loss: 0.7277 | Val Loss: 2.1745 | LR: 1.00e-04 | Time: 15.57s
+2026-10-19 18:42:36,252 [INFO] Epoch [2/8] Train Loss: 0.5910 | Val Loss: 1.4701 | LR: 9.62e-05 | Time: 15.16s
+2026-10-19 18:42:51,903 [INFO] Epoch [3/8] Train Loss: 0.5401 | Val Loss: 0.4532 | LR: 8.54e-05 | Time: 15.40s
+2026-10-19 18:43:07,229 [INFO] Epoch [4/8] Train Loss: 0.4950 | Val Loss: 3.1953 | LR: 6.91e-05 | Time: 15.09s
+2026-10-19 18:43:23,059 [INFO] Epoch [5/8] Train Loss: 0.4295 | Val Loss: 0.7311 | LR: 5.00e-05 | Time: 15.62s
+2026-10-19 18:43:38,747 [INFO] Epoch [6/8] Train Loss: 0.3806 | Val Loss: 4.2354 | LR: 3.09e-05 | Time: 15.50s
+2026-10-19 18:43:38,931 [INFO] Early stopping triggered at epoch 6.
+2026-10-19 18:43:39,777 [INFO] Saved test fold predictions to D:\Mars-QCNN\runs\controlled_evaluation\runs\model1_resnet18\fold_3_seed_42\test_predictions.parquet
+2026-10-19 18:43:48,866 [INFO] Starting run: model=model2, variant=qcnn, fold=3, seed=42 (torch=2.9.1+cu128, pennylane=0.45.1)
+2026-10-19 18:44:52,275 [INFO] Epoch [1/8] Train Loss: 0.8117 | Val Loss: 1.0317 | LR: 1.00e-04 | Time: 62.66s
+2026-10-19 18:45:52,856 [INFO] Epoch [2/8] Train Loss: 0.7306 | Val Loss: 0.9680 | LR: 9.62e-05 | Time: 60.58s
+2026-10-19 18:46:53,606 [INFO] Epoch [3/8] Train Loss: 0.6999 | Val Loss: 1.0747 | LR: 8.54e-05 | Time: 60.74s
+2026-10-19 18:47:56,007 [INFO] Epoch [4/8] Train Loss: 0.6788 | Val Loss: 0.9255 | LR: 6.91e-05 | Time: 62.40s
+2026-10-19 18:48:57,739 [INFO] Epoch [5/8] Train Loss: 0.6671 | Val Loss: 0.9981 | LR: 5.00e-05 | Time: 61.73s
+2026-10-19 18:49:58,442 [INFO] Epoch [6/8] Train Loss: 0.6596 | Val Loss: 1.0485 | LR: 3.09e-05 | Time: 60.70s
+2026-10-19 18:50:58,842 [INFO] Epoch [7/8] Train Loss: 0.6563 | Val Loss: 1.0062 | LR: 1.46e-05 | Time: 60.40s
+2026-10-19 18:50:58,846 [INFO] Early stopping triggered at epoch 7.
+2026-10-19 18:51:01,594 [INFO] Saved test fold predictions to D:\Mars-QCNN\runs\controlled_evaluation\runs\model2_qcnn\fold_3_seed_42\test_predictions.parquet
+2026-10-19 18:51:30,987 [INFO] Starting run: model=model1, variant=resnet18, fold=4, seed=42 (torch=2.9.1+cu128, pennylane=0.45.1)
+2026-10-19 18:51:41,621 [INFO] Epoch [1/8] Train Loss: 0.7219 | Val Loss: 2.2073 | LR: 1.00e-04 | Time: 9.77s
+2026-10-19 18:51:50,677 [INFO] Epoch [2/8] Train Loss: 0.6074 | Val Loss: 2.4754 | LR: 9.62e-05 | Time: 8.82s
+2026-10-19 18:52:00,141 [INFO] Epoch [3/8] Train Loss: 0.5764 | Val Loss: 3.8838 | LR: 8.54e-05 | Time: 9.32s
+2026-10-19 18:52:09,545 [INFO] Epoch [4/8] Train Loss: 0.5475 | Val Loss: 3.1901 | LR: 6.91e-05 | Time: 9.22s
+2026-10-19 18:52:09,712 [INFO] Early stopping triggered at epoch 4.
+2026-10-19 18:52:14,611 [INFO] Saved test fold predictions to D:\Mars-QCNN\runs\controlled_evaluation\runs\model1_resnet18\fold_4_seed_42\test_predictions.parquet
+2026-10-19 18:52:23,340 [INFO] Starting run: model=model2, variant=qcnn, fold=4, seed=42 (torch=2.9.1+cu128, pennylane=0.45.1)
+2026-10-19 18:52:59,812 [INFO] Epoch [1/8] Train Loss: 0.7979 | Val Loss: 2.1924 | LR: 1.00e-04 | Time: 35.76s
+2026-10-19 18:53:36,196 [INFO] Epoch [2/8] Train Loss: 0.7351 | Val Loss: 2.3585 | LR: 9.62e-05 | Time: 36.38s
+2026-10-19 18:54:11,886 [INFO] Epoch [3/8] Train Loss: 0.7095 | Val Loss: 2.4563 | LR: 8.54e-05 | Time: 35.68s
+2026-10-19 18:54:47,443 [INFO] Epoch [4/8] Train Loss: 0.6957 | Val Loss: 2.5275 | LR: 6.91e-05 | Time: 35.55s
+2026-10-19 18:54:47,446 [INFO] Early stopping triggered at epoch 4.
+2026-10-19 18:55:09,393 [INFO] Saved test fold predictions to D:\Mars-QCNN\runs\controlled_evaluation\runs\model2_qcnn\fold_4_seed_42\test_predictions.parquet

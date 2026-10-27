@@ -1,0 +1,4 @@
+2026-10-19 18:13:09,095 [INFO] Starting run: model=model1, variant=resnet18, fold=0, seed=101 (torch=2.9.1+cu128, pennylane=0.45.1)
+2026-10-19 18:13:44,157 [INFO] Epoch [1/2] Train Loss: 0.6310 | Val Loss: 1.0640 | LR: 1.00e-04 | Time: 33.51s
+2026-10-19 18:14:07,487 [INFO] Epoch [2/2] Train Loss: 0.4740 | Val Loss: 3.3105 | LR: 5.00e-05 | Time: 22.38s
+2026-10-19 18:14:10,290 [INFO] Saved test fold predictions to D:\Mars-QCNN\runs\controlled_evaluation\resume_smoke\runs\model1_resnet18\fold_0_seed_101\test_predictions.parquet

@@ -1,0 +1,105 @@
+controlled_root: D:/Mars-QCNN/runs/controlled_evaluation
+controlled_evaluation: true
+project_name: mars_qcnn_controlled_all_site
+paths:
+  manifest_path: data/real_manifest.csv
+  raw_dir: data/raw
+  processed_dir: D:/Mars-QCNN/runs/controlled_evaluation/processed
+  cache_dir: D:\Mars-QCNN\runs\controlled_evaluation\cache\fold_1_seed_42
+  runs_dir: D:\Mars-QCNN\runs\controlled_evaluation\runs
+  results_dir: D:\Mars-QCNN\runs\controlled_evaluation\results
+preprocessing:
+  gsd_m: 2.0
+  tile_px: 64
+  train_stride_px: 64
+  max_masked_fraction: 0.05
+  slope_baselines_m:
+  - 5.0
+  - 15.0
+  primary_baseline_m: 5.0
+  hazard_slope_deg: 15.0
+  safe_mean_slope_deg: 8.0
+  safe_hazard_fraction: 0.05
+  max_tiles_per_class_per_site: null
+  sitewise_image_stretch: false
+  target_cols:
+  - mean_slope_5m
+  - roughness_m
+  - hazard_fraction
+  log1p_targets:
+  - mean_slope_5m
+  - roughness_m
+  - hazard_fraction
+features:
+  use_sun_features: false
+augmentation:
+  enable_photometric: false
+  brightness_jitter: 0.05
+  contrast_jitter: 0.05
+  gaussian_noise_std: 0.01
+  enable_geometric: false
+splits:
+  n_splits: 5
+  split_seed: 42
+  site_order:
+  - site_01
+  - site_02
+  - site_03
+  - site_04
+  - site_05
+training:
+  seeds:
+  - 42
+  epochs: 8
+  batch_size: 16
+  lr: 0.0001
+  weight_decay: 0.0001
+  early_stopping_patience: 3
+  num_workers: 0
+  device: cuda
+models:
+  model1:
+    pretrained: false
+    input_channels: 3
+    backbone_dim: 512
+    mlp_hidden: 128
+    dropout: 0.1
+    variants:
+    - resnet18
+  model2:
+    bottleneck_dim: 8
+    n_qubits: 8
+    n_conv_layers: 3
+    mlp_control_hidden: 4
+    perm_seed: 1337
+    variants:
+    - qcnn
+safety:
+  default_slope_deg: 8.0
+  default_hazard_fraction: 0.05
+  validation_fpr_target: 0.05
+  calibrated_risk_definition: max(predicted_slope / 8 deg, predicted_hazard_fraction
+    / 0.05)
+input_normalization:
+  if_low: 0.042999267578125
+  if_high: 0.16162109375
+  fit_percentiles:
+  - 2.0
+  - 98.0
+  fit_scope: valid pixels from training-fold patches only
+  fit_sites:
+  - site_01
+  - site_04
+  - site_05
+  fit_patch_count: 10864
+  fit_valid_pixel_count: 44492631
+controlled_run:
+  fold: 1
+  seed: 42
+  test_site: site_02
+  validation_site: site_03
+  training_sites:
+  - site_01
+  - site_04
+  - site_05
+  normalization_fit_scope: valid pixels from training-fold patches only

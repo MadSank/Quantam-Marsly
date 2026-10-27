@@ -1,0 +1,45 @@
+{
+  "fold": 2,
+  "seed": 42,
+  "test_site": "site_03",
+  "validation_site": "site_04",
+  "training_sites": [
+    "site_01",
+    "site_02",
+    "site_05"
+  ],
+  "normalization_fit_scope": "valid pixels from training-fold patches only",
+  "train_count": 11770,
+  "validation_count": 979,
+  "test_count": 2484,
+  "training_safe_counts": {
+    "0": 5883,
+    "1": 5887
+  },
+  "validation_safe_counts": {
+    "0": 828,
+    "1": 151
+  },
+  "test_safe_counts": {
+    "0": 1676,
+    "1": 808
+  },
+  "normalization": {
+    "if_low": 0.0748291015625,
+    "if_high": 0.1612548828125,
+    "clip": false,
+    "application": "training-fold affine transform; no clipping; invalid image pixels set to zero",
+    "fit_percentiles": [
+      2.0,
+      98.0
+    ],
+    "fit_scope": "valid pixels from training-fold patches only",
+    "fit_sites": [
+      "site_01",
+      "site_02",
+      "site_05"
+    ],
+    "fit_patch_count": 11770,
+    "fit_valid_pixel_count": 48203057
+  }
+}

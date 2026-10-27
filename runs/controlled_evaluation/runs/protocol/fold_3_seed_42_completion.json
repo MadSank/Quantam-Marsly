@@ -1,0 +1,63 @@
+{
+  "fold": 3,
+  "seed": 42,
+  "test_site": "site_04",
+  "validation_site": "site_05",
+  "training_sites": [
+    "site_01",
+    "site_02",
+    "site_03"
+  ],
+  "normalization_fit_scope": "valid pixels from training-fold patches only",
+  "train_count": 6564,
+  "validation_count": 7690,
+  "test_count": 979,
+  "training_safe_counts": {
+    "0": 4794,
+    "1": 1770
+  },
+  "validation_safe_counts": {
+    "0": 2765,
+    "1": 4925
+  },
+  "test_safe_counts": {
+    "0": 828,
+    "1": 151
+  },
+  "normalization": {
+    "if_low": 0.07269287109375,
+    "if_high": 0.186767578125,
+    "fit_percentiles": [
+      2.0,
+      98.0
+    ],
+    "fit_scope": "valid pixels from training-fold patches only",
+    "fit_sites": [
+      "site_01",
+      "site_02",
+      "site_03"
+    ],
+    "fit_patch_count": 6564,
+    "fit_valid_pixel_count": 26881095
+  },
+  "cnn_status": "complete",
+  "qcnn_status": "complete",
+  "elapsed_seconds": 565.9631445000123,
+  "torch_version": "2.9.1+cu128",
+  "cuda_version": "12.8",
+  "cuda_available": true,
+  "gpu_name": "NVIDIA GeForce RTX 4070 Laptop GPU",
+  "cnn_wall_seconds": 95.50044070000877,
+  "embedding_wall_seconds": 8.800333799998043,
+  "qcnn_wall_seconds": 432.83448950000457,
+  "cnn_peak_cuda_allocated_bytes": 258266624,
+  "gpu_total_memory_bytes": 8585216000,
+  "qcnn_simulator": "PennyLane default.qubit on CPU",
+  "smoke": false,
+  "identical_test_ids": true,
+  "identical_validation_ids": true,
+  "finite_cnn_test": true,
+  "finite_qcnn_test": true,
+  "system_ram_total_bytes": null,
+  "system_ram_available_bytes_at_completion": null
+}

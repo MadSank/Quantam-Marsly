@@ -1,0 +1,80 @@
+'0':
+  if_low: 0.043121337890625
+  if_high: 0.1845703125
+  clip: false
+  application: training-fold affine transform; no clipping; invalid image pixels set
+    to zero
+  fit_percentiles:
+  - 2.0
+  - 98.0
+  fit_scope: valid pixels from training-fold patches only
+  fit_sites:
+  - site_03
+  - site_04
+  - site_05
+  fit_patch_count: 11153
+  fit_valid_pixel_count: 45676558
+'1':
+  if_low: 0.042999267578125
+  if_high: 0.16162109375
+  clip: false
+  application: training-fold affine transform; no clipping; invalid image pixels set
+    to zero
+  fit_percentiles:
+  - 2.0
+  - 98.0
+  fit_scope: valid pixels from training-fold patches only
+  fit_sites:
+  - site_01
+  - site_04
+  - site_05
+  fit_patch_count: 10864
+  fit_valid_pixel_count: 44492631
+'2':
+  if_low: 0.0748291015625
+  if_high: 0.1612548828125
+  clip: false
+  application: training-fold affine transform; no clipping; invalid image pixels set
+    to zero
+  fit_percentiles:
+  - 2.0
+  - 98.0
+  fit_scope: valid pixels from training-fold patches only
+  fit_sites:
+  - site_01
+  - site_02
+  - site_05
+  fit_patch_count: 11770
+  fit_valid_pixel_count: 48203057
+'3':
+  if_low: 0.07269287109375
+  if_high: 0.186767578125
+  clip: false
+  application: training-fold affine transform; no clipping; invalid image pixels set
+    to zero
+  fit_percentiles:
+  - 2.0
+  - 98.0
+  fit_scope: valid pixels from training-fold patches only
+  fit_sites:
+  - site_01
+  - site_02
+  - site_03
+  fit_patch_count: 6564
+  fit_valid_pixel_count: 26881095
+'4':
+  if_low: 0.0401611328125
+  if_high: 0.1875
+  clip: false
+  application: training-fold affine transform; no clipping; invalid image pixels set
+    to zero
+  fit_percentiles:
+  - 2.0
+  - 98.0
+  fit_scope: valid pixels from training-fold patches only
+  fit_sites:
+  - site_02
+  - site_03
+  - site_04
+  fit_patch_count: 5348
+  fit_valid_pixel_count: 21899949

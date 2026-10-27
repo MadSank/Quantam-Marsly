@@ -1,0 +1,105 @@
+augmentation:
+  brightness_jitter: 0.05
+  contrast_jitter: 0.05
+  enable_geometric: false
+  enable_photometric: false
+  gaussian_noise_std: 0.01
+controlled_evaluation: true
+controlled_root: D:/Mars-QCNN/runs/controlled_evaluation
+controlled_run:
+  fold: 3
+  normalization_fit_scope: valid pixels from training-fold patches only
+  seed: 42
+  test_site: site_04
+  training_sites:
+  - site_01
+  - site_02
+  - site_03
+  validation_site: site_05
+features:
+  use_sun_features: false
+input_normalization:
+  fit_patch_count: 6564
+  fit_percentiles:
+  - 2.0
+  - 98.0
+  fit_scope: valid pixels from training-fold patches only
+  fit_sites:
+  - site_01
+  - site_02
+  - site_03
+  fit_valid_pixel_count: 26881095
+  if_high: 0.186767578125
+  if_low: 0.07269287109375
+models:
+  model1:
+    backbone_dim: 512
+    dropout: 0.1
+    input_channels: 3
+    mlp_hidden: 128
+    pretrained: false
+    variants:
+    - resnet18
+  model2:
+    bottleneck_dim: 8
+    mlp_control_hidden: 4
+    n_conv_layers: 3
+    n_qubits: 8
+    perm_seed: 1337
+    variants:
+    - qcnn
+paths:
+  cache_dir: D:\Mars-QCNN\runs\controlled_evaluation\cache\fold_3_seed_42
+  manifest_path: data/real_manifest.csv
+  processed_dir: D:/Mars-QCNN/runs/controlled_evaluation/processed
+  raw_dir: data/raw
+  results_dir: D:\Mars-QCNN\runs\controlled_evaluation\results
+  runs_dir: D:\Mars-QCNN\runs\controlled_evaluation\runs
+preprocessing:
+  gsd_m: 2.0
+  hazard_slope_deg: 15.0
+  log1p_targets:
+  - mean_slope_5m
+  - roughness_m
+  - hazard_fraction
+  max_masked_fraction: 0.05
+  max_tiles_per_class_per_site: null
+  primary_baseline_m: 5.0
+  safe_hazard_fraction: 0.05
+  safe_mean_slope_deg: 8.0
+  sitewise_image_stretch: false
+  slope_baselines_m:
+  - 5.0
+  - 15.0
+  target_cols:
+  - mean_slope_5m
+  - roughness_m
+  - hazard_fraction
+  tile_px: 64
+  train_stride_px: 64
+project_name: mars_qcnn_controlled_all_site
+safety:
+  calibrated_risk_definition: max(predicted_slope / 8 deg, predicted_hazard_fraction
+    / 0.05)
+  default_hazard_fraction: 0.05
+  default_slope_deg: 8.0
+  validation_fpr_target: 0.05
+splits:
+  n_splits: 5
+  site_order:
+  - site_01
+  - site_02
+  - site_03
+  - site_04
+  - site_05
+  split_seed: 42
+training:
+  batch_size: 16
+  device: cuda
+  early_stopping_patience: 3
+  epochs: 8
+  lr: 0.0001
+  num_workers: 0
+  seeds:
+  - 42
+  weight_decay: 0.0001

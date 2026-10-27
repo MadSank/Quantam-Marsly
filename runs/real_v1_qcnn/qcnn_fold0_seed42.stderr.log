@@ -1,0 +1,8 @@
+2026-10-19 14:37:25,604 [INFO] Starting run: model=model2, variant=qcnn, fold=0, seed=42 (torch=2.9.1+cu128, pennylane=0.45.1)
+2026-10-19 14:37:53,733 [INFO] Epoch [1/6] Train Loss: 0.7143 | Val Loss: 2.0390 | LR: 1.00e-04 | Time: 27.61s
+2026-10-19 14:38:21,177 [INFO] Epoch [2/6] Train Loss: 0.6591 | Val Loss: 1.9725 | LR: 9.33e-05 | Time: 27.44s
+2026-10-19 14:38:48,644 [INFO] Epoch [3/6] Train Loss: 0.6459 | Val Loss: 2.0258 | LR: 7.50e-05 | Time: 27.46s
+2026-10-19 14:39:16,151 [INFO] Epoch [4/6] Train Loss: 0.6375 | Val Loss: 1.9887 | LR: 5.00e-05 | Time: 27.50s
+2026-10-19 14:39:43,565 [INFO] Epoch [5/6] Train Loss: 0.6323 | Val Loss: 1.9714 | LR: 2.50e-05 | Time: 27.41s
+2026-10-19 14:40:11,055 [INFO] Epoch [6/6] Train Loss: 0.6289 | Val Loss: 2.0094 | LR: 6.70e-06 | Time: 27.48s
+2026-10-19 14:40:13,528 [INFO] Saved test fold predictions to runs\real_v1_qcnn\model2_qcnn\fold_0_seed_42\test_predictions.parquet

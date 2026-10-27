@@ -1,0 +1,9 @@
+2026-10-19 14:34:34,258 [INFO] Starting run: model=model1, variant=resnet18, fold=0, seed=42 (torch=2.9.1+cu128, pennylane=0.45.1)
+2026-10-19 14:34:37,897 [INFO] Found existing checkpoint runs\real_v1\model1_resnet18\fold_0_seed_42\last_checkpoint.pt. Restoring state...
+2026-10-19 14:34:47,856 [INFO] Epoch [4/12] Train Loss: 0.5398 | Val Loss: 1.5725 | LR: 8.54e-05 | Time: 9.84s
+2026-10-19 14:34:56,683 [INFO] Epoch [5/12] Train Loss: 0.4755 | Val Loss: 2.8702 | LR: 7.50e-05 | Time: 8.62s
+2026-10-19 14:35:05,407 [INFO] Epoch [6/12] Train Loss: 0.4277 | Val Loss: 1.6288 | LR: 6.29e-05 | Time: 8.52s
+2026-10-19 14:35:14,050 [INFO] Epoch [7/12] Train Loss: 0.3698 | Val Loss: 1.6527 | LR: 5.00e-05 | Time: 8.48s
+2026-10-19 14:35:22,680 [INFO] Epoch [8/12] Train Loss: 0.2973 | Val Loss: 2.3572 | LR: 3.71e-05 | Time: 8.44s
+2026-10-19 14:35:22,859 [INFO] Early stopping triggered at epoch 8.
+2026-10-19 14:35:23,390 [INFO] Saved test fold predictions to runs\real_v1\model1_resnet18\fold_0_seed_42\test_predictions.parquet

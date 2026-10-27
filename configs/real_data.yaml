@@ -1,0 +1,78 @@
+project_name: mars_qcnn_real_first_run
+paths:
+  manifest_path: data/real_manifest.csv
+  raw_dir: data/raw
+  processed_dir: data/processed/real_v1
+  cache_dir: data/cache/real_v1
+  runs_dir: runs/real_v1
+  results_dir: results/real_v1
+preprocessing:
+  gsd_m: 2.0
+  tile_px: 64
+  train_stride_px: 64
+  max_masked_fraction: 0.05
+  slope_baselines_m: [5.0, 15.0]
+  primary_baseline_m: 5.0
+  hazard_slope_deg: 15.0
+  safe_mean_slope_deg: 8.0
+  safe_hazard_fraction: 0.05
+  percentile_low: 2.0
+  percentile_high: 98.0
+  max_tiles_per_image: 1500
+  stratify_quantiles: 10
+  mars_radius_m: 3396190.0
+  target_cols: [mean_slope_5m, roughness_m, hazard_fraction]
+  log1p_targets: [mean_slope_5m, roughness_m, hazard_fraction]
+features:
+  use_sun_features: false
+augmentation:
+  enable_photometric: true
+  brightness_jitter: 0.05
+  contrast_jitter: 0.05
+  gaussian_noise_std: 0.01
+  enable_geometric: false
+splits:
+  n_splits: 5
+  split_seed: 42
+training:
+  seeds: [42]
+  epochs: 12
+  batch_size: 16
+  lr: 0.0001
+  weight_decay: 0.0001
+  early_stopping_patience: 4
+  num_workers: 0
+  device: cpu
+models:
+  model1:
+    pretrained: false
+    input_channels: 3
+    backbone_dim: 512
+    mlp_hidden: 128
+    dropout: 0.1
+    variants: [resnet18]
+  model2:
+    bottleneck_dim: 8
+    n_qubits: 8
+    n_conv_layers: 3
+    mlp_control_hidden: 4
+    perm_seed: 1337
+    variants: [qcnn, linear_control, mlp_control, no_entanglement_control, permuted_qubits_control]
+  model3:
+    downsample_px: 32
+    patch_size: 2
+    stride: 2
+    n_qubits: 4
+    n_random_layers: 2
+    quanv_seed: 2026
+    cnn_channels: [16, 32, 64]
+    variants: [quanv, classical_filter_control, plain_cnn_control]
+  model4:
+    downsample_px: 16
+    base_qubits: 8
+    sun_qubits: 2
+    n_conv_layers: 3
+    mlp_control_hidden: 32
+    variants: [pure_qcnn, tiny_cnn_control, mlp_control]
+smoke:
+  enabled: false
