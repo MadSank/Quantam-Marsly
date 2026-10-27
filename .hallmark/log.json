@@ -1,0 +1,27 @@
+[
+ {
+  "shape": "split-studio",
+  "theme": "vantage",
+  "axes": "dark/grotesk-sans/steel",
+  "hero": "index",
+  "nav": "edge-aligned",
+  "footer": "colophon",
+  "imagery": "project data: HiRISE crop, LROCNet mosaic",
+  "photos": [],
+  "entry": "none",
+  "fingerprint": "diptych-doors",
+  "sections": [
+   "hero: two doors",
+   "footer: colophon"
+  ],
+  "signature": "Mars crater strip beside the Moon crater crops",
+  "waived": [
+   "77",
+   "59"
+  ],
+  "prompt": "Choose a world: Mars or Moon landing for the CNN vs hybrid CNN-QCNN study",
+  "scope": "page",
+  "date": "2026-10-27",
+  "mode": "build"
+ }
+]

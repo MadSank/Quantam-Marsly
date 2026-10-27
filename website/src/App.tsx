@@ -1,19 +1,10 @@
 import { MotionConfig } from 'motion/react'
 import { Link, Navigate, Route, Routes } from 'react-router'
+import { Landing } from './pages/Landing'
 import { WorldLayout } from './theme/WorldLayout'
 import type { World } from './theme/world'
 
-// Placeholder pages; replaced by the real views in build steps 5–10 (PLAN.md).
-function Landing() {
-  return (
-    <main>
-      <h1>Choose a world</h1>
-      <nav aria-label="Worlds">
-        <Link to="/mars">Mars</Link> · <Link to="/moon">Moon</Link> · <Link to="/about">About</Link>
-      </nav>
-    </main>
-  )
-}
+// Placeholder pages; replaced by the real views in build steps 6–11 (PLAN.md).
 
 function Explorer({ world }: { world: World }) {
   return (

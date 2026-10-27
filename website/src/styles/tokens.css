@@ -1,34 +1,86 @@
 /*
  * Semantic design tokens. Shared components read only these names; each world
- * redefines them under [data-world]. Token names are fixed by website/PLAN.md.
+ * redefines the colour tokens under [data-world]. Token names are fixed by website/PLAN.md.
  *
  * Rules (PLAN.md "Theme tokens"):
  *  - --model-cnn is always the warm hue, --model-qcnn always the cool hue.
  *  - --truth-safe / --truth-unsafe are for ground truth only, never predictions.
+ *
+ * The neutral shell (landing, About, Lab) follows Hallmark's Vantage theme: blue-black
+ * steel, Geologica, hairline corner ticks. Vantage's lime signal is not used, because
+ * green is reserved for ground truth. Scale tokens come from the Hallmark scaffold.
  */
 
-/* Neutral shell: landing and About pages. */
 :root {
   color-scheme: dark;
 
-  --bg: #0c0c0d;
-  --surface: #161618;
-  --surface-2: #1f1f22;
-  --border: #303034;
-  --text: #f0efed;
-  --text-muted: #a3a19d;
-  --accent: #d9d6d0;
-  --accent-2: #8a8782;
+  /* Neutral shell colours (Vantage steel). */
+  --bg: oklch(13.5% 0.012 235);
+  --surface: oklch(17% 0.014 235);
+  --surface-2: oklch(21% 0.016 235);
+  --border: oklch(34% 0.016 235);
+  --rule: oklch(27% 0.014 235);
+  --text: oklch(95% 0.006 230);
+  --text-2: oklch(82% 0.012 230);
+  --text-muted: oklch(70% 0.016 230);
+  --accent: oklch(92% 0.012 230);
+  --accent-ink: oklch(16% 0.014 235);
+  --accent-2: oklch(66% 0.016 230);
   --model-cnn: #e8a15a;
   --model-qcnn: #7fb2c4;
   --model-mlp: #b9a6e0;
   --truth-safe: #9bc27a;
   --truth-unsafe: #d9573a;
-  --focus: #ffffff;
+  --focus: oklch(96% 0.01 230);
 
-  --font-display: Georgia, 'Times New Roman', serif;
-  --font-body: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Type. */
+  --font-display: 'Geologica', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Geologica', ui-sans-serif, system-ui, sans-serif;
   --font-numeric: var(--font-body);
+  --tracking-display: -0.035em;
+  --display-weight: 300;
+  --text-xs: 0.8125rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-body: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-display-s: clamp(2.25rem, 4vw + 0.5rem, 3.75rem);
+  --text-display: clamp(2.75rem, 5vw + 1rem, 5.25rem);
+  --text-section: clamp(2rem, 2.5vw + 1rem, 3.5rem);
+  --text-title: clamp(1.25rem, 0.75vw + 0.875rem, 1.625rem);
+  --text-lead: clamp(1.125rem, 0.35vw + 1rem, 1.375rem);
+
+  /* Space, layout, shape. */
+  --space-3xs: 2px;
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+  --space-2xl: 64px;
+  --space-3xl: 96px;
+  --space-4xl: 144px;
+  --container: 1440px;
+  --gutter: 64px;
+  --gap-columns: 32px;
+  --radius-card: 4px;
+  --radius-pill: 999px;
+  --rule-hair: 1px;
+  --tick: 10px;
+
+  /* Motion. */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --dur-long: 420ms;
+
+  /* Layers. */
+  --z-base: 1;
+  --z-raised: 10;
+  --z-sticky-nav: 300;
 }
 
 [data-world='mars'] {
@@ -36,9 +88,12 @@
   --surface: #2a1810;
   --surface-2: #3a2216;
   --border: #5a3422;
+  --rule: #4a2a1b;
   --text: #f4e6d8;
+  --text-2: #e2cdb8;
   --text-muted: #c29a7c;
   --accent: #d2691e;
+  --accent-ink: #1a0f0a;
   --accent-2: #c8962e;
   --model-cnn: #e8a15a;
   --model-qcnn: #7fb2c4;
@@ -52,9 +107,12 @@
   --surface: #121418;
   --surface-2: #1c1f24;
   --border: #2e333b;
+  --rule: #24282e;
   --text: #f2f4f7;
+  --text-2: #d5dae1;
   --text-muted: #9aa3ae;
   --accent: #e6e9ee;
+  --accent-ink: #08090b;
   --accent-2: #7e8896;
   --model-cnn: #e8c58f;
   --model-qcnn: #8fb7e8;
@@ -62,4 +120,17 @@
   --truth-safe: #9bc27a;
   --truth-unsafe: #e06a5a;
   --focus: #ffffff;
+}
+
+@media (max-width: 60rem) {
+  :root {
+    --gutter: 24px;
+  }
+}
+
+@media (max-width: 40rem) {
+  :root {
+    --gutter: 16px;
+    --gap-columns: 16px;
+  }
 }

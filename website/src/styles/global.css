@@ -1,5 +1,7 @@
 @import './tokens.css';
 
+/* Base rules from the Hallmark scaffold (base.css), on the plan's token names. */
+
 *,
 *::before,
 *::after {
@@ -8,11 +10,22 @@
 
 html,
 body {
+  overflow-x: clip;
+}
+
+html {
+  scrollbar-color: var(--text-muted) var(--bg);
+}
+
+body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
-  line-height: 1.5;
+  font-size: var(--text-body);
+  font-weight: 300;
+  font-variation-settings: 'SHRP' 0;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -26,13 +39,83 @@ body {
   color: var(--text);
 }
 
-a {
-  color: var(--accent);
+::selection {
+  background: color-mix(in oklab, var(--accent) 28%, transparent);
+  color: var(--text);
 }
 
 :focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-variation-settings: 'SHRP' 100;
+  font-synthesis: none;
+  letter-spacing: var(--tracking-display);
+  line-height: 1.05;
+  overflow-wrap: break-word;
+  min-width: 0;
+  text-wrap: balance;
+}
+
+h1 {
+  max-width: 20ch;
+  font-size: var(--text-display);
+}
+
+h2 {
+  max-width: 30ch;
+  font-size: var(--text-section);
+}
+
+h3 {
+  max-width: 40ch;
+  font-size: var(--text-title);
+  line-height: 1.2;
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 @media (prefers-reduced-motion: reduce) {

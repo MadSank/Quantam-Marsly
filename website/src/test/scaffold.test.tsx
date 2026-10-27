@@ -16,7 +16,7 @@ function renderAt(path: string) {
 describe('routing', () => {
   it('renders the landing page at /', () => {
     renderAt('/')
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Choose a world')
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Choose a world.')
   })
 
   it.each(['mars', 'moon'] as const)('applies the %s world tokens', (world) => {
@@ -33,7 +33,7 @@ describe('routing', () => {
 
   it('redirects unknown paths to the landing page', () => {
     renderAt('/nowhere')
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Choose a world')
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Choose a world.')
   })
 })
 

@@ -1,0 +1,255 @@
+/* Hallmark · shape: Split Studio (a one-screen diptych; the explorers are the sections) · genre: modern-minimal · theme: Vantage (deal 3/3, seed choose-world-mars-moon-72dc·340f42ab·2026-10-27·r0) · job: try (open an explorer) · draw: none (one-screen chooser fixed by website/PLAN.md)
+ * hero: Index (the two doors are the visual) · nav: edge-aligned, a wordmark and one link · footer: colophon block · imagery: the project's own HiRISE and LROCNet derivatives · signature: two real surfaces side by side, the Mars crater strip and the Moon crater crops · vantage: terrain/steel, lime signal replaced by each world's accent
+ * axes: dark/grotesk-sans/steel · posture: restrained · contrast: pass · fold: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H5 E4 S5 R5 V4 · weakest: E, two equal doors risk a template diptych; each door is themed by its own world tokens and shows only that world's real data */
+/* Hallmark · waive 77 · one screen, two doors, the explorers carry the sections · the landing is a chooser fixed by PLAN.md step 5, its content lives in /mars and /moon */
+/* Hallmark · waive 59 · the colophon sits 64px under the doors on a one-screen page · a 120px gap would push the caveat line about mixed results below the fold */
+
+.landing {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100dvh;
+}
+
+/* Nav: edge-aligned, wordmark and one link. */
+.landing-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  min-height: 72px;
+}
+
+.wordmark {
+  white-space: nowrap;
+  font-weight: 400;
+  font-size: var(--text-md);
+  text-decoration: none;
+}
+
+.landing-nav nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: var(--text-2);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--dur-short) var(--ease-out);
+}
+
+.landing-nav nav a:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+.wordmark:focus-visible,
+.landing-nav nav a:focus-visible,
+.landing-foot a:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Head: the line beside the headline, baselines aligned. */
+.landing-main {
+  display: grid;
+  align-items: center;
+}
+
+.landing-hero {
+  display: grid;
+  gap: var(--space-xl);
+  padding-block: var(--space-lg) var(--space-xl);
+}
+
+.landing-head {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+  gap: var(--gap-columns);
+  align-items: baseline;
+}
+
+.landing-head .lead {
+  font-size: var(--text-lead);
+  line-height: 1.45;
+  color: var(--text-2);
+  max-width: 40ch;
+}
+
+/* The doors. */
+.doors {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--gap-columns);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.door {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+  background: var(--surface);
+  color: var(--text);
+  border-radius: var(--radius-card);
+  text-decoration: none;
+}
+
+/* Vantage corner ticks: a hairline frame drawn only at its corners. */
+.door::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: var(--rule-hair) solid var(--border);
+  border-radius: var(--radius-card);
+  -webkit-mask: conic-gradient(at var(--tick) var(--tick), transparent 75%, var(--text) 0) 0 0 / calc(100% - var(--tick)) calc(100% - var(--tick));
+  mask: conic-gradient(at var(--tick) var(--tick), transparent 75%, var(--text) 0) 0 0 / calc(100% - var(--tick)) calc(100% - var(--tick));
+  transition: border-color var(--dur-short) var(--ease-out);
+}
+
+.door:hover::after {
+  border-color: var(--accent);
+}
+
+.door:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+}
+
+.door-figure {
+  margin: 0;
+  aspect-ratio: 2 / 1;
+  overflow: hidden;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  background: var(--surface-2);
+}
+
+.door-figure img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.door-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'name figures'
+    'line line'
+    'action action';
+  align-items: baseline;
+  gap: var(--space-sm) var(--space-lg);
+  padding: var(--space-lg) var(--space-lg) var(--space-lg);
+}
+
+.door-body h2 {
+  grid-area: name;
+  font-size: var(--text-display-s);
+}
+
+.door-line {
+  grid-area: line;
+  max-width: 52ch;
+  color: var(--text-2);
+}
+
+.door-figures {
+  grid-area: figures;
+  display: flex;
+  gap: var(--space-lg);
+  margin: 0;
+}
+
+.door-figure-item {
+  white-space: nowrap;
+}
+
+.door-figures .num {
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-title);
+}
+
+.door-figures .unit {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.door-action {
+  grid-area: action;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  margin-top: var(--space-xs);
+  padding: 0 var(--space-lg);
+  border-radius: var(--radius-pill);
+  box-shadow: inset 0 0 0 var(--rule-hair) var(--border);
+  font-weight: 400;
+  font-size: var(--text-md);
+  white-space: nowrap;
+  transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out);
+}
+
+.door:hover .door-action {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.door:active .door-action {
+  transform: translateY(1px);
+}
+
+/* Footer: a colophon block. */
+.landing-foot {
+  display: grid;
+  gap: var(--space-2xs);
+  padding-block: var(--space-lg) var(--space-xl);
+  font-size: var(--text-sm);
+  color: var(--text-2);
+}
+
+.landing-foot a {
+  color: var(--text);
+}
+
+.landing-foot .credit {
+  color: var(--text-muted);
+}
+
+@media (max-width: 60rem) {
+  .landing-head,
+  .doors {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .landing-head {
+    gap: var(--space-md);
+  }
+}
+
+@media (max-width: 40rem) {
+  .door-body {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'name'
+      'figures'
+      'line'
+      'action';
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .door::after,
+  .door-action,
+  .landing-nav nav a {
+    transition: none;
+  }
+
+  .door:active .door-action {
+    transform: none;
+  }
+}

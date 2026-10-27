@@ -38,6 +38,20 @@ It also checks the exported images:
 
 `export_data.py` also refuses to write a caveat unless its text is a verbatim quote of `FINAL_READINESS_AUDIT.md` or `visualization_app/README.md`.
 
+## Design checks (Hallmark)
+
+The pages follow Hallmark's Vantage theme on the plan's token names. Each page stylesheet starts with its Hallmark stamp and any waivers (`src/styles/landing.css`).
+
+To lint a page against a running dev server:
+
+```bash
+node <hallmark-skill>/scripts/sloplint.mjs website/src/styles/landing.css website/src/pages/Landing.tsx --genre modern-minimal --render --url http://localhost:5173/
+```
+
+The render tier needs `puppeteer-core` (pass its folder in `HALLMARK_PUPPETEER`) and a local Chrome. On this Windows machine the installed skill's files have CRLF line endings, which `theme.mjs` cannot parse, so run it from an LF-normalised copy of the skill.
+
+Review screenshots for each step are in `screenshots/`.
+
 ## Layout
 
 - `src/styles/tokens.css`: semantic design tokens. The neutral shell is `:root`, and each world overrides them under `[data-world="mars"|"moon"]`. Components read only token names.

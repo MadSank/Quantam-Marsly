@@ -198,6 +198,54 @@ def export_moon(written: list[Path]) -> dict[str, Any]:
     return out
 
 
+# ---------------------------------------------------------------- landing
+
+LANDING_SIZE = (1600, 800)  # door image, 2:1 like its frame
+LANDING_MARS_SITE = "site_01"
+LANDING_MOON_PER_CLASS = 6   # crops per class in the Moon mosaic (first in sample-id order)
+LANDING_MARS_CROP = 0.7      # share of the preview width kept, so the crop stays inside the imaged area
+LANDING_MOON_COLS = 6
+
+
+def export_landing(written: list[Path], mars: dict[str, Any]) -> dict[str, Any]:
+    """Door images for the landing page, cut from the derivatives above (real data only)."""
+    out: dict[str, Any] = {}
+    w, h = LANDING_SIZE
+
+    # Mars: the centre of one strip's preview, cropped to the door's aspect (display stretch as in the preview).
+    with Image.open(OUT_DIR / mars[LANDING_MARS_SITE]["preview"]["src"]) as im:
+        preview = im.convert("LA")
+    pw, ph = preview.size
+    cw = min(round(pw * LANDING_MARS_CROP), round(ph * w / h))
+    ch = round(cw * h / w)
+    box = ((pw - cw) // 2, (ph - ch) // 2, (pw - cw) // 2 + cw, (ph - ch) // 2 + ch)
+    mars_img = preview.crop(box).resize((w, h), Image.Resampling.LANCZOS)
+    mars_path = IMG_DIR / "landing" / "mars.webp"
+    save_webp(mars_img, mars_path)
+    out["mars"] = {"src": data_rel(mars_path), "width": w, "height": h, "site_id": LANDING_MARS_SITE,
+                   "crop_from_preview": list(box)}
+
+    # Moon: a mosaic of real test crops, the same number from each class, classes interleaved.
+    summary = json.loads((OUT_DIR / "moon" / "summary.json").read_text(encoding="utf-8"))
+    per_class = [json.loads((OUT_DIR / "moon" / "classes" / f"{c}.json").read_text(encoding="utf-8"))["crops"]
+                 [:LANDING_MOON_PER_CLASS] for c in summary["classes"]]
+    crops = [c for group in zip(*per_class) for c in group]
+    cols = LANDING_MOON_COLS
+    rows = math.ceil(len(crops) / cols)
+    cell = w // cols
+    sheet = Image.new("L", (cols * cell, rows * cell), 0)
+    for i, crop in enumerate(crops):
+        with Image.open(MOON_ROOT / crop["sample_id"]) as im:
+            tile = im.convert("L").resize((cell, cell), Image.Resampling.LANCZOS)
+        sheet.paste(tile, ((i % cols) * cell, (i // cols) * cell))
+    moon_path = IMG_DIR / "landing" / "moon.webp"
+    save_webp(sheet, moon_path)
+    out["moon"] = {"src": data_rel(moon_path), "width": sheet.size[0], "height": sheet.size[1],
+                   "sample_ids": [c["sample_id"] for c in crops]}
+    written += [mars_path, moon_path]
+    return out
+
+
 # ---------------------------------------------------------------- report
 
 def size_report(written: list[Path]) -> None:
@@ -224,6 +272,7 @@ def size_report(written: list[Path]) -> None:
 def main() -> None:
     written: list[Path] = []
     manifest = {"mars": export_mars(written), "moon": export_moon(written)}
+    manifest["landing"] = export_landing(written, manifest["mars"])
     path = IMG_DIR / "manifest.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     write_json(path, manifest, compact=False)

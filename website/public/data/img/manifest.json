@@ -175,5 +175,44 @@
     "height": 324
    }
   }
+ },
+ "landing": {
+  "mars": {
+   "src": "img/landing/mars.webp",
+   "width": 1600,
+   "height": 800,
+   "site_id": "site_01",
+   "crop_from_preview": [
+    916,
+    2798,
+    5192,
+    4936
+   ]
+  },
+  "moon": {
+   "src": "img/landing/moon.webp",
+   "width": 1596,
+   "height": 798,
+   "sample_ids": [
+    "test/ejecta/M1122721870LC_pyr-1052.jpg",
+    "test/oldcrater/M1096559563RC_pyr-0055.jpg",
+    "test/none/M1096559563RC_pyr-0176.jpg",
+    "test/ejecta/M1129666960RC_pyr-0130.jpg",
+    "test/oldcrater/M1096559563RC_pyr-0111.jpg",
+    "test/none/M1096559563RC_pyr-0240.jpg",
+    "test/ejecta/M1129666960RC_pyr-0828.jpg",
+    "test/oldcrater/M1096559563RC_pyr-0127.jpg",
+    "test/none/M1096559563RC_pyr-0289.jpg",
+    "test/ejecta/M1129666960RC_pyr-0990.jpg",
+    "test/oldcrater/M1096559563RC_pyr-0193.jpg",
+    "test/none/M1096559563RC_pyr-0367.jpg",
+    "test/ejecta/M1129666960RC_pyr-1028.jpg",
+    "test/oldcrater/M1096559563RC_pyr-0198.jpg",
+    "test/none/M1096559563RC_pyr-0399.jpg",
+    "test/ejecta/M1129666960RC_pyr-1275.jpg",
+    "test/oldcrater/M1096559563RC_pyr-0408.jpg",
+    "test/none/M1096559563RC_pyr-0444.jpg"
+   ]
+  }
  }
 }
