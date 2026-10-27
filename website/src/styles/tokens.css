@@ -1,0 +1,65 @@
+/*
+ * Semantic design tokens. Shared components read only these names; each world
+ * redefines them under [data-world]. Token names are fixed by website/PLAN.md.
+ *
+ * Rules (PLAN.md "Theme tokens"):
+ *  - --model-cnn is always the warm hue, --model-qcnn always the cool hue.
+ *  - --truth-safe / --truth-unsafe are for ground truth only, never predictions.
+ */
+
+/* Neutral shell: landing and About pages. */
+:root {
+  color-scheme: dark;
+
+  --bg: #0c0c0d;
+  --surface: #161618;
+  --surface-2: #1f1f22;
+  --border: #303034;
+  --text: #f0efed;
+  --text-muted: #a3a19d;
+  --accent: #d9d6d0;
+  --accent-2: #8a8782;
+  --model-cnn: #e8a15a;
+  --model-qcnn: #7fb2c4;
+  --model-mlp: #b9a6e0;
+  --truth-safe: #9bc27a;
+  --truth-unsafe: #d9573a;
+  --focus: #ffffff;
+
+  --font-display: Georgia, 'Times New Roman', serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-numeric: var(--font-body);
+}
+
+[data-world='mars'] {
+  --bg: #1a0f0a;
+  --surface: #2a1810;
+  --surface-2: #3a2216;
+  --border: #5a3422;
+  --text: #f4e6d8;
+  --text-muted: #c29a7c;
+  --accent: #d2691e;
+  --accent-2: #c8962e;
+  --model-cnn: #e8a15a;
+  --model-qcnn: #7fb2c4;
+  --truth-safe: #9bc27a;
+  --truth-unsafe: #d9573a;
+  --focus: #ffd08a;
+}
+
+[data-world='moon'] {
+  --bg: #08090b;
+  --surface: #121418;
+  --surface-2: #1c1f24;
+  --border: #2e333b;
+  --text: #f2f4f7;
+  --text-muted: #9aa3ae;
+  --accent: #e6e9ee;
+  --accent-2: #7e8896;
+  --model-cnn: #e8c58f;
+  --model-qcnn: #8fb7e8;
+  --model-mlp: #b9a6e0;
+  --truth-safe: #9bc27a;
+  --truth-unsafe: #e06a5a;
+  --focus: #ffffff;
+}
