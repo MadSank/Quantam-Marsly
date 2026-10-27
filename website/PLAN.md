@@ -44,13 +44,54 @@ Per-tile predictions exist for both models, for every fold and seed:
 
 - **Moon:** no coordinates. `provenance_manifest.csv` leaves site, observation and source IDs blank by design, and the filename prefixes are unverified. The Moon globe will have **no pins**.
 
+### Inputs for the `/lab` page
+
+**Checkpoints:** one representative checkpoint per model is loaded read-only on CPU.
+- Mars: `runs/pipeline_repair_audit/retraining_seedset/runs/{model1_resnet18,model2_qcnn}/fold_0_seed_42/best_checkpoint.pt`. Fold 0 means test site site_01. Every fold and seed has a `best_checkpoint.pt` and a `last_checkpoint.pt`.
+- Moon: `data/raw/moon/lrocnet/experiment_lunar_cnn_qcnn/runs/checkpoints/{cnn,hybrid,frozen_mlp}_seed_42.pt`.
+
+**Training curves:** these exist, so the Lab training-curves section is built.
+- Mars: all 30 runs (2 models × 5 folds × 3 seeds) have `epoch_log.csv` with `epoch, train_loss, val_loss, lr, epoch_wall_time_sec`. Fold 0 seed 42 has 8 CNN epochs and 4 QCNN epochs.
+- Moon: each seed has `runs/logs/seed_*/history.csv` with `model, epoch, train_loss, val_macro_f1, seconds` for cnn (6 epochs), qcnn (7) and frozen_mlp (5).
+- Wall-time columns are **not** exported to the Lab page, because timings aren't comparable.
+
+**Code permalinks:**
+- GitHub remote: `MadSank/Quantam-Marsly`.
+- Mars code (`src/`) is tracked, so it can be permalinked.
+- The Moon experiment code lives under gitignored `data/raw/moon/lrocnet/experiment_lunar_cnn_qcnn/`. It has **no permalink**, so Moon code is not excerpted in the walkthrough. The Moon circuit diagram and parameters are still generated from that local code and labelled "source not published in the repository".
+- Permalinks use the commit SHA recorded at export time. They resolve on GitHub only after that commit is pushed; at the time of writing, origin only has the initial commit.
+
 ## Pages
 
 1. `/`: split landing, "choose a world", with Mars and Moon halves and a link to About.
 2. `/mars`: site rail, strip panel and results panel. `?site=&model=&seed=` is held in the URL so views are shareable.
 3. `/moon`: class rail, crop-mosaic panel and results panel. `?class=&model=&seed=`.
 4. `/about`: the neutral shared page, covering method, data sources with licences and citations, and every required caveat.
-5. *(Phase 2)* A globe mode inside each world, opened by a toggle in the image panel.
+5. `/lab`, "Under the hood": a neutral-theme page for a reviewer to inspect how the project works. It has six sections:
+   1. **Pipeline diagram.** HiRISE strip + DTM → tiling → slope / roughness / hazard targets → safe-proxy label → CNN / hybrid → leave-one-site-out evaluation. Each stage links to its code permalink.
+   2. **CNN internals (Mars ResNet-18).**
+      - The conv1 filter grid: 64 filters.
+      - Feature maps at each ResNet stage for one real test tile from fold 0 (site_01), with the tile named.
+   3. **Hybrid/QCNN internals.**
+      - A circuit diagram generated from the actual PennyLane code (`qml.draw_mpl` → SVG).
+      - The trained rotation parameters per layer, shown as a heatmap.
+      - A plain-language explanation of the classical→qubit projection: frozen 512-d embedding → 8-d bottleneck → angle encoding.
+      - The same three items for the Moon hybrid head.
+   4. **Parameter breakdown.**
+      - Total vs trainable parameters per model: Mars CNN 11,242,563 vs hybrid head 4,152; Moon CNN 59,347 during training (195 after freeze), hybrid head 568, MLP head 547.
+      - An explanation of the frozen backbone.
+   5. **Training curves per fold and seed.**
+      - Mars: train and validation loss per epoch.
+      - Moon: train loss and validation macro-F1 per epoch.
+      - A fold/seed selector; both models are shown in fixed order using the neutral-shell model colours.
+      - No wall-time is shown.
+   6. **Code walkthrough.**
+      - Curated excerpts: model definitions, circuit and batched evaluation, training loop, train-fold-only scaler, and leave-one-site-out split.
+      - Syntax-highlighted at build time with Shiki.
+      - Each excerpt has a short plain-language note and a GitHub permalink to the exact lines at the exported commit.
+
+   The page makes no performance claims beyond the existing caveats; it links to About for those.
+6. *(Phase 2)* A globe mode inside each world, opened by a toggle in the image panel.
 
 Routing uses `react-router` with hash routing so any static host works.
 
@@ -78,6 +119,13 @@ Routing uses `react-router` with hash routing so any static host works.
           <CaveatNote id=…/>
           <AnimatedNumber/> <GrowBar/>  // shared; respect reduced motion
     <AboutPage> <Method/> <DataSources/> <CaveatList all/>
+    <LabPage>                           // neutral shell
+      <PipelineDiagram/>                // SVG stages, each a link to a code permalink
+      <FilterGrid/> <FeatureMapStrip/>  // CNN internals
+      <CircuitFigure world/> <RotationHeatmap/> <ProjectionExplainer/>   // Mars + Moon hybrid
+      <ParamBreakdown/>
+      <TrainingCurves/>                 // fold/seed selector; loss / val metric only
+      <CodeExcerpt/>×n                  // pre-highlighted HTML + note + permalink
   <MotionConfig reducedMotion="user">
 lib/: typed data loaders + cache, format (units; null → "undefined (no predicted-safe tiles)"), useReducedMotion
 ```
@@ -130,6 +178,36 @@ Two rules apply to every file:
   - Phase 2 globe textures, when they are added.
 - Any licence or citation text that can't be confirmed locally is marked `"TO CONFIRM"`. I'll list those items for you at step 10 rather than guess.
 
+**`lab/` (Lab page; about 3 MB budget, included in the size report)**
+
+**`lab/checkpoints.json`** records which checkpoint fed each figure.
+- `[{ model, world, path, fold?, seed }]`
+- Mars uses fold 0 / seed 42; Moon uses seed 42.
+
+**`lab/params.json`**
+- `{ mars: { cnn: {total, trainable}, hybrid: {total, trainable, frozen_backbone, bottleneck, qcnn_head} }, moon: { cnn: {trainable_during_training, trainable_post_freeze}, hybrid_head, mlp_head } }`
+- Values are counted from the loaded modules and cross-checked against `param_counts.json` and the audit.
+
+**CNN internals**
+- `lab/mars_cnn_conv1.png`: an 8×8 grid of the 64 conv1 filters, each normalised per filter.
+- `lab/mars_cnn_features.json`: `{ tile_id, site_id, stages: [{name, shape, channels_shown, png}] }`.
+- One PNG per stage (`lab/mars_cnn_stage_<name>.png`), showing a grid of the first 16 channels, with the input tile PNG alongside.
+
+**Hybrid internals**
+- `lab/{mars,moon}_circuit.svg`: drawn by `qml.draw_mpl`, saved as SVG and minified.
+- `lab/{mars,moon}_rotations.json`: `{ layers: [{name, shape, values[][]}], value_range }`, read straight from the checkpoint's circuit weights.
+- `lab/{mars,moon}_projection.json`: `{ in_dim, out_dim, encoding, notes }`.
+
+**`lab/curves.json`**
+- `{ mars: { "<fold>_<seed>": { cnn: {epoch[], train_loss[], val_loss[]}, qcnn: {…} } }, moon: { "<seed>": { cnn: {epoch[], train_loss[], val_macro_f1[]}, qcnn: {…}, frozen_mlp: {…} } } }`
+- No wall-time or lr columns.
+
+**`lab/excerpts.json`**
+- `{ commit, repo: "MadSank/Quantam-Marsly", excerpts: [{ id, title, path, start, end, note, permalink, code, html }] }`
+- `code` is the raw text sliced at export.
+- `html` is filled in by Shiki at build time.
+- Excerpts are located by a function or class name, not by hard-coded line numbers, so they stay correct when the code moves.
+
 ## Images
 
 - **Mars previews:** `img/mars/<id>_preview.webp`, quality about 80, with a per-site 2–98% display stretch labelled "display stretch only". Long edges:
@@ -137,9 +215,9 @@ Two rules apply to every file:
   - site_05: 8000 px.
   - site_02, site_03, site_04: about 4000 px.
 - **Mars rail thumbnails:** `img/mars/<id>_thumb.webp`, about 320 px.
-- **Deep zoom (step 11):** if the budget allows, a tiled pyramid (512 px WebP tiles, DZI-style) for site_01 and site_05 under `img/mars/<id>_dz/`. The previews stay in place as fallback.
+- **Deep zoom (step 12):** if the budget allows, a tiled pyramid (512 px WebP tiles, DZI-style) for site_01 and site_05 under `img/mars/<id>_dz/`. The previews stay in place as fallback.
 - **Moon:** test crops go into one WebP sprite sheet per class at 128 px each, plus a thumbnail per class.
-- **Size reporting:** `export_images.py` prints per-file sizes and the `public/data` total. The total must stay under **25 MB**, and I'll report sizes after step 3 and step 11.
+- **Size reporting:** every export script prints per-file sizes and the `public/data` total, broken down into data, images and lab. The total must stay under **25 MB**, with `lab/` at about 3 MB of that. I'll report sizes after steps 2, 3, 11 and 12.
 - **Never** copy raw TIFF, JP2 or IMG files.
 
 ## Export scripts (`website/scripts/`)
@@ -164,6 +242,25 @@ Two rules apply to every file:
 - Its Pillow has JPEG 2000 support and decodes at reduced resolution.
 - Site_04 uses band 2, and the stretch uses valid pixels only.
 - If decoding site_05 fails, fall back to running this script on root `.venv`, which has rasterio's decimated read.
+
+**`export_internals.py`** runs on the root `.venv`, which has torch and pennylane.
+- Read-only: it loads checkpoints with `map_location="cpu"`, uses `torch.no_grad()` and `model.eval()`, and never trains or writes back.
+- **Mars:**
+  - Builds the models with `src.models.build_model` from that run's `config_snapshot.yaml`, then loads `fold_0_seed_42/best_checkpoint.pt`.
+  - The feature-map tile is one real site_01 test tile, chosen deterministically (the first tile in `test_predictions.parquet` order). Its image comes from the processed shard. The training-fold image normalisation is applied exactly as `src/controlled_evaluation.py` does it.
+  - The circuit diagram comes from the QNode in `src/quantum/circuits.py`.
+- **Moon:**
+  - Imports the model classes from the local `experiment_lunar_cnn_qcnn/train.py`.
+  - Loads the `*_seed_42.pt` checkpoints.
+- **Curves:** read from `epoch_log.csv` and `history.csv`.
+- **Excerpts:**
+  - Read from `src/` at `git rev-parse HEAD`.
+  - The script refuses to run if any excerpted file has uncommitted changes, so permalinks match the shipped code.
+- Matplotlib uses the Agg backend. Figures use the neutral-shell palette, with no green or red.
+
+**`scripts/highlight.mjs`** runs as `prebuild`.
+- Runs Shiki over `lab/excerpts.json` and writes the `html` fields.
+- No highlighter ships to the browser.
 - Writes `img/manifest.json` with the source → derivative mapping.
 
 ## Theme tokens
@@ -259,13 +356,30 @@ These rules are built into the components:
 **`sources.test.ts`** is enabled from step 10.
 - Every `about.json` source has a licence and a citation, and no `TO CONFIRM` values remain.
 
+**`lab.test.tsx`** is enabled from step 11.
+- **Parameter counts:** the counts rendered on `/lab` and stored in `lab/params.json` equal the audit constants: 11,242,563; 4,152; 59,347; 195; 568; 547.
+- **Permalinks:**
+  - Every excerpt's permalink matches `https://github.com/MadSank/Quantam-Marsly/blob/<commit>/<path>#L<start>-L<end>`.
+  - `<path>` exists in the repo at `<commit>`, checked with `git cat-file -e <commit>:<path>`.
+  - `start ≤ end ≤` that file's line count at that commit.
+  - The excerpt's `code` equals those lines.
+- **No performance claims:**
+  - The rendered Lab text and the `lab/*.json` notes contain none of these phrases: `better`, `outperform`, `superior`, `wins`, `winner`, `beats`, `faster`, `speedup`, `speed-up`, `advantage`, `improves`, `more accurate`.
+  - The only exception is caveat text pulled verbatim from `caveats.json`, which is allowed through by caveat ID.
+  - The same removed-section deny-list applies.
+- `curves.json` has no wall-time or lr fields.
+
 **Export tests (pytest, `website/scripts/tests/`)**
-- Run on the app venv; skipped when `runs/` is absent.
-- Check that exported values equal the source CSV and parquet files before rounding.
+- `export_data.py` and `export_images.py` tests run on the app venv and are skipped when `runs/` is absent.
+  - They check that exported values equal the source CSV and parquet files before rounding.
+- `export_internals.py` tests run on the root venv and are skipped when the checkpoints are absent.
+  - Parameter counts match `param_counts.json`.
+  - Rotation arrays match the checkpoint tensors.
+  - Loading never modifies a checkpoint's mtime or hash.
 
 ## Build order
 
-1. **Scaffold.** `website/` with Vite + React + TS, ESLint, Vitest, react-router (hash), `motion`, and the token CSS. `npm run dev`, `build`, `test` and `lint` all work. `website/README.md` covers the export commands.
+1. **Scaffold.** `website/` with Vite + React + TS, oxlint, Vitest, react-router (hash), `motion`, and the token CSS. `npm run dev`, `build`, `test` and `lint` all work. `website/README.md` covers the export commands.
 2. **Export data.** Write `export_data.py` for the Mars and Moon JSON, `caveats.json`, and an `about.json` skeleton, with the pytest parity tests.
 3. **Export images.** Write `export_images.py` for the previews (with the resolutions above), thumbnails and Moon sprites. Report sizes.
 4. **Audit tests.** Port the audit, integrity, caveat and removed-section tests; they pass against the exported data.
@@ -285,13 +399,18 @@ These rules are built into the components:
    - 3-way model toggle including the MLP; results panel.
    - Screenshots.
 10. **About page:** method, the full caveat list, and data sources with licence and citation from `about.json`. Enable `sources.test.ts`, and list any `TO CONFIRM` items for you.
-11. **Polish:**
+11. **Lab page ("Under the hood").**
+    - Write `export_internals.py` and its pytest, plus `highlight.mjs` (Shiki, prebuild).
+    - Build the six `/lab` sections and enable `lab.test.tsx`.
+    - Report the `lab/` size against the ~3 MB budget.
+    - Before building, recheck the training-curve inventory listed in Findings and report any gaps.
+12. **Polish:**
     - Responsive layout: rail becomes a horizontal scroller on phones; image and results panels stack.
     - Accessibility: focus order, live-region announcements, table fallbacks for charts.
-    - Performance: lazy-load data.
+    - Performance: lazy-load data, and lazy-load the `/lab` route.
     - Lighthouse pass.
     - Deep-zoom pyramid for site_01 and site_05 if the budget allows. Report its size.
-12. **Phase 2 globe (planned, not built now):**
+13. **Phase 2 globe (planned, not built now):**
     - Use `@react-three/fiber` + `drei`, lazy-loaded.
     - **Mars texture:** the USGS Viking MDIM 2.1 or MOLA-colourized equirectangular mosaic, downscaled to 4096×2048, as KTX2 plus a 2k WebP fallback. Downloading it needs your OK.
     - **Moon texture:** check whether `data/raw/moon/mosaic/moon_mosaic_big.tif` is a global equirectangular mosaic; otherwise use the LRO WAC global mosaic.
@@ -301,10 +420,12 @@ These rules are built into the components:
 
 ## Critical files
 
-- **New:** `website/` (`PLAN.md`, `package.json`, `vite.config.ts`, `src/**`, `public/data/**`, `scripts/export_data.py`, `scripts/export_images.py`, `scripts/tests/`).
+- **New:** `website/` (`PLAN.md`, `package.json`, `vite.config.ts`, `src/**`, `public/data/**`, `scripts/export_data.py`, `scripts/export_images.py`, `scripts/export_internals.py`, `scripts/highlight.mjs`, `scripts/tests/`).
 - **Edited:** `CLAUDE.md`, adding one line: "website work follows website/PLAN.md".
 - **Read only:**
   - `visualization_app/data_loading/{paths,mars_data,moon_data}.py`
+  - `src/models/**`, `src/quantum/circuits.py` (imported by `export_internals.py`, never modified)
+  - Mars `best_checkpoint.pt` (fold 0, seed 42) and Moon `*_seed_42.pt` checkpoints
   - `runs/pipeline_repair_audit/retraining_seedset/**`
   - `runs/controlled_evaluation/processed/{metadata.parquet,dataset_metadata.json}`
   - `data/raw/**`
@@ -313,12 +434,13 @@ These rules are built into the components:
 
 ## Verification
 
-1. The export scripts run on the app venv; the size report shows under 25 MB, and the export pytest passes.
-2. `npm test` passes: audit, integrity, caveat, removed-section, framing, overlay and reduced-motion tests.
+1. The export scripts run (data and images on the app venv, internals on the root venv); the size report shows under 25 MB in total with `lab/` at about 3 MB, and the export pytest passes.
+2. `npm test` passes: audit, integrity, caveat, removed-section, framing, overlay, reduced-motion and lab tests.
 3. `npm run build` succeeds from a copy of `website/` in the scratchpad with no `runs/` or `data/raw/`.
 4. `npm run dev` in the built-in browser at 1920×1080, 1366×768 and 375×812, in both worlds:
    - The overlay lines up with strip features.
    - Toggling models and seeds gives numbers that match the audit.
    - Reduced motion is respected.
    - The console has no errors.
+   - `/lab` shows the circuit SVGs, the filter grid, feature maps and curves, and every permalink opens the right lines on GitHub once the commit is pushed.
 5. The app's `pytest` suite still passes, and `git diff --stat` shows only `website/` and `CLAUDE.md`.
