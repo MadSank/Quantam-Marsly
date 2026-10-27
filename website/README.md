@@ -28,6 +28,14 @@ visualization_app/.venv/Scripts/python.exe -m pytest website/scripts/tests
 
 The pytest suite checks the committed JSON against the source CSV, parquet and `results.json` files. It is skipped when those artifacts are absent.
 
+It also checks the exported images:
+- No raw rasters are shipped.
+- `public/data` stays within the 25 MB budget.
+- Image sizes match the JSON.
+- Each Mars tile's stated position lines up with the preview: per-tile brightness is correlated against the model's input patches.
+
+`export_images.py` decodes the JP2 strips at reduced resolution (about 2.5 minutes in total). The two scripts can run in either order, because `export_data.py` keeps the image fields that `export_images.py` writes.
+
 `export_data.py` also refuses to write a caveat unless its text is a verbatim quote of `FINAL_READINESS_AUDIT.md` or `visualization_app/README.md`.
 
 ## Layout

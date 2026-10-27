@@ -1,0 +1,179 @@
+{
+ "mars": {
+  "site_01": {
+   "source": "data/raw/site_01/ESP_062806_2150_RED_C_01_ORTHO.JP2",
+   "band": 1,
+   "display_stretch": {
+    "percentiles": [
+     2.0,
+     98.0
+    ],
+    "note": "display stretch only"
+   },
+   "preview": {
+    "src": "img/mars/site_01_preview.webp",
+    "width": 6109,
+    "height": 7735,
+    "scale_from_native": {
+     "x": 1.0,
+     "y": 1.0
+    }
+   },
+   "thumb": {
+    "src": "img/mars/site_01_thumb.webp",
+    "width": 253,
+    "height": 320
+   }
+  },
+  "site_02": {
+   "source": "data/raw/kaiser_crater/ESP_039245_1325_RED_D_01_ORTHO.JP2",
+   "band": 1,
+   "display_stretch": {
+    "percentiles": [
+     2.0,
+     98.0
+    ],
+    "note": "display stretch only"
+   },
+   "preview": {
+    "src": "img/mars/site_02_preview.webp",
+    "width": 2682,
+    "height": 3835,
+    "scale_from_native": {
+     "x": 1.0,
+     "y": 1.0
+    }
+   },
+   "thumb": {
+    "src": "img/mars/site_02_thumb.webp",
+    "width": 224,
+    "height": 320
+   }
+  },
+  "site_03": {
+   "source": "data/raw/layered_yardangs/ESP_023051_1865_RED_C_01_ORTHO.JP2",
+   "band": 1,
+   "display_stretch": {
+    "percentiles": [
+     2.0,
+     98.0
+    ],
+    "note": "display stretch only"
+   },
+   "preview": {
+    "src": "img/mars/site_03_preview.webp",
+    "width": 2928,
+    "height": 4000,
+    "scale_from_native": {
+     "x": 0.4689301729660474,
+     "y": 0.46893317702227433
+    }
+   },
+   "thumb": {
+    "src": "img/mars/site_03_thumb.webp",
+    "width": 234,
+    "height": 320
+   }
+  },
+  "site_04": {
+   "source": "data/raw/Coprates_Chasma/ESP_026417_1660_IRB_C_01_ORTHO.JP2",
+   "band": 2,
+   "display_stretch": {
+    "percentiles": [
+     2.0,
+     98.0
+    ],
+    "note": "display stretch only"
+   },
+   "preview": {
+    "src": "img/mars/site_04_preview.webp",
+    "width": 1705,
+    "height": 4000,
+    "scale_from_native": {
+     "x": 0.2601067887109077,
+     "y": 0.26012876373805033
+    }
+   },
+   "thumb": {
+    "src": "img/mars/site_04_thumb.webp",
+    "width": 136,
+    "height": 320
+   }
+  },
+  "site_05": {
+   "source": "data/raw/Huo_Hsing_Vallis/PSP_003495_2065_RED_C_01_ORTHO.JP2",
+   "band": 1,
+   "display_stretch": {
+    "percentiles": [
+     2.0,
+     98.0
+    ],
+    "note": "display stretch only"
+   },
+   "preview": {
+    "src": "img/mars/site_05_preview.webp",
+    "width": 2355,
+    "height": 8000,
+    "scale_from_native": {
+     "x": 0.2896322715533145,
+     "y": 0.289582277564613
+    }
+   },
+   "thumb": {
+    "src": "img/mars/site_05_thumb.webp",
+    "width": 94,
+    "height": 320
+   }
+  }
+ },
+ "moon": {
+  "ejecta": {
+   "sprite": {
+    "src": "img/moon/ejecta_sprite.webp",
+    "cell": 128,
+    "cols": 10,
+    "rows": 9,
+    "count": 89,
+    "width": 1280,
+    "height": 1152
+   },
+   "thumb": {
+    "src": "img/moon/ejecta_thumb.webp",
+    "width": 324,
+    "height": 324
+   }
+  },
+  "oldcrater": {
+   "sprite": {
+    "src": "img/moon/oldcrater_sprite.webp",
+    "cell": 128,
+    "cols": 13,
+    "rows": 13,
+    "count": 157,
+    "width": 1664,
+    "height": 1664
+   },
+   "thumb": {
+    "src": "img/moon/oldcrater_thumb.webp",
+    "width": 324,
+    "height": 324
+   }
+  },
+  "none": {
+   "sprite": {
+    "src": "img/moon/none_sprite.webp",
+    "cell": 128,
+    "cols": 24,
+    "rows": 23,
+    "count": 533,
+    "width": 3072,
+    "height": 2944
+   },
+   "thumb": {
+    "src": "img/moon/none_thumb.webp",
+    "width": 324,
+    "height": 324
+   }
+  }
+ }
+}

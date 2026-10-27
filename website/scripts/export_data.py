@@ -160,6 +160,12 @@ def stamp(sources: list[Path]) -> dict[str, Any]:
 GENERATED_AT = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
 
+def image_fields() -> dict[str, Any]:
+    """Image fields written by export_images.py, kept when this script re-runs."""
+    path = OUT_DIR / "img" / "manifest.json"
+    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {"mars": {}, "moon": {}}
+
+
 # ---------------------------------------------------------------- Mars
 
 def site_center(group: pd.DataFrame) -> dict[str, float]:
@@ -183,8 +189,9 @@ def export_mars(written: list[Path]) -> None:
     meta = mars_data.load_mars_metadata()
     dataset_meta = {s["site_id"]: s for s in mars_data.load_mars_dataset_metadata()["sites"]}
     fold_of = {v["test"]: k for k, v in mars_data.FOLD_SITE_MAPPING.items()}
+    images = image_fields()["mars"]
 
-    # sites.json (preview/thumb are filled in by export_images.py)
+    # sites.json (preview/thumb come from export_images.py's img/manifest.json)
     sites = []
     for site_id, group in meta.groupby("site_id", sort=True):
         windows = group["native_window_px"].unique()
@@ -204,8 +211,8 @@ def export_mars(written: list[Path]) -> None:
             "native_height_px": int(dataset_meta[site_id]["dimensions"][0]),
             "native_width_px": int(dataset_meta[site_id]["dimensions"][1]),
             "tile_size_native_px": int(windows[0]),
-            "preview": None,
-            "thumb": None,
+            "preview": images.get(site_id, {}).get("preview"),
+            "thumb": images.get(site_id, {}).get("thumb"),
         })
     path = OUT_DIR / "mars" / "sites.json"
     write_json(path, {**stamp([MARS_METADATA_PARQUET]), "sites": sites})
@@ -360,6 +367,7 @@ def export_moon(written: list[Path]) -> None:
     written.append(path)
 
     frames = {seed: moon_data.get_moon_predictions_df(seed) for seed in SEEDS}
+    images = image_fields()["moon"]
     for cls in classes:
         sub_ids = sorted(s for s, t in zip(base["test"]["sample_ids"], base["test"]["ground_truth"])
                          if moon_data.CLASS_IDX_TO_NAME[t] == cls)
@@ -379,7 +387,9 @@ def export_moon(written: list[Path]) -> None:
         path = OUT_DIR / "moon" / "classes" / f"{cls}.json"
         write_json(path, {**stamp([MOON_LOGS_DIR / f"seed_{s}" / "results.json" for s in SEEDS]),
                           "class": cls, "classes": classes, "seeds": SEEDS,
-                          "sprite_order": "crops[i].img is the cell index in this class's sprite sheet", "crops": crops},
+                          "sprite_order": "crops[i].img is the cell index in this class's sprite sheet",
+                          "sprite": images.get(cls, {}).get("sprite"), "thumb": images.get(cls, {}).get("thumb"),
+                          "crops": crops},
                    compact=True)
         written.append(path)
 

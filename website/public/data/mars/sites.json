@@ -2,7 +2,7 @@
  "source": [
   "runs/controlled_evaluation/processed/metadata.parquet"
  ],
- "generated_at": "2026-10-27T17:14:19+00:00",
+ "generated_at": "2026-10-27T17:22:23+00:00",
  "sites": [
   {
    "site_id": "site_01",
@@ -20,8 +20,20 @@
    "native_height_px": 7735,
    "native_width_px": 6109,
    "tile_size_native_px": 128,
-   "preview": null,
-   "thumb": null
+   "preview": {
+    "src": "img/mars/site_01_preview.webp",
+    "width": 6109,
+    "height": 7735,
+    "scale_from_native": {
+     "x": 1.0,
+     "y": 1.0
+    }
+   },
+   "thumb": {
+    "src": "img/mars/site_01_thumb.webp",
+    "width": 253,
+    "height": 320
+   }
   },
   {
    "site_id": "site_02",
@@ -39,8 +51,20 @@
    "native_height_px": 3835,
    "native_width_px": 2682,
    "tile_size_native_px": 64,
-   "preview": null,
-   "thumb": null
+   "preview": {
+    "src": "img/mars/site_02_preview.webp",
+    "width": 2682,
+    "height": 3835,
+    "scale_from_native": {
+     "x": 1.0,
+     "y": 1.0
+    }
+   },
+   "thumb": {
+    "src": "img/mars/site_02_thumb.webp",
+    "width": 224,
+    "height": 320
+   }
   },
   {
    "site_id": "site_03",
@@ -58,8 +82,20 @@
    "native_height_px": 8530,
    "native_width_px": 6244,
    "tile_size_native_px": 128,
-   "preview": null,
-   "thumb": null
+   "preview": {
+    "src": "img/mars/site_03_preview.webp",
+    "width": 2928,
+    "height": 4000,
+    "scale_from_native": {
+     "x": 0.4689301729660474,
+     "y": 0.46893317702227433
+    }
+   },
+   "thumb": {
+    "src": "img/mars/site_03_thumb.webp",
+    "width": 234,
+    "height": 320
+   }
   },
   {
    "site_id": "site_04",
@@ -77,8 +113,20 @@
    "native_height_px": 15377,
    "native_width_px": 6555,
    "tile_size_native_px": 128,
-   "preview": null,
-   "thumb": null
+   "preview": {
+    "src": "img/mars/site_04_preview.webp",
+    "width": 1705,
+    "height": 4000,
+    "scale_from_native": {
+     "x": 0.2601067887109077,
+     "y": 0.26012876373805033
+    }
+   },
+   "thumb": {
+    "src": "img/mars/site_04_thumb.webp",
+    "width": 136,
+    "height": 320
+   }
   },
   {
    "site_id": "site_05",
@@ -96,8 +144,20 @@
    "native_height_px": 27626,
    "native_width_px": 8131,
    "tile_size_native_px": 128,
-   "preview": null,
-   "thumb": null
+   "preview": {
+    "src": "img/mars/site_05_preview.webp",
+    "width": 2355,
+    "height": 8000,
+    "scale_from_native": {
+     "x": 0.2896322715533145,
+     "y": 0.289582277564613
+    }
+   },
+   "thumb": {
+    "src": "img/mars/site_05_thumb.webp",
+    "width": 94,
+    "height": 320
+   }
   }
  ]
 }

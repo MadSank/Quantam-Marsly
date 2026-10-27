@@ -7,7 +7,7 @@
   "data/raw/moon/lrocnet/experiment_lunar_cnn_qcnn/runs/logs/seed_43/results.json",
   "data/raw/moon/lrocnet/experiment_lunar_cnn_qcnn/runs/logs/seed_44/results.json"
  ],
- "generated_at": "2026-10-27T17:14:19+00:00",
+ "generated_at": "2026-10-27T17:22:23+00:00",
  "classes": [
   "ejecta",
   "oldcrater",
