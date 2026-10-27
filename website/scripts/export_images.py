@@ -246,6 +246,94 @@ def export_landing(written: list[Path], mars: dict[str, Any]) -> dict[str, Any]:
     return out
 
 
+# ---------------------------------------------------------------- globes
+
+# Public-domain global mosaics, downloaded once into gitignored data/raw/textures (see manifest
+# "source"). Both are equirectangular, longitude -180..180 left to right, latitude 90..-90.
+TEXTURE_DIR = REPO_ROOT / "data" / "raw" / "textures"
+GLOBES: dict[str, dict[str, Any]] = {
+    "mars": {
+        "file": TEXTURE_DIR / "mars" / "mars_viking_mdim21_clrmosaic_1km.jpg",
+        "url": "https://astrogeology.usgs.gov/search/map/mars_viking_colorized_global_mosaic_232m",
+        "credit": "Mars Viking MDIM 2.1 colorized global mosaic, NASA Ames / USGS Astrogeology Science Center (public domain)",
+        "front_longitude": -70.0,  # Valles Marineris faces the viewer in the still
+        "light": (0.92, 0.22, 0.32),  # Mars sits at the left edge, lit from the page centre (its right)
+    },
+    "moon": {
+        "file": TEXTURE_DIR / "moon" / "lroc_color_poles_4k.tif",
+        "url": "https://svs.gsfc.nasa.gov/4720",
+        "credit": "CGI Moon Kit, LRO LROC WAC colour mosaic, NASA's Scientific Visualization Studio (public domain)",
+        "front_longitude": 0.0,  # the near side
+        "light": (-0.92, 0.22, 0.32),  # the Moon sits at the right edge, lit from its left
+    },
+}
+GLOBE_SIZES = (2048, 1024)  # texture widths (2:1)
+STILL_PX = 1024
+# Shared with src/components/globe/lighting.ts so the still matches the live sphere.
+GLOBE_AMBIENT = 0.035
+GLOBE_DIFFUSE = 1.15
+
+
+def _srgb_to_linear(c: np.ndarray) -> np.ndarray:
+    return np.where(c <= 0.04045, c / 12.92, ((c + 0.055) / 1.055) ** 2.4)
+
+
+def _linear_to_srgb(c: np.ndarray) -> np.ndarray:
+    c = np.clip(c, 0.0, 1.0)
+    return np.where(c <= 0.0031308, c * 12.92, 1.055 * np.power(c, 1 / 2.4) - 0.055)
+
+
+def render_still(texture: Image.Image, front_longitude: float, light: tuple[float, float, float]) -> Image.Image:
+    """Orthographic view of a Lambert-lit sphere (same model as the live three.js globe)."""
+    tex = _srgb_to_linear(np.asarray(texture.convert("RGB"), dtype=np.float32) / 255.0)
+    th, tw = tex.shape[:2]
+    n = STILL_PX
+    ys, xs = np.mgrid[0:n, 0:n].astype(np.float32)
+    x = (xs + 0.5) / n * 2 - 1
+    y = 1 - (ys + 0.5) / n * 2
+    r2 = x * x + y * y
+    inside = r2 <= 1.0
+    z = np.sqrt(np.clip(1 - r2, 0, 1))
+    lon = np.radians(front_longitude) + np.arctan2(x, z)
+    lat = np.arcsin(np.clip(y, -1, 1))
+    tx = ((lon / (2 * np.pi) + 0.5) % 1.0) * (tw - 1)
+    ty = (0.5 - lat / np.pi) * (th - 1)
+    albedo = tex[ty.round().astype(int), tx.round().astype(int)]
+    lvec = np.asarray(light, dtype=np.float32)
+    lvec /= np.linalg.norm(lvec)
+    lambert = np.clip(x * lvec[0] + y * lvec[1] + z * lvec[2], 0, None)
+    rgb = _linear_to_srgb(albedo * (GLOBE_AMBIENT + GLOBE_DIFFUSE * lambert)[..., None])
+    # Antialiased limb: alpha falls off over about one pixel at the edge.
+    edge = np.clip((1 - np.sqrt(r2)) * n / 2, 0, 1)
+    rgba = np.dstack([rgb * 255, np.where(inside, edge, 0) * 255]).round().astype(np.uint8)
+    return Image.fromarray(rgba, "RGBA")
+
+
+def export_globes(written: list[Path]) -> dict[str, Any]:
+    out: dict[str, Any] = {}
+    for world, spec in GLOBES.items():
+        with Image.open(spec["file"]) as im:
+            src = im.convert("RGB")
+        entry: dict[str, Any] = {"source": rel(spec["file"]), "source_size": list(src.size), "url": spec["url"],
+                                 "credit": spec["credit"], "front_longitude": spec["front_longitude"],
+                                 "light": list(spec["light"]), "ambient": GLOBE_AMBIENT, "diffuse": GLOBE_DIFFUSE,
+                                 "textures": {}}
+        for width in GLOBE_SIZES:
+            tex = src.resize((width, width // 2), Image.Resampling.LANCZOS)
+            path = IMG_DIR / "globe" / f"{world}_{width // 1024}k.webp"
+            save_webp(tex, path)
+            written.append(path)
+            entry["textures"][f"{width // 1024}k"] = {"src": data_rel(path), "width": width, "height": width // 2}
+        still = render_still(src.resize((4096, 2048), Image.Resampling.LANCZOS), spec["front_longitude"], spec["light"])
+        still_path = IMG_DIR / "globe" / f"{world}_still.webp"
+        save_webp(still, still_path)
+        written.append(still_path)
+        entry["still"] = {"src": data_rel(still_path), "width": STILL_PX, "height": STILL_PX}
+        out[world] = entry
+        print(f"{world} globe: {src.size} -> textures {GLOBE_SIZES}, still {STILL_PX}px")
+    return out
+
+
 # ---------------------------------------------------------------- report
 
 def size_report(written: list[Path]) -> None:
@@ -273,6 +361,7 @@ def main() -> None:
     written: list[Path] = []
     manifest = {"mars": export_mars(written), "moon": export_moon(written)}
     manifest["landing"] = export_landing(written, manifest["mars"])
+    manifest["globe"] = export_globes(written)
     path = IMG_DIR / "manifest.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     write_json(path, manifest, compact=False)

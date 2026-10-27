@@ -33,6 +33,14 @@
   --truth-unsafe: #d9573a;
   --focus: oklch(96% 0.01 230);
 
+  /* Landing sky: deep space, star colour temperatures (cool, neutral, warm), floating cards. */
+  --space: oklch(9% 0.008 255);
+  --star-cool: oklch(90% 0.035 245);
+  --star-neutral: oklch(96% 0.006 90);
+  --star-warm: oklch(90% 0.05 70);
+  --shadow-float: 0 18px 40px -18px oklch(4% 0.01 255 / 0.85);
+  --shadow-float-hover: 0 28px 56px -20px oklch(4% 0.01 255 / 0.95);
+
   /* Type. */
   --font-display: 'Geologica', ui-sans-serif, system-ui, sans-serif;
   --font-body: 'Geologica', ui-sans-serif, system-ui, sans-serif;

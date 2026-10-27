@@ -6,6 +6,31 @@
   "hero": "index",
   "nav": "edge-aligned",
   "footer": "colophon",
+  "imagery": "project data on cards; public-domain globe mosaics",
+  "photos": [],
+  "entry": "none",
+  "fingerprint": "doors-before-planets",
+  "sections": [
+   "hero: two doors over rotating globes",
+   "footer: colophon"
+  ],
+  "signature": "each card floating in front of its own rotating world",
+  "waived": [
+   "77",
+   "59"
+  ],
+  "prompt": "Landing redesign: deep space, star field, rotating Mars and Moon globes behind floating cards",
+  "scope": "page",
+  "date": "2026-10-27",
+  "mode": "build"
+ },
+ {
+  "shape": "split-studio",
+  "theme": "vantage",
+  "axes": "dark/grotesk-sans/steel",
+  "hero": "index",
+  "nav": "edge-aligned",
+  "footer": "colophon",
   "imagery": "project data: HiRISE crop, LROCNet mosaic",
   "photos": [],
   "entry": "none",

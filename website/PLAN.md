@@ -417,10 +417,15 @@ These rules are built into the components:
     - Performance: lazy-load data, and lazy-load the `/lab` route.
     - Lighthouse pass.
     - Deep-zoom pyramid for site_01 and site_05 if the budget allows. Report its size.
-13. **Phase 2 globe (planned, not built now):**
+13. **Phase 2 globe (planned, not built now).** The textures and the sphere component were pulled forward into the step 5 landing redesign:
+    - **Textures (downloaded with approval, kept in gitignored `data/raw/textures/`):**
+      - Mars: USGS Viking MDIM 2.1 colorized mosaic, 1 km/px JPG (21339×10670, 36.7 MB, public domain).
+      - Moon: NASA SVS CGI Moon Kit `lroc_color_poles_4k.tif` (4096×2048, 13.1 MB, LROC WAC colour with the poles filled).
+      - `export_images.py` writes 2k and 1k WebP textures plus a pre-rendered lit still per world under `img/globe/`.
+    - **Component:** `src/components/globe/Globe.tsx`. The still paints first; the three.js sphere (`GlobeCanvas`, lazy) fades in over it when motion is allowed. `spec.ts` has `rotationForLongitude` and `surfacePoint(lat, lon)` for pins, and pins go in `children`.
+    - What remains for Phase 2:
     - Use `@react-three/fiber` + `drei`, lazy-loaded.
-    - **Mars texture:** the USGS Viking MDIM 2.1 or MOLA-colourized equirectangular mosaic, downscaled to 4096×2048, as KTX2 plus a 2k WebP fallback. Downloading it needs your OK.
-    - **Moon texture:** check whether `data/raw/moon/mosaic/moon_mosaic_big.tif` is a global equirectangular mosaic; otherwise use the LRO WAC global mosaic.
+    - A 4k texture (KTX2 or WebP) for close-up viewing, if the budget allows.
     - **Pins:** Mars pins come from `sites.json` centres. Clicking one sets `?site=` and the explorer animates to that site. No Moon pins.
     - Reduced motion disables auto-rotation and the camera fly-to.
     - Texture credits are added to `about.json`.

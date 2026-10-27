@@ -214,5 +214,75 @@
     "test/none/M1096559563RC_pyr-0444.jpg"
    ]
   }
+ },
+ "globe": {
+  "mars": {
+   "source": "data/raw/textures/mars/mars_viking_mdim21_clrmosaic_1km.jpg",
+   "source_size": [
+    21339,
+    10670
+   ],
+   "url": "https://astrogeology.usgs.gov/search/map/mars_viking_colorized_global_mosaic_232m",
+   "credit": "Mars Viking MDIM 2.1 colorized global mosaic, NASA Ames / USGS Astrogeology Science Center (public domain)",
+   "front_longitude": -70.0,
+   "light": [
+    0.92,
+    0.22,
+    0.32
+   ],
+   "ambient": 0.035,
+   "diffuse": 1.15,
+   "textures": {
+    "2k": {
+     "src": "img/globe/mars_2k.webp",
+     "width": 2048,
+     "height": 1024
+    },
+    "1k": {
+     "src": "img/globe/mars_1k.webp",
+     "width": 1024,
+     "height": 512
+    }
+   },
+   "still": {
+    "src": "img/globe/mars_still.webp",
+    "width": 1024,
+    "height": 1024
+   }
+  },
+  "moon": {
+   "source": "data/raw/textures/moon/lroc_color_poles_4k.tif",
+   "source_size": [
+    4096,
+    2048
+   ],
+   "url": "https://svs.gsfc.nasa.gov/4720",
+   "credit": "CGI Moon Kit, LRO LROC WAC colour mosaic, NASA's Scientific Visualization Studio (public domain)",
+   "front_longitude": 0.0,
+   "light": [
+    -0.92,
+    0.22,
+    0.32
+   ],
+   "ambient": 0.035,
+   "diffuse": 1.15,
+   "textures": {
+    "2k": {
+     "src": "img/globe/moon_2k.webp",
+     "width": 2048,
+     "height": 1024
+    },
+    "1k": {
+     "src": "img/globe/moon_1k.webp",
+     "width": 1024,
+     "height": 512
+    }
+   },
+   "still": {
+    "src": "img/globe/moon_still.webp",
+    "width": 1024,
+    "height": 1024
+   }
+  }
  }
 }

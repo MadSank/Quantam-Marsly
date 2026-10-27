@@ -432,6 +432,16 @@ def export_about(written: list[Path]) -> None:
              "used_for": "Mars strips, terrain targets (slope, roughness, hazard) and tiles"},
             {"name": "LROCNet", "provider": todo, "licence": todo, "citation": todo, "url": todo,
              "used_for": "Moon crater classification crops (ejecta, oldcrater, none)"},
+            {"name": "Mars Viking MDIM 2.1 colorized global mosaic", "provider": "NASA Ames / USGS Astrogeology Science Center",
+             "licence": "Public domain (USGS catalog: access constraints public domain, use constraints none)",
+             "citation": "USGS Astrogeology Science Center (2009). Mars Viking Colorized Global Mosaic 232m. Originator: NASA Ames.",
+             "url": "https://astrogeology.usgs.gov/search/map/mars_viking_colorized_global_mosaic_232m",
+             "used_for": "Mars globe texture (1 km/px JPG, downscaled)"},
+            {"name": "CGI Moon Kit (LRO LROC WAC colour mosaic)", "provider": "NASA's Scientific Visualization Studio",
+             "licence": todo,
+             "citation": "NASA's Scientific Visualization Studio, CGI Moon Kit (lroc_color_poles_4k.tif).",
+             "url": "https://svs.gsfc.nasa.gov/4720",
+             "used_for": "Moon globe texture (4096x2048 TIF, downscaled)"},
         ],
     }
     path = OUT_DIR / "about.json"

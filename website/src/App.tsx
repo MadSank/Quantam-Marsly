@@ -1,5 +1,6 @@
 import { MotionConfig } from 'motion/react'
 import { Link, Navigate, Route, Routes } from 'react-router'
+import { MotionProvider } from './components/motion'
 import { Landing } from './pages/Landing'
 import { WorldLayout } from './theme/WorldLayout'
 import type { World } from './theme/world'
@@ -29,13 +30,15 @@ function About() {
 export function App() {
   return (
     <MotionConfig reducedMotion="user">
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/mars" element={<Explorer world="mars" />} />
-        <Route path="/moon" element={<Explorer world="moon" />} />
-        <Route path="/about" element={<About />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <MotionProvider>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/mars" element={<Explorer world="mars" />} />
+          <Route path="/moon" element={<Explorer world="moon" />} />
+          <Route path="/about" element={<About />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </MotionProvider>
     </MotionConfig>
   )
 }
