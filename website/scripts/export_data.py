@@ -33,6 +33,7 @@ import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
 from data_loading import mars_data, moon_data  # noqa: E402
+from stable_io import write_json  # noqa: E402
 
 for _name in list(logging.root.manager.loggerDict):
     if _name.startswith("streamlit"):
@@ -144,13 +145,6 @@ def clean(value: Any) -> Any:
 
 def rounded(values: Any, decimals: int = TILE_DECIMALS) -> list[float | None]:
     return [None if not math.isfinite(float(v)) else round(float(v), decimals) for v in values]
-
-
-def write_json(path: Path, payload: Any, *, compact: bool = False) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    text = json.dumps(payload, ensure_ascii=False, allow_nan=False,
-                      separators=(",", ":") if compact else None, indent=None if compact else 1)
-    path.write_text(text + "\n", encoding="utf-8")
 
 
 def stamp(sources: list[Path]) -> dict[str, Any]:

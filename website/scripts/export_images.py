@@ -12,6 +12,7 @@ mars/sites.json and moon/classes/<class>.json. See website/PLAN.md "Images".
 
 from __future__ import annotations
 
+import io
 import json
 import math
 import os
@@ -22,6 +23,8 @@ from typing import Any
 import numpy as np
 import pandas as pd
 from PIL import Image
+
+from stable_io import write_bytes, write_json
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 OUT_DIR = REPO_ROOT / "website" / "public" / "data"
@@ -58,14 +61,9 @@ def data_rel(path: Path) -> str:
 
 
 def save_webp(img: Image.Image, path: Path) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    img.save(path, "WEBP", quality=WEBP_QUALITY, method=6)
-
-
-def write_json(path: Path, payload: Any, *, compact: bool) -> None:
-    text = json.dumps(payload, ensure_ascii=False, allow_nan=False,
-                      separators=(",", ":") if compact else None, indent=None if compact else 1)
-    path.write_text(text + "\n", encoding="utf-8")
+    buf = io.BytesIO()
+    img.save(buf, "WEBP", quality=WEBP_QUALITY, method=6)
+    write_bytes(path, buf.getvalue())
 
 
 # ---------------------------------------------------------------- Mars
