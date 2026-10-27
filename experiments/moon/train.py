@@ -2,12 +2,18 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import csv
+import hashlib
 import json
 import random
 import time
 import os
+import zlib
 from pathlib import Path
+
+# Deterministic cuBLAS needs this before CUDA initialises (torch.use_deterministic_algorithms).
+os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
 
 import numpy as np
 import torch
@@ -48,6 +54,13 @@ class LunarImages(Dataset):
         return x, label
 
 
+class GlobalMeanPool(nn.Module):
+    """Same output as nn.AdaptiveAvgPool2d(1) (no parameters, same state_dict), but its CUDA
+    backward pass is deterministic, which torch.use_deterministic_algorithms requires."""
+    def forward(self, x):
+        return x.mean(dim=(2, 3), keepdim=True)
+
+
 class Encoder(nn.Module):
     """Small CNN with 64-d global pooled representation."""
     def __init__(self):
@@ -55,7 +68,7 @@ class Encoder(nn.Module):
         self.features = nn.Sequential(
             nn.Conv2d(1, 24, 5, stride=2, padding=2), nn.BatchNorm2d(24), nn.ReLU(inplace=True), nn.MaxPool2d(2),
             nn.Conv2d(24, 48, 3, padding=1), nn.BatchNorm2d(48), nn.ReLU(inplace=True), nn.MaxPool2d(2),
-            nn.Conv2d(48, 96, 3, padding=1), nn.BatchNorm2d(96), nn.ReLU(inplace=True), nn.AdaptiveAvgPool2d(1),
+            nn.Conv2d(48, 96, 3, padding=1), nn.BatchNorm2d(96), nn.ReLU(inplace=True), GlobalMeanPool(),
         )
         self.projection = nn.Sequential(nn.Flatten(), nn.Linear(96, 64), nn.ReLU(inplace=True))
 
@@ -99,6 +112,33 @@ def seed_everything(seed):
     if torch.cuda.is_available(): torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
+    torch.use_deterministic_algorithms(True)
+
+
+# Named random streams. Each model initialisation and each data loader draws from its own
+# stream derived from (seed, name), so nothing depends on how many random numbers earlier
+# steps consumed (e.g. how often a test loader was iterated).
+# The two frozen-embedding heads share the "head_train"/"head_val" streams through separate
+# loader instances, so both see the same batch order regardless of how long the other trained.
+STREAMS = ("cnn_init", "cnn_train", "cnn_val", "hybrid_init", "mlp_init", "head_train", "head_val",
+           "gradient_check", "embed", "test")
+
+
+def stream_seed(seed, name):
+    if name not in STREAMS: raise KeyError(f"Unknown random stream: {name}")
+    return int(np.random.SeedSequence([int(seed), zlib.crc32(name.encode())]).generate_state(1, dtype=np.uint64)[0] >> 1)
+
+
+def stream_generator(seed, name):
+    return torch.Generator().manual_seed(stream_seed(seed, name))
+
+
+@contextlib.contextmanager
+def init_stream(seed, name):
+    """Initialise a module from its own stream; the global CPU generator is restored afterwards."""
+    with torch.random.fork_rng(devices=[]):
+        torch.default_generator.manual_seed(stream_seed(seed, name))
+        yield
 
 
 def class_weights(ds, device):
@@ -108,8 +148,10 @@ def class_weights(ds, device):
     return torch.tensor(weights, dtype=torch.float32, device=device), counts.tolist()
 
 
-def loader(ds, batch_size, shuffle=False):
-    return DataLoader(ds, batch_size=batch_size, shuffle=shuffle, num_workers=0, pin_memory=torch.cuda.is_available())
+def loader(ds, batch_size, generator, shuffle=False):
+    # Every loader owns a generator: shuffling and the per-iteration base seed never touch the global RNG.
+    return DataLoader(ds, batch_size=batch_size, shuffle=shuffle, num_workers=0, generator=generator,
+                      pin_memory=torch.cuda.is_available())
 
 
 def collect_predictions(model, batches, device, input_kind="image"):
@@ -175,10 +217,10 @@ def fit(model, train_batches, val_batches, optimizer, criterion, device, epochs,
     return history
 
 
-def embed_split(encoder, ds, device, batch_size):
+def embed_split(encoder, ds, device, batch_size, generator):
     encoder.eval(); allx=[]; ally=[]
     with torch.no_grad():
-        for x,y in loader(ds,batch_size):
+        for x,y in loader(ds,batch_size,generator):
             allx.append(encoder(x.to(device)).cpu()); ally.append(y)
     return TensorDataset(torch.cat(allx),torch.cat(ally))
 
@@ -207,6 +249,17 @@ def inference_timing(model, batches, device):
     if device.type=="cuda": torch.cuda.synchronize(device)
     elapsed=time.perf_counter()-start
     return {"total_seconds":elapsed,"milliseconds_per_image":1000*elapsed/max(total,1),"samples":total}
+
+
+def determinism_record(seeds):
+    import pennylane
+    return {"use_deterministic_algorithms":torch.are_deterministic_algorithms_enabled(),
+            "cudnn_deterministic":torch.backends.cudnn.deterministic,"cudnn_benchmark":torch.backends.cudnn.benchmark,
+            "cublas_workspace_config":os.environ.get("CUBLAS_WORKSPACE_CONFIG"),
+            "versions":{"torch":torch.__version__,"cuda":torch.version.cuda,"cudnn":torch.backends.cudnn.version(),
+                        "pennylane":pennylane.__version__,"numpy":np.__version__},
+            "train_py_sha256":hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+            "stream_seeds":{str(s):{n:stream_seed(s,n) for n in STREAMS} for s in seeds}}
 
 
 def safe_save(obj, path):
@@ -246,13 +299,14 @@ def main():
             print(json.dumps({"seed":seed,"status":"already_complete_skipped"}),flush=True)
             continue
         w,counts=class_weights(train_ds,device)
-        tr=loader(train_ds,batch_size,True); va=loader(val_ds,batch_size)
-        cnn=CNN().to(device); cnn_opt=torch.optim.AdamW(cnn.parameters(),lr=float(cfg["learning_rate_cnn"]),weight_decay=float(cfg["weight_decay"]))
+        tr=loader(train_ds,batch_size,stream_generator(seed,"cnn_train"),True); va=loader(val_ds,batch_size,stream_generator(seed,"cnn_val"))
+        with init_stream(seed,"cnn_init"): cnn=CNN()
+        cnn=cnn.to(device); cnn_opt=torch.optim.AdamW(cnn.parameters(),lr=float(cfg["learning_rate_cnn"]),weight_decay=float(cfg["weight_decay"]))
         criterion=nn.CrossEntropyLoss(weight=w)
         if args.pilot:
             # Use bounded, deterministic subsets; the pilot cannot inspect the held-out test partition.
-            tr=loader(Subset(train_ds,pilot_indices(train_ds,64)),batch_size,True)
-            va=loader(Subset(val_ds,pilot_indices(val_ds,32)),batch_size)
+            tr=loader(Subset(train_ds,pilot_indices(train_ds,64)),batch_size,stream_generator(seed,"cnn_train"),True)
+            va=loader(Subset(val_ds,pilot_indices(val_ds,32)),batch_size,stream_generator(seed,"cnn_val"))
         cnn_t=time.perf_counter(); cnn_final=out/"checkpoints"/f"cnn_seed_{seed}.pt"
         cnn_stage=out/"checkpoints"/f"cnn_seed_{seed}_training.pt"
         if args.resume and cnn_final.exists():
@@ -267,18 +321,20 @@ def main():
         # Freeze encoder selected solely on training/validation data. Extract embeddings for supplied splits.
         encoder=cnn.encoder
         for p in encoder.parameters(): p.requires_grad=False
-        splits={"train":embed_split(encoder,train_ds,device,batch_size),"val":embed_split(encoder,val_ds,device,batch_size)}
+        splits={"train":embed_split(encoder,train_ds,device,batch_size,stream_generator(seed,"embed")),
+                "val":embed_split(encoder,val_ds,device,batch_size,stream_generator(seed,"embed"))}
         if args.pilot:
             it=pilot_indices(train_ds,64); iv=pilot_indices(val_ds,32)
             splits["train"]=TensorDataset(splits["train"].tensors[0][it],splits["train"].tensors[1][it])
             splits["val"]=TensorDataset(splits["val"].tensors[0][iv],splits["val"].tensors[1][iv])
         # Head-only training on frozen, train-fitted CNN embeddings.
         head_weights=w.detach().cpu()
-        qcnn=HybridHead(); qopt=torch.optim.AdamW(qcnn.parameters(),lr=float(cfg["learning_rate_head"]),weight_decay=float(cfg["weight_decay"]))
+        with init_stream(seed,"hybrid_init"): qcnn=HybridHead()
+        qopt=torch.optim.AdamW(qcnn.parameters(),lr=float(cfg["learning_rate_head"]),weight_decay=float(cfg["weight_decay"]))
         qcriterion=nn.CrossEntropyLoss(weight=head_weights)
-        qtr=loader(splits["train"],batch_size,True); qva=loader(splits["val"],batch_size)
-        # Gradient verification is mandatory before a run can proceed.
-        qcnn.train(); qx,qy=next(iter(qtr)); qlog=qcnn(qx); qloss=qcriterion(qlog,qy); qloss.backward()
+        qtr=loader(splits["train"],batch_size,stream_generator(seed,"head_train"),True); qva=loader(splits["val"],batch_size,stream_generator(seed,"head_val"))
+        # Gradient verification is mandatory before a run can proceed (own stream: it must not advance qtr).
+        qcnn.train(); qx,qy=next(iter(loader(splits["train"],batch_size,stream_generator(seed,"gradient_check"),True))); qlog=qcnn(qx); qloss=qcriterion(qlog,qy); qloss.backward()
         grad_norm=float(sum(p.grad.detach().norm().item() for p in qcnn.parameters() if p.grad is not None))
         if not np.isfinite(grad_norm) or grad_norm<=0: raise RuntimeError(f"QCNN gradient check failed: {grad_norm}")
         qcnn.zero_grad(set_to_none=True)
@@ -290,10 +346,13 @@ def main():
         if not args.pilot:
             torch.save({"state_dict":qcnn.state_dict(),"seed":seed,"encoder_checkpoint":f"cnn_seed_{seed}.pt","class_map":CLASS_TO_ID},qfinal)
         # Matched classical control on the same frozen embeddings and optimization data.
-        mlp=ClassicalHead(); mopt=torch.optim.AdamW(mlp.parameters(),lr=float(cfg["learning_rate_head"]),weight_decay=float(cfg["weight_decay"]))
+        with init_stream(seed,"mlp_init"): mlp=ClassicalHead()
+        mopt=torch.optim.AdamW(mlp.parameters(),lr=float(cfg["learning_rate_head"]),weight_decay=float(cfg["weight_decay"]))
         mfinal=out/"checkpoints"/f"frozen_mlp_seed_{seed}.pt"; mstage=out/"checkpoints"/f"frozen_mlp_seed_{seed}_training.pt"
         if args.resume and mfinal.exists(): mlp.load_state_dict(torch.load(mfinal,map_location="cpu",weights_only=False)["state_dict"]); mhist=[]
-        else: mhist=fit(mlp,qtr,qva,mopt,qcriterion,torch.device("cpu"),epochs,int(cfg["patience"]),args.pilot,mstage,args.resume,run_dir/"frozen_mlp_epochs.jsonl")
+        else:
+            mtr=loader(splits["train"],batch_size,stream_generator(seed,"head_train"),True); mva=loader(splits["val"],batch_size,stream_generator(seed,"head_val"))
+            mhist=fit(mlp,mtr,mva,mopt,qcriterion,torch.device("cpu"),epochs,int(cfg["patience"]),args.pilot,mstage,args.resume,run_dir/"frozen_mlp_epochs.jsonl")
         if not args.pilot: torch.save({"state_dict":mlp.state_dict(),"seed":seed,"class_map":CLASS_TO_ID},mfinal)
         row={"seed":seed,"class_counts_train":counts,"parameter_counts":{"cnn_during_fit":cnn_parameter_counts,
              "cnn_classifier_after_encoder_freeze":parameter_counts(cnn),"hybrid_head":parameter_counts(qcnn),"frozen_mlp_head":parameter_counts(mlp)},
@@ -302,16 +361,17 @@ def main():
         if not args.pilot:
             # Test predictions are generated only after all training/model choices for this seed are fixed.
             test_ds=LunarImages(root,"test")
-            splits["test"]=embed_split(encoder,test_ds,device,batch_size)
-            cnn_logits,cy=collect_predictions(cnn,loader(test_ds,batch_size),device)
-            te=splits["test"]; q_logits,qy=collect_predictions(qcnn,loader(te,batch_size),torch.device("cpu")); m_logits,_=collect_predictions(mlp,loader(te,batch_size),torch.device("cpu"))
+            test_gen=lambda: stream_generator(seed,"test")  # noqa: E731
+            splits["test"]=embed_split(encoder,test_ds,device,batch_size,test_gen())
+            cnn_logits,cy=collect_predictions(cnn,loader(test_ds,batch_size,test_gen()),device)
+            te=splits["test"]; q_logits,qy=collect_predictions(qcnn,loader(te,batch_size,test_gen()),torch.device("cpu")); m_logits,_=collect_predictions(mlp,loader(te,batch_size,test_gen()),torch.device("cpu"))
             if not np.array_equal(cy,qy): raise RuntimeError("Models were evaluated on different test labels/order")
             row["test"]={"sample_count":int(len(cy)),"class_distribution":np.bincount(cy,minlength=3).tolist(),
                          "cnn":score(cy,cnn_logits.argmax(1)),"hybrid_qcnn":score(cy,q_logits.argmax(1)),"frozen_embedding_mlp":score(cy,m_logits.argmax(1)),
                          "majority_train_baseline":score(cy,np.full_like(cy,int(np.argmax(counts)))),
-                         "inference":{"cnn":inference_timing(cnn,loader(test_ds,batch_size),device),
-                                      "hybrid_qcnn":inference_timing(qcnn,loader(te,batch_size),torch.device("cpu")),
-                                      "frozen_embedding_mlp":inference_timing(mlp,loader(te,batch_size),torch.device("cpu"))},
+                         "inference":{"cnn":inference_timing(cnn,loader(test_ds,batch_size,test_gen()),device),
+                                      "hybrid_qcnn":inference_timing(qcnn,loader(te,batch_size,test_gen()),torch.device("cpu")),
+                                      "frozen_embedding_mlp":inference_timing(mlp,loader(te,batch_size,test_gen()),torch.device("cpu"))},
                          "sample_ids":[p.relative_to(root).as_posix() for p,_ in test_ds.items],
                          "ground_truth":cy.tolist(),"predictions":{"cnn":cnn_logits.argmax(1).tolist(),"hybrid_qcnn":q_logits.argmax(1).tolist(),"frozen_embedding_mlp":m_logits.argmax(1).tolist()},
                          "logits":{"cnn":cnn_logits.tolist(),"hybrid_qcnn":q_logits.tolist(),"frozen_embedding_mlp":m_logits.tolist()}}
@@ -327,7 +387,8 @@ def main():
                 for model_name,hist in row["history"].items():
                     for h in hist: writer.writerow({"model":model_name,**h})
         print(json.dumps({"seed":seed,"cnn_seconds":cnn_seconds,"qcnn_seconds":q_seconds,"qcnn_gradient_norm":grad_norm,"pilot":args.pilot}),flush=True)
-    summary={"config":cfg,"device":str(device),"pilot":args.pilot,"elapsed_seconds":time.perf_counter()-start_all,"runs":all_results}
+    summary={"config":cfg,"device":str(device),"pilot":args.pilot,"elapsed_seconds":time.perf_counter()-start_all,
+             "determinism":determinism_record(seeds),"runs":all_results}
     summary_path=out/"summary.json"
     if args.resume and summary_path.exists(): summary_path.unlink()
     safe_save(summary,summary_path)

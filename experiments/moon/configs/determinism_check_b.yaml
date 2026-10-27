@@ -1,0 +1,26 @@
+# Determinism check (README "Code history"): seed 42 run twice, compared bit for bit.
+# Paths are relative to the repository root.
+dataset: data/raw/moon/lrocnet
+output: data/raw/moon/lrocnet/experiment_lunar_cnn_qcnn/determinism_check_b_20261028
+classes: [ejecta, oldcrater, none]
+image_size: 227
+batch_size: 64
+seeds: [42]
+max_epochs: 12
+patience: 3
+learning_rate_cnn: 0.001
+learning_rate_head: 0.005
+weight_decay: 0.0001
+num_workers: 0
+device: cuda
+class_weighting: inverse_frequency_train_only
+selection_metric: validation_macro_f1
+test_policy: final_evaluation_once_after_all_model_choices_fixed
+quantum:
+  framework: PennyLane default.qubit
+  qubits: 8
+  encoding: angle; tanh(bottleneck) mapped to [0, pi]
+  circuit: 3 shared-parameter convolution stages with 8->4->2 pooling schedule
+  measurements: Z on each of two remaining wires plus their ZZ correlation
+  classical_readout: learned affine 3-value to 3-class logits
+  frozen_encoder: true

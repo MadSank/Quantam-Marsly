@@ -135,3 +135,28 @@ Mean ± sample SD over seeds 42/43/44 on the same 779-image test set:
 2. Decide whether the published Moon figures, the website caveats and `FINAL_READINESS_AUDIT.md` need an added disclosure or more seeds. That decision belongs to the project owner; nothing has been changed.
 
 The website shows this note next to the Moon code excerpts and keeps the audit's test-embedding caveat.
+
+**Summary for readers of the results.** The hybrid QCNN head and frozen-embedding MLP results did not reproduce exactly in a locked-test re-run, most likely because of a different random initialisation, so the ranking between hybrid, MLP and CNN on the Moon should not be treated as robust.
+
+### Deterministic trainer (2026-10-28)
+
+`train.py` is now deterministic, so a future run can be repeated exactly. Changes:
+
+- **Deterministic kernels:** `torch.use_deterministic_algorithms(True)` is on, with `CUBLAS_WORKSPACE_CONFIG=:4096:8` set before CUDA starts. The CNN's `nn.AdaptiveAvgPool2d(1)` is replaced by `GlobalMeanPool`, which gives the same output, has no parameters and keeps the same `state_dict`, but has a deterministic CUDA backward pass. The reported checkpoints still load.
+- **Named random streams:** each model initialisation (`cnn_init`, `hybrid_init`, `mlp_init`) and each data loader gets its own seed, derived from (seed, stream name).
+  - Initialisation runs inside `torch.random.fork_rng`.
+  - Every `DataLoader` owns a generator, so iterating one loader (for example a test loader) can no longer shift anything else. This removes the cause identified above.
+- **Matched head batches:** the hybrid and MLP heads read the same `head_train` / `head_val` streams through separate loaders, so both see the same batch order. Before, the MLP reused the hybrid's loader, so its order depended on how long the hybrid trained.
+- **The gradient check** draws its batch from its own stream, so it no longer advances the training loader.
+- **`summary.json` records** the determinism settings, library versions, a SHA-256 of `train.py` and every stream seed.
+
+Supporting tools:
+- `tests/test_determinism.py` (8 tests) covers the mechanics. Initialisation is unaffected by earlier random draws and loader iterations. The global generator is restored after initialisation. Loader order depends only on its own stream. `GlobalMeanPool` equals `AdaptiveAvgPool2d(1)`, and the reported checkpoints still load.
+- `compare_runs.py` compares two run folders bit for bit, excluding wall-clock timings.
+- `verify_results.py` takes `--runs <folder>` and checks the seed list from that run's own config, instead of assuming three seeds.
+
+Known limit: `--resume` restores the global generator but not the loaders' own generators, so a resumed run is not guaranteed bit-identical to an uninterrupted one. Run without `--resume` when exact reproduction matters.
+
+**Check A, passed:** seed 42 was run twice with `configs/determinism_check_a.yaml` and `configs/determinism_check_b.yaml` (outputs `data/raw/.../determinism_check_{a,b}_20261028/`, 83 s each on the RTX 4070). `compare_runs.py` reports them **identical**: every logit, prediction, metric, loss and validation-F1 history, and every checkpoint tensor. As a control, it reports 131 differences against the earlier locked-test re-run.
+
+**10-seed re-run: planned, not yet done.** `configs/deterministic_10seed.yaml` (seeds 42–51) and `configs/deterministic_repeat.yaml` (seeds 42 and 43, for a bit-for-bit repeat) are ready. The first attempt was stopped on request before it wrote any output. Expected time is about 14 minutes for 10 seeds plus 3 minutes for the repeat. Until it is run, the published three-seed Moon figures stand, with the caveat above.
