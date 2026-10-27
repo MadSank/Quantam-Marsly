@@ -6,7 +6,8 @@ The study's results currently live only in the Streamlit app (`visualization_app
 
 ## How the work proceeds
 
-- Build one step at a time. After each step: run the tests, commit to `website-redesign` with a clear message, then stop for review.
+- Build one step at a time. After each step: run the tests, commit to `website-redesign` with a clear message, push `website-redesign` to `origin`, then stop for review.
+- **Merging:** merge `website-redesign` into `main` with a normal merge commit. Don't squash or rebase: the `/lab` permalinks point at commit SHAs on this branch and must stay reachable from `main`.
 - After steps 5, 6, 8 and 9, also take built-in-browser screenshots at 1920×1080 and 1366×768.
 
 ## Findings
@@ -58,7 +59,9 @@ Per-tile predictions exist for both models, for every fold and seed:
 **Code permalinks:**
 - GitHub remote: `MadSank/Quantam-Marsly`.
 - Mars code (`src/`) is tracked, so it can be permalinked.
-- The Moon experiment code lives under gitignored `data/raw/moon/lrocnet/experiment_lunar_cnn_qcnn/`. It has **no permalink**, so Moon code is not excerpted in the walkthrough. The Moon circuit diagram and parameters are still generated from that local code and labelled "source not published in the repository".
+- The Moon experiment code currently lives under gitignored `data/raw/moon/lrocnet/experiment_lunar_cnn_qcnn/`. It is project code written for this study, not code shipped with the LROCNet dataset. A move of the code files (not data or run artifacts) into tracked `experiments/moon/` is proposed and awaiting approval.
+  - Once it's tracked, `/lab` links the Moon code with permalinks exactly like the Mars code, and there's no "source not published" label.
+  - The Moon hybrid already uses the tracked `src/quantum/circuits.py::BatchedQCNNHead`, so its circuit can be permalinked either way.
 - Permalinks use the commit SHA recorded at export time. They resolve on GitHub only after that commit is pushed; at the time of writing, origin only has the initial commit.
 
 ## Pages
@@ -365,7 +368,9 @@ These rules are built into the components:
   - The excerpt's `code` equals those lines.
 - **No performance claims:**
   - The rendered Lab text and the `lab/*.json` notes contain none of these phrases: `better`, `outperform`, `superior`, `wins`, `winner`, `beats`, `faster`, `speedup`, `speed-up`, `advantage`, `improves`, `more accurate`.
-  - The only exception is caveat text pulled verbatim from `caveats.json`, which is allowed through by caveat ID.
+  - Exceptions:
+    - Caveat text pulled verbatim from `caveats.json`, allowed through by caveat ID.
+    - The exact direction labels `lower is better` and `higher is better`, which every metric must show. Only those exact phrases are allowed; any other use of `better` still fails.
   - The same removed-section deny-list applies.
 - `curves.json` has no wall-time or lr fields.
 
