@@ -1,9 +1,10 @@
 {
  "source": [
   "FINAL_READINESS_AUDIT.md",
-  "visualization_app/README.md"
+  "visualization_app/README.md",
+  "experiments/moon/README.md"
  ],
- "generated_at": "2026-10-27T17:44:52+00:00",
+ "generated_at": "2026-10-27T18:49:55+00:00",
  "caveats": [
   {
    "id": "safe_proxy",
@@ -115,6 +116,14 @@
    "title": "Unverified provenance",
    "source": "FINAL_READINESS_AUDIT.md",
    "text": "The provenance audit did not verify class annotation criteria, original split-generation methodology, source-image identity, or geographic/site identity.",
+   "quote_parts": 1
+  },
+  {
+   "id": "moon_reproducibility",
+   "world": "moon",
+   "title": "Hybrid and MLP results did not reproduce exactly",
+   "source": "experiments/moon/README.md",
+   "text": "The hybrid QCNN head and frozen-embedding MLP results did not reproduce exactly in a locked-test re-run, most likely because of a different random initialisation, so the ranking between hybrid, MLP and CNN on the Moon should not be treated as robust.",
    "quote_parts": 1
   },
   {

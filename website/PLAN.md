@@ -167,7 +167,7 @@ Two rules apply to every file:
 
 **`caveats.json`**
 - `[{ id, world: "mars"|"moon"|"both", title, text, source }]`
-- The text is quoted verbatim from `FINAL_READINESS_AUDIT.md` or the app's caveat rules.
+- The text is quoted verbatim from `FINAL_READINESS_AUDIT.md`, the app's caveat rules, or (for `moon_reproducibility`) the "Code history" section of `experiments/moon/README.md`.
 - The mixed-results caveat uses the audit's §1 wording only:
   - Mars: "Numerically, the QCNN reduces the reported regression errors and false-positive rate, but the CNN has higher safe recall and coverage. These results therefore do not identify a clear overall winner."
   - Moon: "Three seeds on one supplied split are descriptive evidence, not proof of a general advantage."
@@ -306,6 +306,7 @@ These rules are built into the components:
   - Both decision regimes, fixed and validation-calibrated, are shown.
 - **Mixed-results caveat:** shown persistently in the results panel, using the audit's §1 wording from `caveats.json`. No paired-difference table, no interval chart, and no mention of intervals.
 - **Moon:**
+  - The published three-seed Moon numbers are kept. Beside them, the `moon_reproducibility` caveat states that the hybrid and MLP results did not reproduce exactly in a locked-test re-run, so the hybrid / MLP / CNN ranking is not robust. Its source is the "Code history" section of `experiments/moon/README.md`.
   - Balanced accuracy and macro-F1 are listed first; accuracy is shown with the majority-baseline line (68.4%).
   - Timings appear only on About, as "separately measured, not comparable".
   - The CNN parameter count is 59,347 trainable during training, with the 195 explained.
@@ -404,6 +405,7 @@ These rules are built into the components:
    - Crops are outlined in the model colour, dashed when the prediction is wrong.
    - Ground-truth layer is a toggle.
    - 3-way model toggle including the MLP; results panel.
+   - The results panel always shows the `moon_reproducibility` caveat next to the Moon metrics, linked to the "Code history" section of `experiments/moon/README.md` (its source). Add a render test that the caveat is present whenever Moon results are shown.
    - Screenshots.
 10. **About page:** method, the full caveat list, and data sources with licence and citation from `about.json`. Enable `sources.test.ts`, and list any `TO CONFIRM` items for you.
 11. **Lab page ("Under the hood").**

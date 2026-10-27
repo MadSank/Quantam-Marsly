@@ -66,6 +66,7 @@ MOON_DF_PREFIX = {"cnn": "cnn", "hybrid_qcnn": "hybrid", "frozen_embedding_mlp":
 
 AUDIT = REPO_ROOT / "FINAL_READINESS_AUDIT.md"
 APP_README = APP_DIR / "README.md"
+MOON_CODE_HISTORY = REPO_ROOT / "experiments" / "moon" / "README.md"  # "Code history" section
 
 # Every caveat is a verbatim quote (or verbatim "parts" joined with a space); export fails
 # if any quoted text is not found in its source.
@@ -116,13 +117,18 @@ CAVEATS: list[dict[str, Any]] = [
     {"id": "moon_provenance", "world": "moon", "title": "Unverified provenance", "source": "audit",
      "text": "The provenance audit did not verify class annotation criteria, original split-generation "
              "methodology, source-image identity, or geographic/site identity."},
+    {"id": "moon_reproducibility", "world": "moon", "title": "Hybrid and MLP results did not reproduce exactly",
+     "source": "moon_code_history",
+     "text": "The hybrid QCNN head and frozen-embedding MLP results did not reproduce exactly in a locked-test re-run, "
+             "most likely because of a different random initialisation, so the ranking between hybrid, MLP and CNN "
+             "on the Moon should not be treated as robust."},
     {"id": "moon_test_embeddings", "world": "moon", "title": "Test-embedding timing in the completed run",
      "source": "audit",
      "text": "Test embeddings were computed before fitting the QCNN/MLP heads, but were not used for gradient "
              "updates, validation selection, or threshold selection; the saved audit confirms final metrics "
              "came from saved predictions."},
 ]
-CAVEAT_SOURCES = {"audit": AUDIT, "app_readme": APP_README}
+CAVEAT_SOURCES = {"audit": AUDIT, "app_readme": APP_README, "moon_code_history": MOON_CODE_HISTORY}
 
 
 # ---------------------------------------------------------------- helpers

@@ -23,6 +23,7 @@ const REQUIRED: Array<[string, 'mars' | 'moon' | 'both']> = [
   ['moon_seeds', 'moon'],
   ['moon_provenance', 'moon'],
   ['moon_test_embeddings', 'moon'],
+  ['moon_reproducibility', 'moon'],
 ]
 
 describe('caveats.json', () => {
@@ -31,7 +32,7 @@ describe('caveats.json', () => {
     expect(c, id).toBeDefined()
     expect(c!.world).toBe(world)
     expect(c!.text.length).toBeGreaterThan(20)
-    expect(c!.source).toMatch(/^(FINAL_READINESS_AUDIT\.md|visualization_app\/README\.md)$/)
+    expect(c!.source).toMatch(/^(FINAL_READINESS_AUDIT\.md|visualization_app\/README\.md|experiments\/moon\/README\.md)$/)
   })
 
   it('uses the approved mixed-results wording (audit §1, no interval language)', () => {
@@ -53,6 +54,13 @@ describe('caveats.json', () => {
     expect(byId.get('safe_proxy')!.text).toMatch(/derived proxy label/)
     expect(byId.get('no_quantum_advantage')!.text).toMatch(/No quantum advantage or superiority is claimed/)
     expect(byId.get('moon_timing')!.text).toMatch(/not an apples-to-apples/)
+  })
+
+  it('flags the Moon ranking as not robust, citing the Code history', () => {
+    const c = byId.get('moon_reproducibility')!
+    expect(c.text).toMatch(/did not reproduce exactly in a locked-test re-run/)
+    expect(c.text).toMatch(/should not be treated as robust/)
+    expect(c.source).toBe('experiments/moon/README.md')
   })
 
   it.todo('renders every caveat on About (step 10)')
