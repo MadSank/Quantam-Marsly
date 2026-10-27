@@ -1,0 +1,25 @@
+{
+ "source": [
+  "FINAL_READINESS_AUDIT.md"
+ ],
+ "generated_at": "2026-10-27T17:14:19+00:00",
+ "method": [],
+ "sources": [
+  {
+   "name": "HiRISE orthoimages and DTMs",
+   "provider": "NASA/JPL/University of Arizona",
+   "licence": "TO CONFIRM",
+   "citation": "TO CONFIRM",
+   "url": "TO CONFIRM",
+   "used_for": "Mars strips, terrain targets (slope, roughness, hazard) and tiles"
+  },
+  {
+   "name": "LROCNet",
+   "provider": "TO CONFIRM",
+   "licence": "TO CONFIRM",
+   "citation": "TO CONFIRM",
+   "url": "TO CONFIRM",
+   "used_for": "Moon crater classification crops (ejecta, oldcrater, none)"
+  }
+ ]
+}

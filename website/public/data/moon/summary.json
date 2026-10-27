@@ -1,0 +1,229 @@
+{
+ "source": [
+  "data/raw/moon/lrocnet/experiment_lunar_cnn_qcnn/runs/results_verification/recomputed_metrics.csv",
+  "data/raw/moon/lrocnet/experiment_lunar_cnn_qcnn/runs/metrics.csv",
+  "data/raw/moon/lrocnet/provenance_manifest.csv",
+  "data/raw/moon/lrocnet/experiment_lunar_cnn_qcnn/runs/logs/seed_42/results.json",
+  "data/raw/moon/lrocnet/experiment_lunar_cnn_qcnn/runs/logs/seed_43/results.json",
+  "data/raw/moon/lrocnet/experiment_lunar_cnn_qcnn/runs/logs/seed_44/results.json"
+ ],
+ "generated_at": "2026-10-27T17:14:19+00:00",
+ "classes": [
+  "ejecta",
+  "oldcrater",
+  "none"
+ ],
+ "models": [
+  "cnn",
+  "hybrid_qcnn",
+  "frozen_embedding_mlp"
+ ],
+ "split_counts": {
+  "train": {
+   "ejecta": 358,
+   "oldcrater": 594,
+   "none": 2656
+  },
+  "val": {
+   "ejecta": 55,
+   "oldcrater": 118,
+   "none": 440
+  },
+  "test": {
+   "ejecta": 89,
+   "oldcrater": 157,
+   "none": 533
+  }
+ },
+ "split_sizes": {
+  "train": 3608,
+  "val": 613,
+  "test": 779
+ },
+ "metrics": {
+  "cnn": {
+   "accuracy": {
+    "mean": 0.5297389816003424,
+    "sd": 0.0354201148251174
+   },
+   "balanced_accuracy": {
+    "mean": 0.5578921891427019,
+    "sd": 0.053302350845611
+   },
+   "macro_f1": {
+    "mean": 0.4649514316434924,
+    "sd": 0.0238750217304747
+   }
+  },
+  "hybrid_qcnn": {
+   "accuracy": {
+    "mean": 0.5288831835686777,
+    "sd": 0.0387668006945866
+   },
+   "balanced_accuracy": {
+    "mean": 0.6080270862769513,
+    "sd": 0.0064637934097947
+   },
+   "macro_f1": {
+    "mean": 0.4973126273689083,
+    "sd": 0.0257104561289935
+   }
+  },
+  "frozen_embedding_mlp": {
+   "accuracy": {
+    "mean": 0.4510055626872058,
+    "sd": 0.0372124563136446
+   },
+   "balanced_accuracy": {
+    "mean": 0.5865189455807599,
+    "sd": 0.0207897634754007
+   },
+   "macro_f1": {
+    "mean": 0.4395913404068901,
+    "sd": 0.0284077026501196
+   }
+  },
+  "majority_train_baseline": {
+   "accuracy": {
+    "mean": 0.6842105263157895,
+    "sd": 0.0
+   },
+   "balanced_accuracy": {
+    "mean": 0.3333333333333333,
+    "sd": 0.0
+   },
+   "macro_f1": {
+    "mean": 0.2708333333333333,
+    "sd": 0.0
+   }
+  }
+ },
+ "per_seed": [
+  {
+   "seed": 42,
+   "model": "cnn",
+   "accuracy": 0.5160462130937099,
+   "balanced_accuracy": 0.5074993419588308,
+   "macro_f1": 0.4375642370407808,
+   "test_samples": 779
+  },
+  {
+   "seed": 42,
+   "model": "hybrid_qcnn",
+   "accuracy": 0.4878048780487805,
+   "balanced_accuracy": 0.6039475667067555,
+   "macro_f1": 0.4690840075916491,
+   "test_samples": 779
+  },
+  {
+   "seed": 42,
+   "model": "frozen_embedding_mlp",
+   "accuracy": 0.4094993581514762,
+   "balanced_accuracy": 0.5650521753581138,
+   "macro_f1": 0.4078559990360783,
+   "test_samples": 779
+  },
+  {
+   "seed": 42,
+   "model": "majority_train_baseline",
+   "accuracy": 0.6842105263157895,
+   "balanced_accuracy": 0.3333333333333333,
+   "macro_f1": 0.2708333333333333,
+   "test_samples": 779
+  },
+  {
+   "seed": 43,
+   "model": "cnn",
+   "accuracy": 0.5699614890885751,
+   "balanced_accuracy": 0.5524853233657495,
+   "macro_f1": 0.4813786787899352,
+   "test_samples": 779
+  },
+  {
+   "seed": 43,
+   "model": "hybrid_qcnn",
+   "accuracy": 0.5648267008985879,
+   "balanced_accuracy": 0.604654012672613,
+   "macro_f1": 0.5193884900874889,
+   "test_samples": 779
+  },
+  {
+   "seed": 43,
+   "model": "frozen_embedding_mlp",
+   "accuracy": 0.4621309370988447,
+   "balanced_accuracy": 0.5879465476772477,
+   "macro_f1": 0.4482723115079151,
+   "test_samples": 779
+  },
+  {
+   "seed": 43,
+   "model": "majority_train_baseline",
+   "accuracy": 0.6842105263157895,
+   "balanced_accuracy": 0.3333333333333333,
+   "macro_f1": 0.2708333333333333,
+   "test_samples": 779
+  },
+  {
+   "seed": 44,
+   "model": "cnn",
+   "accuracy": 0.503209242618742,
+   "balanced_accuracy": 0.6136919021035252,
+   "macro_f1": 0.4759113790997614,
+   "test_samples": 779
+  },
+  {
+   "seed": 44,
+   "model": "hybrid_qcnn",
+   "accuracy": 0.5340179717586649,
+   "balanced_accuracy": 0.6154796794514857,
+   "macro_f1": 0.503465384427587,
+   "test_samples": 779
+  },
+  {
+   "seed": 44,
+   "model": "frozen_embedding_mlp",
+   "accuracy": 0.4813863928112965,
+   "balanced_accuracy": 0.6065581137069181,
+   "macro_f1": 0.4626457106766771,
+   "test_samples": 779
+  },
+  {
+   "seed": 44,
+   "model": "majority_train_baseline",
+   "accuracy": 0.6842105263157895,
+   "balanced_accuracy": 0.3333333333333333,
+   "macro_f1": 0.2708333333333333,
+   "test_samples": 779
+  }
+ ],
+ "parameter_counts": {
+  "cnn": {
+   "trainable_during_training": 59347,
+   "trainable_recorded_post_freeze": 195,
+   "note": "Independent audit confirmed 59,347 trainable parameters during initial CNN fitting. The recorded 195 represents only the trainable linear classifier after freezing the encoder."
+  },
+  "hybrid_head": 568,
+  "mlp_head": 547
+ },
+ "timing": {
+  "comparable": false,
+  "caveat_id": "moon_timing",
+  "milliseconds_per_image": {
+   "cnn": {
+    "42": 0.8183388960107191,
+    "43": 0.8599948652004357,
+    "44": 0.8151759948316646
+   },
+   "hybrid_qcnn": {
+    "42": 0.8061970475001861,
+    "43": 0.8166234916230288,
+    "44": 0.7797028241435183
+   },
+   "frozen_embedding_mlp": {
+    "42": 0.012974069329440134,
+    "43": 0.012358023095529273,
+    "44": 0.012241335042043373
+   }
+  }
+ }
+}

@@ -1,0 +1,103 @@
+{
+ "source": [
+  "runs/controlled_evaluation/processed/metadata.parquet"
+ ],
+ "generated_at": "2026-10-27T17:14:19+00:00",
+ "sites": [
+  {
+   "site_id": "site_01",
+   "name": "Northern Mid-Latitude Crater",
+   "fold": 0,
+   "ortho_product_id": "ESP_062806_2150_RED_C_01_ORTHO",
+   "dtm_product_id": "DTEEC_062740_2150_062806_2150_A01",
+   "center": {
+    "lat": 34.8067,
+    "lon_e": 100.6848
+   },
+   "n_tiles": 2195,
+   "n_true_safe": 212,
+   "native_resolution_m": 1.0045020712681,
+   "native_height_px": 7735,
+   "native_width_px": 6109,
+   "tile_size_native_px": 128,
+   "preview": null,
+   "thumb": null
+  },
+  {
+   "site_id": "site_02",
+   "name": "Kaiser Crater",
+   "fold": 1,
+   "ortho_product_id": "ESP_039245_1325_RED_D_01_ORTHO",
+   "dtm_product_id": "DTEED_039245_1325_039944_1325_A01",
+   "center": {
+    "lat": -47.0121,
+    "lon_e": 18.7455
+   },
+   "n_tiles": 1885,
+   "n_true_safe": 750,
+   "native_resolution_m": 1.9986249395537,
+   "native_height_px": 3835,
+   "native_width_px": 2682,
+   "tile_size_native_px": 64,
+   "preview": null,
+   "thumb": null
+  },
+  {
+   "site_id": "site_03",
+   "name": "Layered Yardangs",
+   "fold": 2,
+   "ortho_product_id": "ESP_023051_1865_RED_C_01_ORTHO",
+   "dtm_product_id": "DTEEC_022774_1865_023051_1865_A01",
+   "center": {
+    "lat": 6.3232,
+    "lon_e": 34.6912
+   },
+   "n_tiles": 2484,
+   "n_true_safe": 808,
+   "native_resolution_m": 1.0116097897759,
+   "native_height_px": 8530,
+   "native_width_px": 6244,
+   "tile_size_native_px": 128,
+   "preview": null,
+   "thumb": null
+  },
+  {
+   "site_id": "site_04",
+   "name": "Coprates Chasma",
+   "fold": 3,
+   "ortho_product_id": "ESP_026417_1660_IRB_C_01_ORTHO",
+   "dtm_product_id": "DTEEC_018347_1660_026417_1660_A01",
+   "center": {
+    "lat": -13.8592,
+    "lon_e": 300.9691
+   },
+   "n_tiles": 979,
+   "n_true_safe": 151,
+   "native_resolution_m": 1.0106411505385,
+   "native_height_px": 15377,
+   "native_width_px": 6555,
+   "tile_size_native_px": 128,
+   "preview": null,
+   "thumb": null
+  },
+  {
+   "site_id": "site_05",
+   "name": "Huo Hsing Vallis",
+   "fold": 4,
+   "ortho_product_id": "PSP_003495_2065_RED_C_01_ORTHO",
+   "dtm_product_id": "DTEEC_003495_2065_003561_2065_A01",
+   "center": {
+    "lat": 26.4343,
+    "lon_e": 66.6011
+   },
+   "n_tiles": 7690,
+   "n_true_safe": 4925,
+   "native_resolution_m": 1.0072186763504,
+   "native_height_px": 27626,
+   "native_width_px": 8131,
+   "tile_size_native_px": 128,
+   "preview": null,
+   "thumb": null
+  }
+ ]
+}

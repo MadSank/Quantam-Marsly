@@ -1,0 +1,28 @@
+{
+ "schema_version": 1,
+ "generated_at": "2026-10-27T17:14:19+00:00",
+ "worlds": [
+  "mars",
+  "moon"
+ ],
+ "files": [
+  "about.json",
+  "caveats.json",
+  "mars/headline.json",
+  "mars/sites.json",
+  "mars/sites/site_01.json",
+  "mars/sites/site_02.json",
+  "mars/sites/site_03.json",
+  "mars/sites/site_04.json",
+  "mars/sites/site_05.json",
+  "mars/tiles/site_01.json",
+  "mars/tiles/site_02.json",
+  "mars/tiles/site_03.json",
+  "mars/tiles/site_04.json",
+  "mars/tiles/site_05.json",
+  "moon/classes/ejecta.json",
+  "moon/classes/none.json",
+  "moon/classes/oldcrater.json",
+  "moon/summary.json"
+ ]
+}

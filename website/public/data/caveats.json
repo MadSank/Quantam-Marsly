@@ -1,0 +1,129 @@
+{
+ "source": [
+  "FINAL_READINESS_AUDIT.md",
+  "visualization_app/README.md"
+ ],
+ "generated_at": "2026-10-27T17:14:19+00:00",
+ "caveats": [
+  {
+   "id": "safe_proxy",
+   "world": "mars",
+   "title": "“Safe” is a proxy label",
+   "source": "FINAL_READINESS_AUDIT.md",
+   "text": "“Safe” is a derived proxy label: mean slope <8° and hazard fraction <0.05. It is not an observed landing outcome or validated safety assessment.",
+   "quote_parts": 1
+  },
+  {
+   "id": "mars_mixed_results",
+   "world": "mars",
+   "title": "Mixed results",
+   "source": "FINAL_READINESS_AUDIT.md",
+   "text": "Numerically, the QCNN reduces the reported regression errors and false-positive rate, but the CNN has higher safe recall and coverage. These results therefore do not identify a clear overall winner.",
+   "quote_parts": 2
+  },
+  {
+   "id": "mars_pipeline_comparison",
+   "world": "mars",
+   "title": "Pipeline comparison, not equal capacity",
+   "source": "FINAL_READINESS_AUDIT.md",
+   "text": "Thus the real-data experiment compares a full end-to-end CNN with a small head on a supervised frozen representation; it is a pipeline comparison, not an architecture-only or equal-capacity comparison.",
+   "quote_parts": 1
+  },
+  {
+   "id": "mars_no_matched_control",
+   "world": "mars",
+   "title": "No matched classical head",
+   "source": "FINAL_READINESS_AUDIT.md",
+   "text": "QCNN consumes a frozen supervised CNN representation and has far fewer trainable parameters. No real-data matched classical-head control is present in this primary Mars comparison, so numerical differences cannot be attributed specifically to quantum computation.",
+   "quote_parts": 1
+  },
+  {
+   "id": "mars_sites",
+   "world": "mars",
+   "title": "Five sites are the replication units",
+   "source": "FINAL_READINESS_AUDIT.md",
+   "text": "Five sites are the geographic replication units. Tiles within a site are not independent site-level observations. Three random seeds do not create more independent sites.",
+   "quote_parts": 1
+  },
+  {
+   "id": "mars_terrain_proxy",
+   "world": "mars",
+   "title": "Terrain-proxy results",
+   "source": "FINAL_READINESS_AUDIT.md",
+   "text": "These are terrain-proxy results, not evidence for operational landing safety.",
+   "quote_parts": 1
+  },
+  {
+   "id": "no_quantum_advantage",
+   "world": "both",
+   "title": "No quantum advantage claimed",
+   "source": "visualization_app/README.md",
+   "text": "All quantum circuits were simulated numerically on classical hardware. No quantum advantage or superiority is claimed.",
+   "quote_parts": 1
+  },
+  {
+   "id": "moon_param_count",
+   "world": "moon",
+   "title": "Corrected Moon CNN parameter count",
+   "source": "FINAL_READINESS_AUDIT.md",
+   "text": "The independent audit correctly establishes 59,347 trainable parameters during CNN fitting, with the 195-parameter classifier remaining trainable after encoder freeze.",
+   "quote_parts": 1
+  },
+  {
+   "id": "moon_timing",
+   "world": "moon",
+   "title": "Timings are not comparable",
+   "source": "FINAL_READINESS_AUDIT.md",
+   "text": "CNN timing includes image-encoder inference, while recorded QCNN timing is for the head on already-computed embeddings. It excludes the encoder and is not an apples-to-apples end-to-end latency comparison.",
+   "quote_parts": 1
+  },
+  {
+   "id": "moon_imbalance",
+   "world": "moon",
+   "title": "Class imbalance",
+   "source": "FINAL_READINESS_AUDIT.md",
+   "text": "The majority baseline’s 68.42% test accuracy is correct but predicts no minority classes (balanced accuracy 0.333, macro-F1 0.271). Accuracy alone is therefore misleading.",
+   "quote_parts": 1
+  },
+  {
+   "id": "moon_training_regime",
+   "world": "moon",
+   "title": "Different training regimes",
+   "source": "FINAL_READINESS_AUDIT.md",
+   "text": "This can support a frozen-embedding head comparison, not a clean end-to-end CNN-versus-QCNN attribution.",
+   "quote_parts": 1
+  },
+  {
+   "id": "moon_mixed_results",
+   "world": "moon",
+   "title": "Descriptive evidence only",
+   "source": "FINAL_READINESS_AUDIT.md",
+   "text": "Three seeds on one supplied split are descriptive evidence, not proof of a general advantage.",
+   "quote_parts": 1
+  },
+  {
+   "id": "moon_seeds",
+   "world": "moon",
+   "title": "Seeds are not independent test samples",
+   "source": "FINAL_READINESS_AUDIT.md",
+   "text": "The three-seed mean ± SD is not a confidence interval. The same fixed test partition is reused across seeds, so seeds reflect initialization/training variation, not independent test samples.",
+   "quote_parts": 1
+  },
+  {
+   "id": "moon_provenance",
+   "world": "moon",
+   "title": "Unverified provenance",
+   "source": "FINAL_READINESS_AUDIT.md",
+   "text": "The provenance audit did not verify class annotation criteria, original split-generation methodology, source-image identity, or geographic/site identity.",
+   "quote_parts": 1
+  },
+  {
+   "id": "moon_test_embeddings",
+   "world": "moon",
+   "title": "Test-embedding timing in the completed run",
+   "source": "FINAL_READINESS_AUDIT.md",
+   "text": "Test embeddings were computed before fitting the QCNN/MLP heads, but were not used for gradient updates, validation selection, or threshold selection; the saved audit confirms final metrics came from saved predictions.",
+   "quote_parts": 1
+  }
+ ]
+}

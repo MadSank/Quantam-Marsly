@@ -148,18 +148,18 @@ Two rules apply to every file:
 - `{ fixed: { CNN: {metric: {mean, sd, n_sites}}, CNN_QCNN: {...} }, validation_calibrated: {...} }`
 - No interval columns and no paired differences are exported.
 
-**`mars/site_<id>.json`**
+**`mars/sites/<site_id>.json`**
 - `{ site_id, mean: { fixed: {CNN, CNN_QCNN}, validation_calibrated: {...} }, per_seed: [{ seed, model, regime, RMSE_*, MAE_*, safe_recall, false_positive_rate, predicted_safe_fraction, safe_precision, TP, FP, TN, FN, risk_threshold? }] }`
 - Sources are `*_site_mean.csv` and `*_per_site_seed.csv`.
 
-**`mars/tiles_<id>.json`** is columnar to keep it small:
+**`mars/tiles/<site_id>.json`** is columnar to keep it small:
 - `{ tile_id[], row[], col[], size_native, true: {slope[], rough[], hazard[], safe[]}, pred: { cnn: {"42": {slope[], rough[], hazard[], safe[]}, …}, qcnn: {…} } }`
 - Values are rounded to 3 decimal places. If it gets too large, fall back to typed-array `.bin` files with a JSON header.
 
 **`moon/summary.json`**
 - `{ classes, test_counts, models: {cnn, hybrid_qcnn, frozen_embedding_mlp, majority_train_baseline}: {accuracy, balanced_accuracy, macro_f1: {mean, sd}}, per_seed, parameter_counts: { cnn: {trainable_during_training: 59347, trainable_recorded_post_freeze: 195, note}, hybrid_head: 568, mlp_head: 547 }, timing: { …, comparable: false, note } }`
 
-**`moon/class_<name>.json`**
+**`moon/classes/<class>.json`**
 - `{ class, crops: [{ sample_id, img, truth, pred: { cnn: {"42": {label, conf}}, hybrid_qcnn, frozen_embedding_mlp } }] }`
 
 **`caveats.json`**
@@ -326,7 +326,7 @@ These rules are built into the components:
 **`data.integrity.test.ts`**
 - Site tile counts sum to 15,233, and site_01 has 2,195.
 - CNN and QCNN tile ID lists are identical for each site and seed.
-- Spot checks: per-seed metrics recomputed from the tile JSON match `site_<id>.json`.
+- Spot checks: per-seed metrics recomputed from the tile JSON match `mars/sites/<site_id>.json`.
 - Moon confidences are between 0 and 1, and each predicted label matches its argmax.
 
 **`caveats.test.tsx`**

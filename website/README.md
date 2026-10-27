@@ -23,7 +23,12 @@ These scripts are added in build steps 2–3. They need the gitignored experimen
 ```bash
 visualization_app/.venv/Scripts/python.exe website/scripts/export_data.py
 visualization_app/.venv/Scripts/python.exe website/scripts/export_images.py
+visualization_app/.venv/Scripts/python.exe -m pytest website/scripts/tests
 ```
+
+The pytest suite checks the committed JSON against the source CSV, parquet and `results.json` files. It is skipped when those artifacts are absent.
+
+`export_data.py` also refuses to write a caveat unless its text is a verbatim quote of `FINAL_READINESS_AUDIT.md` or `visualization_app/README.md`.
 
 ## Layout
 
