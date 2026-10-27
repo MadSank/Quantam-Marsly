@@ -59,3 +59,41 @@ All code here was written for this project. None of it is derived from code dist
 
 The images, class labels and train/validation/test split come from the LROCNet lunar crater dataset. Its licence and citation are still to be confirmed (tracked in `website/PLAN.md`, build step 10).
 
+
+## Code history
+
+**What changed after the reported run.**
+- The reported run (seeds 42/43/44) wrote its checkpoints between 11:50 and 11:55 on 2026-10-20, and its `summary.json` and `metrics.csv` at 11:55.
+- `train.py` was last modified at 11:59 and this README at 12:00, so the current `train.py` is **not** the exact source that produced the reported numbers.
+- That earlier source was never under version control, and no copy survives. What changed is reconstructed from three pieces of evidence:
+  1. This README's earlier text and `FINAL_READINESS_AUDIT.md` §2–3.
+  2. The run's own artifacts.
+  3. The current source.
+
+| Behaviour | Reported run (old trainer) | Current `train.py` | Evidence |
+|---|---|---|---|
+| When test data is touched | The test dataset was built, and test images passed through the frozen CNN encoder to get embeddings, **before** the hybrid and MLP heads were fitted. | `test_ds` stays unset until a seed's CNN, hybrid and MLP are all fitted and selected. Only then are test images loaded, embedded and scored. | Audit §2 (Moon) and §3.5; the README text of the time; the current code (`test_ds=None`, the final evaluation block). |
+| Resuming an interrupted run | Final per-seed weights only. | Per-epoch stage checkpoints with optimizer and RNG state, JSONL epoch logs, and `--resume`. | The run has no `*_epochs.jsonl` or `*_training.pt` files. |
+| Recorded parameter counts | One `cnn` entry, counted after the encoder was frozen (`trainable: 195`). | `cnn_during_fit` (59,347) and `cnn_classifier_after_encoder_freeze` (195), recorded separately. | `runs/logs/seed_*/results.json`, compared with the current code. |
+
+**Could test data have influenced training, early stopping, checkpoint selection or calibration?** The answer is **can't tell with certainty**, because the old source is gone. The surviving evidence all points to no:
+
+- **Gradient updates:** class weights come from the training labels only: `class_counts_train` is `[358, 594, 2656]`, which matches the training folders. No logged quantity involves test data. The audit states the test embeddings "were not used for gradient updates, validation selection, or threshold selection". That statement can't be checked against the old source now.
+- **Early stopping:** in all 9 fits (3 models × 3 seeds), training stopped exactly 3 epochs after the epoch with the best **validation** macro-F1. That matches the validation-only patience rule (patience 3) recorded in `history.csv`. A stopping rule driven by test data would be unlikely to coincide with it in every fit.
+- **Checkpoint selection:** the logged selection metric is validation macro-F1. Whether the saved weights are the best-validation epoch hasn't been re-verified from the checkpoints (see the re-checks below).
+- **Calibration:** none exists. Predictions are the argmax of the logits, and there's no threshold or temperature. The saved predictions equal the argmax of the saved logits (`runs/results_verification/results_audit.md`).
+- **The one known difference:** test embeddings were computed early. On its own, that can't change any result, as long as the encoder was frozen and in evaluation mode (no BatchNorm statistics updated) while embedding. Whether the old code embedded test data in evaluation mode can't be confirmed without the source.
+
+**Are the published Moon numbers valid as stated?** The arithmetic is verified: every reported metric was independently recomputed from the saved logits and labels. That the results are free of any test influence is very likely but not proven. Two re-checks would settle it; neither has been run.
+
+1. **Read-only checkpoint replay** (CPU, a few minutes, no training).
+   - Load each seed's `cnn`, `hybrid` and `frozen_mlp` checkpoints.
+   - Recompute the test logits; they must match the saved logits within floating-point tolerance. This shows the reported predictions come from the saved weights, with no BatchNorm change after saving.
+   - Recompute each model's validation macro-F1; it must equal the best `val_macro_f1` for that fit in `history.csv`. This shows the saved weights are the validation-selected epochs.
+   - Limit: this does not rule out test influence during training itself.
+2. **Locked-test re-run** (decisive; about 6 minutes on the RTX 4070).
+   - Run the current `train.py`, which by construction keeps test data locked until the end, for seeds 42/43/44 into a **new** output directory.
+   - Compare its metrics with the reported ones. Identical numbers settle the question.
+   - Any difference should be judged against the seed-to-seed spread, because GPU and simulator nondeterminism can cause small changes.
+
+Until one of these is run, the website shows this note next to the Moon code excerpts and keeps the audit's test-embedding caveat.

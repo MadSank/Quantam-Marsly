@@ -59,9 +59,9 @@ Per-tile predictions exist for both models, for every fold and seed:
 **Code permalinks:**
 - GitHub remote: `MadSank/Quantam-Marsly`.
 - Mars code (`src/`) is tracked, so it can be permalinked.
-- The Moon experiment code currently lives under gitignored `data/raw/moon/lrocnet/experiment_lunar_cnn_qcnn/`. It is project code written for this study, not code shipped with the LROCNet dataset. A move of the code files (not data or run artifacts) into tracked `experiments/moon/` is proposed and awaiting approval.
-  - Once it's tracked, `/lab` links the Moon code with permalinks exactly like the Mars code, and there's no "source not published" label.
-  - The Moon hybrid already uses the tracked `src/quantum/circuits.py::BatchedQCNNHead`, so its circuit can be permalinked either way.
+- The Moon experiment code is project code, not code shipped with the LROCNet dataset. It is tracked in `experiments/moon/` (moved from gitignored `data/raw/moon/lrocnet/` in commit `8602eb8`; run artifacts stay in `data/raw`).
+  - `/lab` permalinks the Moon code exactly like the Mars code. The Moon hybrid's circuit is the shared `src/quantum/circuits.py::BatchedQCNNHead`.
+  - **Code history note:** the current `experiments/moon/train.py` is not the exact source that produced the reported Moon numbers; test access was moved later. `/lab` shows the "Code history" section of `experiments/moon/README.md` next to every Moon excerpt, linked by permalink. That section records what changed, the evidence, and the two re-checks that would settle it.
 - Permalinks use the commit SHA recorded at export time. They resolve on GitHub only after that commit is pushed; at the time of writing, origin only has the initial commit.
 
 ## Pages
@@ -209,6 +209,7 @@ Two rules apply to every file:
 - `{ commit, repo: "MadSank/Quantam-Marsly", excerpts: [{ id, title, path, start, end, note, permalink, code, html }] }`
 - `code` is the raw text sliced at export.
 - `html` is filled in by Shiki at build time.
+- Moon excerpts also carry `history_note: { text, permalink }`. The text is the "Code history" section of `experiments/moon/README.md`, read at export.
 - Excerpts are located by a function or class name, not by hard-coded line numbers, so they stay correct when the code moves.
 
 ## Images
@@ -253,7 +254,7 @@ Two rules apply to every file:
   - The feature-map tile is one real site_01 test tile, chosen deterministically (the first tile in `test_predictions.parquet` order). Its image comes from the processed shard. The training-fold image normalisation is applied exactly as `src/controlled_evaluation.py` does it.
   - The circuit diagram comes from the QNode in `src/quantum/circuits.py`.
 - **Moon:**
-  - Imports the model classes from the local `experiment_lunar_cnn_qcnn/train.py`.
+  - Imports the model classes from the tracked `experiments/moon/train.py`.
   - Loads the `*_seed_42.pt` checkpoints.
 - **Curves:** read from `epoch_log.csv` and `history.csv`.
 - **Excerpts:**
@@ -373,6 +374,7 @@ These rules are built into the components:
     - The exact direction labels `lower is better` and `higher is better`, which every metric must show. Only those exact phrases are allowed; any other use of `better` still fails.
   - The same removed-section deny-list applies.
 - `curves.json` has no wall-time or lr fields.
+- Every Moon excerpt has a `history_note` whose text equals the README's "Code history" section, and the rendered page shows it next to each Moon excerpt.
 
 **Export tests (pytest, `website/scripts/tests/`)**
 - `export_data.py` and `export_images.py` tests run on the app venv and are skipped when `runs/` is absent.
