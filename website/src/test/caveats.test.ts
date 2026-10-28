@@ -70,5 +70,4 @@ describe('caveats.json', () => {
   })
 
   it.todo('renders every caveat on About (step 10)')
-  it.todo('renders each Moon caveat in the Moon explorer (step 9)')
 })

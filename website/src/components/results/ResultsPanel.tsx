@@ -1,10 +1,10 @@
-import { useId, useState } from 'react'
+import { useId } from 'react'
 import caveatsFile from '../../../public/data/caveats.json'
 import headlineFile from '../../../public/data/mars/headline.json'
-import type { CaveatsFile, MarsHeadline, MarsModel, MarsSite, MarsSiteFile, Metric, Regime } from '../../data/types'
+import type { CaveatsFile, MarsHeadline, MarsModel, MarsSite, MarsSiteFile, Regime } from '../../data/types'
 import { useJson, useJsonAll } from '../../lib/useJson'
-import { AnimatedNumber } from '../AnimatedNumber'
-import { DECISIONS, formatMetric, MARS_MODELS, REGIMES, REGRESSION, scaleMax, type MetricDef } from './metrics'
+import { MetricChart, type Row } from './MetricChart'
+import { DECISIONS, formatMetric, MARS_MODELS, num, REGIMES, REGRESSION, type MetricDef } from './metrics'
 
 const headline = headlineFile as unknown as MarsHeadline
 const caveats = (caveatsFile as CaveatsFile).caveats
@@ -13,85 +13,6 @@ const mixedResults = caveats.find((c) => c.id === 'mars_mixed_results')!
 const marsCaveats = caveats.filter((c) => c.world === 'mars' || c.world === 'both')
 
 export type Scope = 'site' | 'all'
-
-interface Point {
-  id: string
-  label: string
-  value: Metric
-  active: boolean
-}
-
-interface Row {
-  model: (typeof MARS_MODELS)[number]
-  mean: Metric
-  sd: number | null
-  points: Point[]
-}
-
-const num = (v: unknown): Metric => (typeof v === 'number' && Number.isFinite(v) ? v : null)
-
-// ---------------------------------------------------------------- one metric, both models
-
-function MetricChart({ def, rows, pointNoun }: { def: MetricDef; rows: Row[]; pointNoun: string }) {
-  const max = scaleMax(def, rows.flatMap((r) => [r.mean, ...r.points.map((p) => p.value)]))
-  const frac = (v: Metric) => (v === null ? 0 : Math.max(0, Math.min(1, v / max)))
-  const [hover, setHover] = useState<{ row: number; text: string; x: number } | null>(null)
-
-  return (
-    <div className="metric" data-metric={def.key}>
-      <div className="metric-head">
-        <h4>{def.label}</h4>
-        <span className="metric-direction">{def.direction ?? def.note}</span>
-      </div>
-      <div className="metric-rows" onPointerLeave={() => setHover(null)}>
-        {rows.map((r, i) => (
-          <div key={r.model.key} className="metric-row" data-model={r.model.data}>
-            <span className="metric-model">{r.model.short}</span>
-            <span className="metric-track">
-              {r.mean !== null && (
-                <span
-                  className="metric-bar"
-                  style={{ clipPath: `inset(0 ${(1 - frac(r.mean)) * 100}% 0 0 round 0 4px 4px 0)` }}
-                  onPointerEnter={() =>
-                    setHover({ row: i, text: `${r.model.label}, mean: ${formatMetric(def, r.mean)}`, x: frac(r.mean) })
-                  }
-                />
-              )}
-              {r.points.map((p) => (
-                <span key={p.id} className="metric-dot-pos" style={{ transform: `translateX(${frac(p.value) * 100}%)` }}>
-                  <span
-                    className="metric-dot"
-                    data-active={p.active || undefined}
-                    hidden={p.value === null}
-                    onPointerEnter={() =>
-                      setHover({ row: i, text: `${r.model.label}, ${p.label}: ${formatMetric(def, p.value)}`, x: frac(p.value) })
-                    }
-                  />
-                </span>
-              ))}
-              {hover?.row === i && (
-                <span className="metric-tip" role="tooltip" style={{ transform: `translateX(${hover.x * 100}%)` }}>
-                  <span>{hover.text}</span>
-                </span>
-              )}
-            </span>
-            <span className="metric-value">
-              <AnimatedNumber className="num" value={r.mean} format={(v) => formatMetric(def, v)} />
-              {r.sd !== null && (
-                <span className="metric-sd num">
-                  {' '}± {def.percent ? (r.sd * 100).toFixed(def.digits) : r.sd.toFixed(def.digits)}
-                </span>
-              )}
-            </span>
-          </div>
-        ))}
-      </div>
-      <p className="visually-hidden">
-        Bars show the mean; dots show each {pointNoun}.
-      </p>
-    </div>
-  )
-}
 
 // ---------------------------------------------------------------- table view
 

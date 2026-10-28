@@ -134,9 +134,10 @@
   --accent: #e6e9ee;
   --accent-ink: #08090b;
   --accent-2: #7e8896;
-  --model-cnn: #e8c58f;
-  --model-qcnn: #8fb7e8;
-  --model-mlp: #b9a6e0;
+  /* Validated with the dataviz palette check on --bg (dark), all pairs: in band, CVD ΔE ≥ 16. */
+  --model-cnn: #b47825;
+  --model-qcnn: #4aa0c7;
+  --model-mlp: #93398e;
   --truth-safe: #9bc27a;
   --truth-unsafe: #e06a5a;
   --focus: #ffffff;

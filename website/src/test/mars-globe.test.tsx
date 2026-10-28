@@ -8,8 +8,8 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import caveatsFile from '../../public/data/caveats.json'
 import sitesFile from '../../public/data/mars/sites.json'
 import { App } from '../App'
-import { latLabel, lonLabel, siteDescription } from '../components/marsglobe/format'
-import { flatMapRect, projectEquirect } from '../components/marsglobe/projection'
+import { latLabel, lonLabel, siteDescription } from '../components/globeview/format'
+import { flatMapRect, projectEquirect } from '../components/globeview/projection'
 import type { CaveatsFile, MarsSitesFile } from '../data/types'
 
 const PUBLIC = resolve(import.meta.dirname, '../../public')
@@ -178,9 +178,10 @@ describe('routing between globe and explorer', () => {
     expect(document.querySelector('.globe-page')).not.toBeNull()
   })
 
-  it('the Moon world is unchanged: no pins', () => {
+  it('the Moon globe has no location pins', () => {
     renderAt('/moon')
-    expect(document.querySelector('.callout, .pin-hit, .globe-page')).toBeNull()
+    expect(document.querySelector('.globe-page')).not.toBeNull()
+    expect(document.querySelector('.callout, .pin-hit, .footprint, .drape')).toBeNull()
   })
 })
 

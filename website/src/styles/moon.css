@@ -1,0 +1,267 @@
+/* Hallmark · shape: app screens (Moon explorer: class rail | crop mosaic | results; Moon globe entry: full-screen Moon, class cards right) · genre: modern-minimal · theme: Vantage (carried from the landing), Moon world tokens · job: compare the models on one crater class · steps 9 and 9b
+ * signature: the test crops themselves, each outlined in the active model's colour, solid when right and dashed when wrong; on the globe, the real Moon with LOLA relief and no pins, because the crops have no verified locations · imagery: LROCNet test crops; LROC WAC colour and LOLA relief (public domain)
+ * axes: dark/grotesk-sans/steel · posture: restrained · motion: the globe's drag inertia and idle spin, off under reduced motion · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S5 R4 V4 · weakest: V, the mosaic is a dense grid by nature; outlines carry the encoding and the counts table restates it */
+
+/* ---------------------------------------------------------------- mosaic */
+
+.moon-panel {
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.moon-panel-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-md) var(--space-lg) var(--space-lg);
+  scrollbar-width: thin;
+}
+
+.mosaic {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 88px);
+  gap: 6px;
+  justify-content: start;
+}
+
+.crop {
+  position: relative;
+  display: block;
+  width: 88px;
+  height: 88px;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: var(--surface);
+  cursor: pointer;
+  /* Model colour from [data-model] on the mosaic. Wrong predictions are dashed: pattern, not hue. */
+  outline: 2px dashed var(--swatch);
+  outline-offset: 1px;
+}
+
+.crop[data-correct] {
+  outline-style: solid;
+}
+
+.crop:hover {
+  filter: brightness(1.15);
+}
+
+.crop:active {
+  filter: brightness(0.9);
+}
+
+.crop[aria-pressed='true'] {
+  box-shadow:
+    0 0 0 4px var(--bg),
+    0 0 0 6px var(--focus);
+}
+
+.crop:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.crop-sprite {
+  display: block;
+  background-repeat: no-repeat;
+}
+
+.crop .crop-sprite {
+  border-radius: 2px;
+}
+
+.crop-tag {
+  position: absolute;
+  left: 3px;
+  bottom: 3px;
+  padding: 0 4px;
+  border-radius: 2px;
+  background: color-mix(in oklab, var(--bg) 82%, transparent);
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.moon-provenance {
+  max-width: 72ch;
+  margin-top: var(--space-lg);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.moon-provenance strong {
+  font-weight: 400;
+  color: var(--text-2);
+}
+
+/* ---------------------------------------------------------------- legend */
+
+.moon-legend-rows {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-xs);
+  line-height: 1.35;
+  color: var(--text-2);
+}
+
+.moon-legend-rows li {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: var(--space-xs);
+  align-items: center;
+}
+
+.crop-key {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  background: var(--surface-2);
+  outline: 2px dashed var(--swatch);
+  outline-offset: -2px;
+}
+
+.crop-key[data-correct] {
+  outline-style: solid;
+}
+
+.moon-counts td {
+  text-align: right;
+}
+
+/* ---------------------------------------------------------------- inspector */
+
+.moon-inspector {
+  width: min(460px, calc(100% - 2 * var(--space-lg)));
+}
+
+.moon-inspector-body {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: var(--space-md);
+  align-items: start;
+}
+
+.moon-inspector .inspector-table th[scope='row'] {
+  color: var(--text);
+}
+
+/* ---------------------------------------------------------------- globe entry: class cards */
+
+.class-cards {
+  position: absolute;
+  top: var(--space-lg);
+  right: var(--space-lg);
+  bottom: var(--space-lg);
+  z-index: var(--z-raised);
+  display: grid;
+  align-content: center;
+  gap: var(--space-sm);
+  width: 340px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.class-card {
+  display: grid;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+  border: var(--rule-hair) solid var(--border);
+  border-left: 2px solid var(--accent);
+  border-radius: var(--radius-card);
+  background: color-mix(in oklab, var(--bg) 86%, transparent);
+}
+
+.class-card[data-current] {
+  border-color: var(--accent);
+}
+
+.class-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.class-card h2 {
+  max-width: none;
+  font-size: var(--text-lg);
+  text-wrap: balance;
+}
+
+.class-card-count {
+  font-size: var(--text-xs);
+  color: var(--text-2);
+}
+
+.class-card-crops {
+  display: flex;
+  gap: var(--space-2xs);
+}
+
+.class-card-crops .crop-sprite {
+  border-radius: 2px;
+}
+
+.class-card-note {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.class-card .button-primary {
+  justify-self: start;
+  min-height: 36px;
+}
+
+.moon-globe-note {
+  position: absolute;
+  left: var(--space-lg);
+  top: var(--space-lg);
+  z-index: var(--z-raised);
+  max-width: 300px;
+  padding: var(--space-sm) var(--space-md);
+  border: var(--rule-hair) solid var(--border);
+  border-radius: var(--radius-card);
+  background: color-mix(in oklab, var(--bg) 82%, transparent);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  color: var(--text-2);
+}
+
+.moon-globe-side {
+  position: absolute;
+  left: var(--space-lg);
+  bottom: var(--space-lg);
+  z-index: var(--z-raised);
+  display: grid;
+  gap: var(--space-xs);
+}
+
+/* ---------------------------------------------------------------- reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .crop {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------- narrow screens (full pass in step 12) */
+
+@media (max-width: 52rem) {
+  .class-cards,
+  .moon-globe-note,
+  .moon-globe-side {
+    position: static;
+    width: auto;
+    margin: var(--space-md);
+  }
+
+  .moon-inspector-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

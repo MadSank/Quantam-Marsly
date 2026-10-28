@@ -69,7 +69,8 @@ Per-tile predictions exist for both models, for every fold and seed:
 1. `/`: split landing, "choose a world", with Mars and Moon halves and a link to About.
 2. `/mars`: the globe entry view (step 8b). A full-screen, interactive Mars globe on the landing's space backdrop, with a pin and callout per site. Picking a site flies the camera to it, draws its strip footprint and opens a side card with "Explore site" and "Back". `?site=` selects a site on the globe.
    `/mars/explore`: the explorer, with site rail, strip panel and results panel. `?site=&model=&seed=&truth=&scope=` is held in the URL so views are shareable. Old `/mars?...` links that carry explorer parameters (`model`, `seed`, `truth`, `scope`) are redirected to `/mars/explore` with every parameter kept.
-3. `/moon`: class rail, crop-mosaic panel and results panel. `?class=&model=&seed=`.
+3. `/moon`: the Moon globe entry view (step 9b). A full-screen, interactive Moon with LOLA relief and **no location pins**. The three classes appear as screen-anchored cards that are not attached to the surface. Each card shows sample crops, its test-crop count and "Explore class". A visible note says why nothing is placed on the globe.
+   `/moon/explore`: the explorer, with class rail, crop-mosaic panel and results panel. `?class=&model=&seed=&labels=` is held in the URL. Old `/moon?...` links that carry explorer parameters are redirected to `/moon/explore` with every parameter kept.
 4. `/about`: the neutral shared page, covering method, data sources with licences and citations, and every required caveat.
 5. `/lab`, "Under the hood": a neutral-theme page for a reviewer to inspect how the project works. It has six sections:
    1. **Pipeline diagram.** HiRISE strip + DTM → tiling → slope / roughness / hazard targets → safe-proxy label → CNN / hybrid → leave-one-site-out evaluation. Each stage links to its code permalink.
@@ -223,6 +224,7 @@ Two rules apply to every file:
 - **Mars rail thumbnails:** `img/mars/<id>_thumb.webp`, about 320 px.
 - **Deep zoom (step 12):** if the budget allows, a tiled pyramid (512 px WebP tiles, DZI-style) for site_01 and site_05 under `img/mars/<id>_dz/`. The previews stay in place as fallback.
 - **Moon:** test crops go into one WebP sprite sheet per class at 128 px each, plus a thumbnail per class.
+- **Moon relief (step 9b):** `img/globe/moon_normal_1k.webp` (lossless) and `moon_relief.json`, from the LRO LOLA GDR at 16 px/deg (`ldem_16.img`, 33.2 MB, public domain; gitignored `data/raw/textures/lola/`). They come from the same pipeline and conventions as Mars.
 - **Mars relief (step 8b):** `img/globe/mars_normal_1k.webp` (lossless; lossy WebP bends the encoded normals), a tangent-space normal map derived from the MGS MOLA MEGDR topography at 16 px/deg (`megt90n000eb.img`, 33.2 MB, NASA PDS Geosciences Node, public domain; downloaded with approval into gitignored `data/raw/textures/mola/`). The grid is rolled to −180…180° to match the colour texture, and the vertical exaggeration is recorded in `img/globe/mars_relief.json`. Only these derivatives are committed.
 - **Size reporting:** every export script prints per-file sizes and the `public/data` total, broken down into data, images and lab. The total must stay under **25 MB**, with `lab/` at about 3 MB of that. I'll report sizes after steps 2, 3, 11 and 12.
 - **Never** copy raw TIFF, JP2 or IMG files.
@@ -289,9 +291,9 @@ The page root carries `data-world="mars|moon"`, and shared components read only 
 | `--text-muted` | `#C29A7C` | `#9AA3AE` |
 | `--accent` | `#D2691E` rust | `#E6E9EE` silver |
 | `--accent-2` | `#C8962E` ochre | `#7E8896` slate |
-| `--model-cnn` (warm) | `#CA8038` amber (was `#E8A15A`; step 8 dataviz check) | `#E8C58F` pale amber |
-| `--model-qcnn` (cool) | `#3F98C2` teal-blue (was `#7FB2C4`; step 8 dataviz check) | `#8FB7E8` steel blue |
-| `--model-mlp` | — | `#B9A6E0` lavender |
+| `--model-cnn` (warm) | `#CA8038` amber (was `#E8A15A`; step 8 dataviz check) | `#B47825` amber (was `#E8C58F`; step 9 dataviz check) |
+| `--model-qcnn` (cool) | `#3F98C2` teal-blue (was `#7FB2C4`; step 8 dataviz check) | `#4AA0C7` sky blue (was `#8FB7E8`; step 9 dataviz check) |
+| `--model-mlp` | — | `#93398E` plum (was `#B9A6E0`; failed CVD against the hybrid) |
 | `--truth-safe` / `--truth-unsafe` | `#9BC27A` / `#D9573A` | `#9BC27A` / `#E06A5A` |
 | `--focus` | `#FFD08A` | `#FFFFFF` |
 | fonts | display: geologic serif; body: humanist sans | display: condensed grotesk; body: same sans; tabular numerals |
@@ -421,12 +423,27 @@ These rules are built into the components:
     - **Tests:** pins at the correct latitude and longitude, card content from `sites.json`, routing between globe and explorer (including old links), and the fallback rendering without WebGL.
     - The Moon world is unchanged: no coordinates, so no pins.
     - Screenshots at 1920×1080 and 1366×768: the globe overview, a selected site with the card open, and the 2D fallback.
-9. **Moon explorer:** class rail and crop mosaic.
-   - Crops are outlined in the model colour, dashed when the prediction is wrong.
-   - Ground-truth layer is a toggle.
-   - 3-way model toggle including the MLP; results panel.
-   - The results panel always shows the `moon_reproducibility` caveat next to the Moon metrics, citing the audit's Addendum (its source). Add a render test that the caveat is present whenever Moon results are shown.
-   - Screenshots.
+9. **Moon explorer** (`/moon/explore`): class rail and crop mosaic.
+   - Crops are outlined in the model colour: solid when the prediction is right, dashed when it is wrong. Green and red are never used for predictions.
+   - **Ground truth:** in a class view every crop's ground truth is the class itself, so a ground-truth layer would add nothing. Instead, a "Predicted class" toggle labels each crop with what the model predicted, which shows where the confusions go. The legend counts predictions per class for the chosen model and seed.
+   - 3-way model toggle in fixed order (CNN, hybrid, MLP) and a seed select over the 10 deterministic seeds. A crop inspector shows every model's predicted class and class probabilities for the seed.
+   - **Results panel** (10-seed run, audit Addendum):
+     - balanced accuracy and macro-F1 first, then accuracy with the majority-baseline line (68.4%);
+     - the mean ± SD per model, per-seed dots and the min–max range;
+     - a table view.
+     - No paired differences.
+   - The results panel always shows the `moon_reproducibility` caveat next to the Moon metrics, citing the audit's Addendum (its source). Every Moon caveat is listed verbatim in the explorer. Render tests check both.
+   - The Moon model colours pass the dataviz palette check on the Moon surface.
+   - Screenshots of the explorer per class.
+9b. **Moon globe entry view** (`/moon`).
+    - **Globe:** the step 8b globe components (`GlobeSphere`, `useGlobeControls`, the projection) on the landing's star field. The same drag, zoom and inertia rules apply; under reduced motion there is no inertia, no fly-to and no auto-rotate.
+    - **Relief:** a tangent-space normal map from the LRO LOLA GDR at 16 px/deg (`ldem_16.img`, 33.2 MB, NASA PDS Geosciences Node, public domain; downloaded with approval into gitignored `data/raw/textures/lola/`). It uses the same `export_relief.py` pipeline; only `img/globe/moon_normal_1k.webp` (lossless) and `moon_relief.json` are committed.
+    - **No location pins.** The three classes are screen-anchored cards, not attached to the surface. Each card shows the first four test crops of its class by file name (a fixed rule, not a selection), its test-crop count and "Explore class" (to `/moon/explore?class=…`).
+    - **Visible note:** "LROCNet crops carry no verified source locations, so they are not placed on the globe."
+    - **Accessibility and fallback:** the cards form a keyboard-accessible class list. Without WebGL, or via the toggle, a flat equirectangular map shows the same cards.
+    - **Caveats:** the footer carries the required Moon caveats verbatim: `moon_reproducibility`, `moon_provenance` and `no_quantum_advantage`.
+    - **Tests:** cards from the class data, no pins, routing between globe and explorer (including old links), and the fallback without WebGL.
+    - Screenshots at 1920×1080 and 1366×768.
 10. **About page:** method, the full caveat list, and data sources with licence and citation from `about.json`. Enable `sources.test.ts`, and list any `TO CONFIRM` items for you.
 11. **Lab page ("Under the hood").**
     - Write `export_internals.py` and its pytest, plus `highlight.mjs` (Shiki, prebuild).
@@ -448,7 +465,7 @@ These rules are built into the components:
     - What remains for Phase 2:
     - Use `@react-three/fiber` + `drei`, lazy-loaded.
     - A 4k texture (KTX2 or WebP) for close-up viewing, if the budget allows.
-    - Mars pins, fly-to and reduced-motion handling were built in step 8b. No Moon pins.
+    - Mars pins, fly-to and reduced-motion handling were built in step 8b, and the Moon globe in step 9b. The Moon has no pins (step 9b).
     - Texture credits are added to `about.json`.
 
 ## Critical files

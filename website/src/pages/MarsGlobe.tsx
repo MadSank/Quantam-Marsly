@@ -1,13 +1,16 @@
-import { Component, lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import caveatsFile from '../../public/data/caveats.json'
 import imageManifest from '../../public/data/img/manifest.json'
 import reliefFile from '../../public/data/img/globe/mars_relief.json'
 import sitesFile from '../../public/data/mars/sites.json'
-import { Callouts, type Rect } from '../components/marsglobe/Callouts'
-import { latLabel, lonLabel, siteDescription } from '../components/marsglobe/format'
-import { FLAT_INSETS, flatMapRect, projectEquirect, projectOrtho, viewFor, zoomForFootprint, type GlobeView, type Size } from '../components/marsglobe/projection'
-import { useGlobeControls } from '../components/marsglobe/useGlobeControls'
+import { Callouts, type Rect } from '../components/globeview/Callouts'
+import { FlatOnError } from '../components/globeview/FlatOnError'
+import { latLabel, lonLabel, siteDescription } from '../components/globeview/format'
+import { FLAT_INSETS, flatMapRect, projectEquirect, projectOrtho, viewFor, zoomForFootprint, type GlobeView } from '../components/globeview/projection'
+import { useGlobeControls } from '../components/globeview/useGlobeControls'
+import { useSize } from '../components/globeview/useSize'
+import { webglAvailable } from '../components/globeview/webgl'
 import { MotionToggle } from '../components/motion'
 import { useMotion } from '../components/motionContext'
 import { StarField } from '../components/StarField'
@@ -18,7 +21,7 @@ import { WorldLayout } from '../theme/WorldLayout'
 import '../styles/explorer.css'
 import '../styles/globe.css'
 
-const GlobeSphere = lazy(() => import('../components/marsglobe/GlobeSphere'))
+const GlobeSphere = lazy(() => import('../components/globeview/GlobeSphere'))
 
 const sites = (sitesFile as MarsSitesFile).sites
 const colourTexture = (imageManifest.globe as unknown as Record<'mars', { textures: Record<'2k', { src: string }>; credit: string }>).mars
@@ -29,45 +32,6 @@ const fmt = new Intl.NumberFormat('en-GB')
 // Opening view: 20° E, 10° N puts four of the five sites on the near side.
 const OVERVIEW: GlobeView = viewFor(10, 20, 1)
 const FOOTPRINT_ZOOM = 20
-
-function webglAvailable(): boolean {
-  try {
-    const canvas = document.createElement('canvas')
-    return !!(canvas.getContext('webgl2') || canvas.getContext('webgl'))
-  } catch {
-    return false
-  }
-}
-
-/** Falls back to the flat map if the WebGL scene fails to load or render. */
-class FlatOnError extends Component<{ children: ReactNode; onError: () => void }, { failed: boolean }> {
-  state = { failed: false }
-  static getDerivedStateFromError() {
-    return { failed: true }
-  }
-  componentDidCatch() {
-    this.props.onError()
-  }
-  render() {
-    return this.state.failed ? null : this.props.children
-  }
-}
-
-function useSize<T extends HTMLElement>() {
-  const ref = useRef<T>(null)
-  const [size, setSize] = useState<Size>({ width: 0, height: 0 })
-  useLayoutEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const measure = () => setSize({ width: el.clientWidth, height: el.clientHeight })
-    measure()
-    if (typeof ResizeObserver === 'undefined') return
-    const ro = new ResizeObserver(measure)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
-  return [ref, size] as const
-}
 
 // ---------------------------------------------------------------- site list and card
 

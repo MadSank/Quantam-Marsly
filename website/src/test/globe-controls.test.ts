@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import { viewFor } from '../components/marsglobe/projection'
-import { useGlobeControls } from '../components/marsglobe/useGlobeControls'
+import { viewFor } from '../components/globeview/projection'
+import { useGlobeControls } from '../components/globeview/useGlobeControls'
 
 const size = { width: 1200, height: 800 }
 

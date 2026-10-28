@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { Euler, Matrix4, Vector3 } from 'three'
 import sitesFile from '../../public/data/mars/sites.json'
 import { surfacePoint } from '../components/globe/spec'
-import { nearestAngle, projectEquirect, projectOrtho, rotate, signedLongitude, viewFor } from '../components/marsglobe/projection'
+import { nearestAngle, projectEquirect, projectOrtho, rotate, signedLongitude, viewFor } from '../components/globeview/projection'
 import type { MarsSitesFile } from '../data/types'
 
 const sites = (sitesFile as MarsSitesFile).sites

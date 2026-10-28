@@ -1,8 +1,8 @@
 import { render } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import sitesFile from '../../public/data/mars/sites.json'
-import { Callouts } from '../components/marsglobe/Callouts'
-import { baseRadius, projectOrtho, viewFor, zoomForFootprint } from '../components/marsglobe/projection'
+import { Callouts } from '../components/globeview/Callouts'
+import { baseRadius, projectOrtho, viewFor, zoomForFootprint } from '../components/globeview/projection'
 import type { MarsSitesFile } from '../data/types'
 
 const sites = (sitesFile as MarsSitesFile).sites

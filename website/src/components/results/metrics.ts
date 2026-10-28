@@ -13,6 +13,8 @@ export interface MetricDef {
   digits: number
   /** Shown under the label when the metric has no better direction. */
   note?: string
+  /** A fixed scale end (e.g. 1 for proportions); otherwise the data sets it. */
+  max?: number
 }
 
 /** Fixed display order: CNN first, then the hybrid. Never sorted by value. */
@@ -61,6 +63,7 @@ export function formatMetric(def: MetricDef, v: Metric): string {
 
 /** Shared scale end for one metric's small multiple: 100% for rates, else a rounded-up max. */
 export function scaleMax(def: MetricDef, values: Metric[]): number {
+  if (def.max !== undefined) return def.max
   if (def.percent) return 1
   const finite = values.filter((v): v is number => v !== null && Number.isFinite(v))
   const max = Math.max(...finite, 0)
@@ -68,3 +71,6 @@ export function scaleMax(def: MetricDef, values: Metric[]): number {
   const pow = 10 ** Math.floor(Math.log10(max))
   return Math.ceil((max * 1.05) / (pow / 2)) * (pow / 2)
 }
+
+/** A finite number, or null (NaN and non-numbers in the source). */
+export const num = (v: unknown): Metric => (typeof v === 'number' && Number.isFinite(v) ? v : null)
