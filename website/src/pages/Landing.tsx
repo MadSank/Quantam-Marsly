@@ -9,10 +9,10 @@ import { MotionToggle } from '../components/motion'
 import { useMotion } from '../components/motionContext'
 import { StarField } from '../components/StarField'
 import type { MarsSitesFile, MoonSummary } from '../data/types'
+import { dataUrl } from '../lib/dataUrl'
 import type { World } from '../theme/world'
 import '../styles/landing.css'
 
-const dataUrl = (rel: string) => `${import.meta.env.BASE_URL}data/${rel}`
 const fmt = new Intl.NumberFormat('en-GB')
 
 const mars = sitesFile as MarsSitesFile
