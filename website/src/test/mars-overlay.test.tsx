@@ -52,7 +52,7 @@ const siteFile = (id: string): MarsSiteFile => JSON.parse(readFileSync(resolve(P
 
 describe('Mars overlay controls', () => {
   it('offers both models in fixed order, CNN selected by default', () => {
-    renderAt('/mars')
+    renderAt('/mars/explore')
     const radios = within(screen.getByRole('radiogroup', { name: 'Model' })).getAllByRole('radio')
     expect(radios.map((r) => r.textContent)).toEqual(['CNN', 'Hybrid CNN–QCNN'])
     expect(radios[0]).toHaveAttribute('aria-checked', 'true')
@@ -60,7 +60,7 @@ describe('Mars overlay controls', () => {
   })
 
   it('keeps model, seed and truth in the URL', async () => {
-    renderAt('/mars?site=site_02')
+    renderAt('/mars/explore?site=site_02')
     await screen.findByText('Predicted safe, proxy safe')
     fireEvent.click(screen.getByRole('radio', { name: 'Hybrid CNN–QCNN' }))
     fireEvent.change(await screen.findByRole('combobox', { name: 'Seed' }), { target: { value: '43' } })
@@ -71,13 +71,13 @@ describe('Mars overlay controls', () => {
   })
 
   it('reads model and seed from the URL', async () => {
-    renderAt('/mars?site=site_03&model=qcnn&seed=44')
+    renderAt('/mars/explore?site=site_03&model=qcnn&seed=44')
     expect(screen.getByRole('radio', { name: 'Hybrid CNN–QCNN' })).toHaveAttribute('aria-checked', 'true')
     expect(await within(legend()).findByText(/seed/)).toHaveTextContent('Hybrid CNN–QCNN, seed 44. Fixed-threshold decisions.')
   })
 
   it('leaves the ground-truth layer off by default', () => {
-    renderAt('/mars')
+    renderAt('/mars/explore')
     expect(screen.getByRole('switch', { name: 'Ground truth' })).not.toBeChecked()
     expect(within(legend()).queryByText(/Ground truth, corner mark/)).toBeNull()
   })
@@ -88,7 +88,7 @@ describe('Mars overlay legend', () => {
     ['site_01', 'cnn', 'CNN', '42'],
     ['site_05', 'qcnn', 'CNN_QCNN', '44'],
   ])('%s %s seed %s: counts are the fixed-threshold TP/FP/FN/TN', async (site, key, model, seed) => {
-    renderAt(`/mars?site=${site}&model=${key}&seed=${seed}`)
+    renderAt(`/mars/explore?site=${site}&model=${key}&seed=${seed}`)
     const row = siteFile(site).per_seed.find((r) => r.regime === 'fixed' && r.model === model && r.seed === Number(seed))!
     await within(legend()).findByText((_, el) => el?.getAttribute('data-outcome') === 'safe-agree' && /\d/.test(el.textContent ?? ''))
     const count = (o: string) => Number(legend().querySelector(`[data-outcome="${o}"] .legend-count`)!.textContent!.replace(/,/g, ''))
@@ -96,7 +96,7 @@ describe('Mars overlay legend', () => {
   })
 
   it('explains every encoding and shows truth rows only with the truth layer', async () => {
-    renderAt('/mars?truth=1')
+    renderAt('/mars/explore?truth=1')
     for (const label of ['Predicted safe, proxy safe', 'Predicted safe, proxy unsafe', 'Predicted unsafe, proxy safe', 'Predicted unsafe, proxy unsafe'])
       expect(within(legend()).getByText(label)).toBeInTheDocument()
     expect(within(legend()).getByText('proxy safe')).toBeInTheDocument()
@@ -104,7 +104,7 @@ describe('Mars overlay legend', () => {
   })
 
   it('always shows the safe-proxy caveat verbatim, outside the drawer', () => {
-    renderAt('/mars')
+    renderAt('/mars/explore')
     const caveat = legend().querySelector('[data-caveat="safe_proxy"]')!
     expect(caveat).toHaveTextContent(safeProxy.text)
     expect(caveat.closest('[role="dialog"]')).toBeNull()
@@ -113,7 +113,7 @@ describe('Mars overlay legend', () => {
 
 describe('Mars tile inspector', () => {
   it('Enter inspects the tile at the centre; Close and Escape dismiss it', async () => {
-    renderAt('/mars?site=site_05&seed=43')
+    renderAt('/mars/explore?site=site_05&seed=43')
     await within(legend()).findByText((_, el) => el?.getAttribute('data-outcome') === 'safe-agree' && /\d/.test(el.textContent ?? ''))
     fireEvent.keyDown(viewer(), { key: 'Enter' })
     const inspector = await screen.findByRole('region', { name: /^Tile site_05_r\d+_c\d+$/ })

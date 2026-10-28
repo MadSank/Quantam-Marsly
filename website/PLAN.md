@@ -67,7 +67,8 @@ Per-tile predictions exist for both models, for every fold and seed:
 ## Pages
 
 1. `/`: split landing, "choose a world", with Mars and Moon halves and a link to About.
-2. `/mars`: site rail, strip panel and results panel. `?site=&model=&seed=` is held in the URL so views are shareable.
+2. `/mars`: the globe entry view (step 8b). A full-screen, interactive Mars globe on the landing's space backdrop, with a pin and callout per site. Picking a site flies the camera to it, draws its strip footprint and opens a side card with "Explore site" and "Back". `?site=` selects a site on the globe.
+   `/mars/explore`: the explorer, with site rail, strip panel and results panel. `?site=&model=&seed=&truth=&scope=` is held in the URL so views are shareable. Old `/mars?...` links that carry explorer parameters (`model`, `seed`, `truth`, `scope`) are redirected to `/mars/explore` with every parameter kept.
 3. `/moon`: class rail, crop-mosaic panel and results panel. `?class=&model=&seed=`.
 4. `/about`: the neutral shared page, covering method, data sources with licences and citations, and every required caveat.
 5. `/lab`, "Under the hood": a neutral-theme page for a reviewer to inspect how the project works. It has six sections:
@@ -145,7 +146,8 @@ Two rules apply to every file:
 - `{ schema_version, generated_at, worlds, files }`
 
 **`mars/sites.json`**
-- `[{ site_id, name, fold, ortho_product_id, dtm_product_id, center: {lat, lon_e}, n_tiles, n_true_safe, native_resolution_m, preview: {src, width, height, scale_from_native}, deepzoom?: {dzi, tile_size, levels}, thumb: {src, width, height} }]`
+- `[{ site_id, name, fold, ortho_product_id, dtm_product_id, center: {lat, lon_e}, footprint: [[lat, lon_e], …], n_tiles, n_true_safe, native_resolution_m, preview: {src, width, height, scale_from_native}, deepzoom?: {dzi, tile_size, levels}, thumb: {src, width, height} }]`
+- `footprint` (step 8b) is the convex hull of every tile's four corners, converted to latitude and longitude with the same `crs_wkt` + `transform` maths as `center`.
 
 **`mars/headline.json`** holds the 5-site aggregates:
 - `{ fixed: { CNN: {metric: {mean, sd, n_sites}}, CNN_QCNN: {...} }, validation_calibrated: {...} }`
@@ -221,6 +223,7 @@ Two rules apply to every file:
 - **Mars rail thumbnails:** `img/mars/<id>_thumb.webp`, about 320 px.
 - **Deep zoom (step 12):** if the budget allows, a tiled pyramid (512 px WebP tiles, DZI-style) for site_01 and site_05 under `img/mars/<id>_dz/`. The previews stay in place as fallback.
 - **Moon:** test crops go into one WebP sprite sheet per class at 128 px each, plus a thumbnail per class.
+- **Mars relief (step 8b):** `img/globe/mars_normal_1k.webp` (lossless; lossy WebP bends the encoded normals), a tangent-space normal map derived from the MGS MOLA MEGDR topography at 16 px/deg (`megt90n000eb.img`, 33.2 MB, NASA PDS Geosciences Node, public domain; downloaded with approval into gitignored `data/raw/textures/mola/`). The grid is rolled to −180…180° to match the colour texture, and the vertical exaggeration is recorded in `img/globe/mars_relief.json`. Only these derivatives are committed.
 - **Size reporting:** every export script prints per-file sizes and the `public/data` total, broken down into data, images and lab. The total must stay under **25 MB**, with `lab/` at about 3 MB of that. I'll report sizes after steps 2, 3, 11 and 12.
 - **Never** copy raw TIFF, JP2 or IMG files.
 
@@ -246,6 +249,8 @@ Two rules apply to every file:
 - Its Pillow has JPEG 2000 support and decodes at reduced resolution.
 - Site_04 uses band 2, and the stretch uses valid pixels only.
 - If decoding site_05 fails, fall back to running this script on root `.venv`, which has rasterio's decimated read.
+
+**`export_relief.py`** (step 8b) runs on the app venv (numpy + Pillow). It reads the MOLA MEGDR, computes slopes on the sphere (east-west spacing scaled by cos latitude) and writes the normal map and `mars_relief.json`.
 
 **`export_internals.py`** runs on the root `.venv`, which has torch and pennylane.
 - Read-only: it loads checkpoints with `map_location="cpu"`, uses `torch.no_grad()` and `model.eval()`, and never trains or writes back.
@@ -402,6 +407,20 @@ These rules are built into the components:
    - The ground-truth layer uses `--truth-safe` / `--truth-unsafe`; it's a separate toggle, off by default.
    - Also: CNN ↔ QCNN toggle, seed selector, tile inspector, and a legend explaining every encoding. Add `overlay.test.ts`.
 8. **Mars explorer, part 3:** results panel with animated numbers and bars, per-seed breakdown, site-switch transitions, reduced motion, and the dataviz skill for charts. Screenshots.
+8b. **Mars globe entry view.** `/mars` opens on a full-screen interactive globe; the explorer moves to `/mars/explore`.
+    - **Globe:** reuses the sphere component on the landing's star field. Drag rotates and scroll or pinch zooms, with damped inertia. Lighting uses the MOLA normal map so relief catches the light.
+    - **Pins and callouts:** one pin at each site's exact centre (`sites.json` `center`), with a label box and leader line in the project's own callout style. A label hides when its pin is on the far side.
+    - **Selecting a site** (pin, callout or the list):
+      - the camera flies to the site;
+      - at close zoom the strip footprint (`sites.json` `footprint`) is drawn on the surface;
+      - a side card slides in with the thumbnail, name, coordinates, tile count and a one-line factual description, plus "Explore site" (to `/mars/explore?site=…`) and "Back".
+    - **In the explorer,** the mini-globe locator is the "Back to globe" control (to `/mars?site=…`).
+    - **Accessibility:** a keyboard-navigable site list sits beside the globe. Without WebGL, a flat equirectangular 2D map shows the same pins, list and card.
+    - **Reduced motion:** no fly-to, no inertia, no auto-rotate.
+    - **Caveats:** the required caveats stay visible on the globe view, in the footer.
+    - **Tests:** pins at the correct latitude and longitude, card content from `sites.json`, routing between globe and explorer (including old links), and the fallback rendering without WebGL.
+    - The Moon world is unchanged: no coordinates, so no pins.
+    - Screenshots at 1920×1080 and 1366×768: the globe overview, a selected site with the card open, and the 2D fallback.
 9. **Moon explorer:** class rail and crop mosaic.
    - Crops are outlined in the model colour, dashed when the prediction is wrong.
    - Ground-truth layer is a toggle.
@@ -429,8 +448,7 @@ These rules are built into the components:
     - What remains for Phase 2:
     - Use `@react-three/fiber` + `drei`, lazy-loaded.
     - A 4k texture (KTX2 or WebP) for close-up viewing, if the budget allows.
-    - **Pins:** Mars pins come from `sites.json` centres. Clicking one sets `?site=` and the explorer animates to that site. No Moon pins.
-    - Reduced motion disables auto-rotation and the camera fly-to.
+    - Mars pins, fly-to and reduced-motion handling were built in step 8b. No Moon pins.
     - Texture credits are added to `about.json`.
 
 ## Critical files

@@ -189,6 +189,65 @@ def site_center(group: pd.DataFrame) -> dict[str, float]:
     return {"lat": round(lat, 4), "lon_e": round(lon % 360.0, 4)}
 
 
+def _projection(group: pd.DataFrame):
+    """(row, col) in native pixels -> (lat, lon_e) degrees, from the site's equirectangular CRS."""
+    first = group.iloc[0]
+    wkt = first["crs_wkt"]
+    lat_ts = float(re.search(r'standard_parallel_1",([-\d.]+)', wkt).group(1))
+    lon0 = float(re.search(r'central_meridian",([-\d.]+)', wkt).group(1))
+    radius = float(re.search(r'SPHEROID\["[^"]*",([\d.]+)', wkt).group(1))
+    a, _, c, _, e, f = list(first["transform"])
+
+    def to_lat_lon(row: np.ndarray, col: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        x, y = c + a * col, f + e * row
+        lat = np.degrees(y / radius)
+        lon = lon0 + np.degrees(x / (radius * math.cos(math.radians(lat_ts))))
+        return lat, np.mod(lon, 360.0)
+
+    return to_lat_lon
+
+
+def _convex_hull(points: np.ndarray) -> np.ndarray:
+    """Andrew's monotone chain; points (n, 2) -> hull vertices, counter-clockwise, no repeat."""
+    pts = np.unique(points, axis=0)
+    pts = pts[np.lexsort((pts[:, 1], pts[:, 0]))]
+
+    def cross(o, a, b):
+        return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+
+    lower: list = []
+    for q in pts:
+        while len(lower) >= 2 and cross(lower[-2], lower[-1], q) <= 0:
+            lower.pop()
+        lower.append(q)
+    upper: list = []
+    for q in pts[::-1]:
+        while len(upper) >= 2 and cross(upper[-2], upper[-1], q) <= 0:
+            upper.pop()
+        upper.append(q)
+    return np.asarray(lower[:-1] + upper[:-1])
+
+
+def site_footprint(group: pd.DataFrame) -> list[list[float]]:
+    """Convex hull of every tile's four corners, as [lat, lon_e] pairs (globe strip outline)."""
+    w = float(group.iloc[0]["native_window_px"])
+    rows, cols = group["row"].to_numpy(float), group["col"].to_numpy(float)
+    corners = np.concatenate([np.column_stack([rows + dr, cols + dc]) for dr in (0, w) for dc in (0, w)])
+    hull = _convex_hull(corners)
+    lat, lon = _projection(group)(hull[:, 0], hull[:, 1])
+    return [[round(float(la), 5), round(float(lo), 5)] for la, lo in zip(lat, lon)]
+
+
+def image_corners(group: pd.DataFrame, height: int, width: int) -> dict[str, list[float]]:
+    """[lat, lon_e] of the native ortho grid's top-left, top-right and bottom-left pixel corners,
+    so the preview (stretched over the native grid) can be placed on the globe."""
+    to_lat_lon = _projection(group)
+    rows = np.array([0.0, 0.0, float(height)])
+    cols = np.array([0.0, float(width), 0.0])
+    lat, lon = to_lat_lon(rows, cols)
+    return {k: [round(float(lat[i]), 6), round(float(lon[i]), 6)] for i, k in enumerate(("top_left", "top_right", "bottom_left"))}
+
+
 def export_mars(written: list[Path]) -> None:
     meta = mars_data.load_mars_metadata()
     dataset_meta = {s["site_id"]: s for s in mars_data.load_mars_dataset_metadata()["sites"]}
@@ -208,12 +267,14 @@ def export_mars(written: list[Path]) -> None:
             "ortho_product_id": first["ortho_product_id"],
             "dtm_product_id": first["dtm_product_id"],
             "center": site_center(group),
+            "footprint": site_footprint(group),
             "n_tiles": int(len(group)),
             "n_true_safe": int(group["safe_label"].sum()),
             "native_resolution_m": clean(dataset_meta[site_id]["native_resolution_m"]),
             # dataset_metadata "dimensions" is [rows, cols] of the native ortho/DTM grid.
             "native_height_px": int(dataset_meta[site_id]["dimensions"][0]),
             "native_width_px": int(dataset_meta[site_id]["dimensions"][1]),
+            "image_corners": image_corners(group, *map(int, dataset_meta[site_id]["dimensions"][:2])),
             "tile_size_native_px": int(windows[0]),
             "preview": images.get(site_id, {}).get("preview"),
             "thumb": images.get(site_id, {}).get("thumb"),

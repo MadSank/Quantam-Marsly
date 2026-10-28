@@ -1,0 +1,23 @@
+{
+ "source": [
+  "data/raw/textures/mola/megt90n000eb.img",
+  "data/raw/textures/mola/megt90n000eb.lbl"
+ ],
+ "generated_at": "2026-10-28T13:57:48+00:00",
+ "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/",
+ "credit": "MGS MOLA MEGDR topography, 16 px/deg (NASA / GSFC / MOLA Science Team, via the PDS Geosciences Node; public domain)",
+ "layout": "equirectangular, longitude -180..180 E left to right, latitude 90..-90 top to bottom",
+ "convention": "tangent space: red = east (+u), green = north (+v), blue = up",
+ "vertical_exaggeration": 12.0,
+ "elevation_range_m": [
+  -8177,
+  21171
+ ],
+ "textures": {
+  "1k": {
+   "src": "img/globe/mars_normal_1k.webp",
+   "width": 1024,
+   "height": 512
+  }
+ }
+}

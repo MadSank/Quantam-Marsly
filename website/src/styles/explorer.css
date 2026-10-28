@@ -1205,8 +1205,34 @@ kbd {
   position: absolute;
   top: var(--space-lg);
   right: var(--space-lg);
-  pointer-events: none;
-  transition: opacity var(--dur-short) var(--ease-out);
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-2xs);
+  border-radius: var(--radius-card);
+  color: var(--text-2);
+  text-decoration: none;
+  transition:
+    opacity var(--dur-short) var(--ease-out),
+    background-color var(--dur-short) var(--ease-out);
+}
+
+.locator:hover {
+  background: color-mix(in oklab, var(--bg) 70%, transparent);
+  color: var(--text);
+}
+
+.locator:active {
+  background: var(--surface);
+}
+
+.locator:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.locator-label {
+  font-size: var(--text-xs);
 }
 
 .locator .locator-globe {
@@ -1217,6 +1243,7 @@ kbd {
 
 .image-panel:has(.drawer[data-open]) .locator {
   opacity: 0;
+  pointer-events: none;
 }
 
 /* ---------------------------------------------------------------- site details drawer */

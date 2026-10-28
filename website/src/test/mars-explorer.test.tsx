@@ -45,7 +45,7 @@ const scaleOf = () => Number(viewer().querySelector<HTMLElement>('.panzoom-conte
 
 describe('Mars explorer', () => {
   it('lists the five sites in site order with exported tile counts', () => {
-    renderAt('/mars')
+    renderAt('/mars/explore')
     const items = within(rail()).getAllByRole('link')
     expect(items).toHaveLength(5)
     items.forEach((item, i) => {
@@ -56,13 +56,13 @@ describe('Mars explorer', () => {
   })
 
   it('defaults to the first site and marks it current', () => {
-    renderAt('/mars')
+    renderAt('/mars/explore')
     expect(within(rail()).getAllByRole('link')[0]).toHaveAttribute('aria-current', 'true')
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(sites[0].name)
   })
 
   it('reads ?site= and keeps other params when switching site', () => {
-    renderAt('/mars?site=site_04&model=qcnn&seed=43')
+    renderAt('/mars/explore?site=site_04&model=qcnn&seed=43')
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Coprates Chasma')
     fireEvent.click(within(rail()).getByRole('link', { name: /Kaiser Crater/ }))
     const search = new URLSearchParams(screen.getByTestId('location').textContent!.split('?')[1])
@@ -71,12 +71,12 @@ describe('Mars explorer', () => {
   })
 
   it('falls back to the first site for an unknown ?site=', () => {
-    renderAt('/mars?site=site_99')
+    renderAt('/mars/explore?site=site_99')
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(sites[0].name)
   })
 
   it('moves focus along the rail with the arrow keys', () => {
-    renderAt('/mars')
+    renderAt('/mars/explore')
     const items = within(rail()).getAllByRole('link')
     items[0].focus()
     fireEvent.keyDown(items[0], { key: 'ArrowDown' })
@@ -86,12 +86,12 @@ describe('Mars explorer', () => {
   })
 
   it('shows the strip with alt text naming the ortho product', () => {
-    renderAt('/mars?site=site_02')
+    renderAt('/mars/explore?site=site_02')
     expect(screen.getByRole('img', { name: /ESP_039245_1325_RED_D_01/ })).toBeInTheDocument()
   })
 
   it('zooms with the keyboard and the buttons, and Fit resets', () => {
-    renderAt('/mars')
+    renderAt('/mars/explore')
     const before = scaleOf()
     fireEvent.keyDown(viewer(), { key: '+' })
     expect(scaleOf()).toBeGreaterThan(before)
@@ -104,13 +104,13 @@ describe('Mars explorer', () => {
   })
 
   it('is keyboard focusable and explains its controls', () => {
-    renderAt('/mars')
+    renderAt('/mars/explore')
     expect(viewer()).toHaveAttribute('tabindex', '0')
     expect(viewer()).toHaveAccessibleDescription(/arrow keys to pan/)
   })
 
   it('carries the quantum caveat in the footer and links to About', () => {
-    renderAt('/mars')
+    renderAt('/mars/explore')
     expect(screen.getByText(/No quantum advantage claimed; circuits simulated/)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Moon' })).toHaveAttribute('href', '/moon')
     expect(screen.getByRole('link', { name: 'Mars' })).toHaveAttribute('aria-current', 'page')
@@ -122,7 +122,7 @@ describe('Mars explorer readout and site details drawer', () => {
   const drawer = () => document.getElementById(toggle().getAttribute('aria-controls')!)!
 
   it('shows only the compact fact strip by default', () => {
-    renderAt('/mars?site=site_05')
+    renderAt('/mars/explore?site=site_05')
     const readout = screen.getByRole('region', { name: 'Site readout' })
     expect(readout).toHaveTextContent('Huo Hsing Vallis')
     expect(readout).toHaveTextContent('26.43° N')
@@ -134,7 +134,7 @@ describe('Mars explorer readout and site details drawer', () => {
   })
 
   it('opens with the button, moves focus in, and Close returns focus', () => {
-    renderAt('/mars')
+    renderAt('/mars/explore')
     fireEvent.click(toggle())
     expect(toggle()).toHaveAttribute('aria-expanded', 'true')
     expect(drawer()).toHaveAttribute('data-open')
@@ -148,7 +148,7 @@ describe('Mars explorer readout and site details drawer', () => {
   })
 
   it('toggles with the i key and closes with Escape, returning focus', () => {
-    renderAt('/mars')
+    renderAt('/mars/explore')
     fireEvent.keyDown(document.body, { key: 'i' })
     expect(drawer()).toHaveAttribute('data-open')
     fireEvent.keyDown(drawer(), { key: 'Escape' })
@@ -160,7 +160,7 @@ describe('Mars explorer readout and site details drawer', () => {
   })
 
   it('keeps the required caveats outside the drawer', () => {
-    renderAt('/mars')
+    renderAt('/mars/explore')
     for (const text of [/No quantum advantage claimed; circuits simulated/, /^Display stretch only$/]) {
       const el = screen.getByText(text)
       expect(drawer().contains(el)).toBe(false)

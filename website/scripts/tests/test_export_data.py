@@ -212,3 +212,25 @@ def test_caveats_are_verbatim():
         for part in spec.get("parts", [spec.get("text")]):
             assert ex.normalise(part) in sources[c["source"]], c["id"]
         assert "cross zero" not in c["text"] and "t interval" not in c["text"]
+
+
+def test_mars_footprints_and_image_corners():
+    """Step 8b globe data: the tile hull sits inside the strip's image corners and contains the pin."""
+    TOL = 1e-5  # footprint vertices are rounded to 5 decimal places
+    meta = pd.read_parquet(ex.MARS_METADATA_PARQUET)
+    for site in load("mars/sites.json")["sites"]:
+        fp = np.array(site["footprint"])
+        c = site["image_corners"]
+        top, bottom = c["top_left"][0], c["bottom_left"][0]
+        left, right = c["top_left"][1], c["top_right"][1]
+        assert c["top_left"][0] == c["top_right"][0] and c["top_left"][1] == c["bottom_left"][1]
+        assert (fp[:, 0] <= top + TOL).all() and (fp[:, 0] >= bottom - TOL).all()
+        assert (fp[:, 1] >= left - TOL).all() and (fp[:, 1] <= right + TOL).all()
+        assert fp[:, 0].min() <= site["center"]["lat"] <= fp[:, 0].max()
+        assert fp[:, 1].min() <= site["center"]["lon_e"] <= fp[:, 1].max()
+        # Every tile centre lies inside the hull's bounding box (the hull wraps all tile corners).
+        group = meta[meta["site_id"] == site["site_id"]]
+        lat, lon = ex._projection(group)(group["row"].to_numpy(float) + 0.5 * group["native_window_px"].to_numpy(float),
+                                         group["col"].to_numpy(float) + 0.5 * group["native_window_px"].to_numpy(float))
+        assert lat.min() >= fp[:, 0].min() - TOL and lat.max() <= fp[:, 0].max() + TOL
+        assert lon.min() >= fp[:, 1].min() - TOL and lon.max() <= fp[:, 1].max() + TOL

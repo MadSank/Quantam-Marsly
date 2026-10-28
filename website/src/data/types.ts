@@ -26,6 +26,10 @@ export interface MarsSite {
   ortho_product_id: string
   dtm_product_id: string
   center: { lat: number; lon_e: number }
+  /** Convex hull of the tile corners, [lat, lon_e] pairs (globe footprint, step 8b). */
+  footprint: Array<[number, number]>
+  /** [lat, lon_e] of the native grid's corners, for draping the preview on the globe. */
+  image_corners: Record<'top_left' | 'top_right' | 'bottom_left', [number, number]>
   n_tiles: number
   n_true_safe: number
   native_resolution_m: number

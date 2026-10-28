@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import sitesFile from '../../public/data/mars/sites.json'
 import imageManifest from '../../public/data/img/manifest.json'
 import { Atmosphere } from '../components/Atmosphere'
@@ -318,9 +318,10 @@ export function MarsExplorer() {
             >
               <StripImage site={site} />
             </PanZoomViewport>
-            <div className="locator">
+            <Link className="locator" to={{ pathname: '/mars', search: `?site=${site.site_id}` }}>
               <Globe spec={marsGlobe} resolution="1k" target={target} pinToken="--pin" className="locator-globe" />
-            </div>
+              <span className="locator-label">Back to globe</span>
+            </Link>
             {tiles && selected !== null && (
               <TileInspector tiles={tiles} index={selected} seed={seed} model={model} onClose={() => setPicked(null)} />
             )}

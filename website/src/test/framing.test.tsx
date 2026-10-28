@@ -44,7 +44,7 @@ const siteFile = (id: string): MarsSiteFile => JSON.parse(readFileSync(resolve(P
 
 describe('framing', () => {
   it.each(sites.map((s) => s.site_id))('%s: every metric lists CNN then the hybrid, whatever the values', async (id) => {
-    renderAt(`/mars?site=${id}`)
+    renderAt(`/mars/explore?site=${id}`)
     await loaded()
     const metrics = panel().querySelectorAll('.metric')
     expect(metrics.length).toBe(3 + 2 * 3)
@@ -65,7 +65,7 @@ describe('framing', () => {
   })
 
   it('marks no winner anywhere', async () => {
-    renderAt('/mars?site=site_02')
+    renderAt('/mars/explore?site=site_02')
     await loaded()
     expect(document.querySelector('[data-winner], .winner, .best')).toBeNull()
     // The charts and their labels only; caveats quote the audit ("no clear overall winner").
@@ -73,7 +73,7 @@ describe('framing', () => {
   })
 
   it('gives every metric a direction, or says it has none', async () => {
-    renderAt('/mars')
+    renderAt('/mars/explore')
     await loaded()
     for (const m of panel().querySelectorAll('.metric')) {
       expect(m.querySelector('.metric-direction')!.textContent).toMatch(/^(lower is better|higher is better|read with recall and false-positive rate)$/)
@@ -81,7 +81,7 @@ describe('framing', () => {
   })
 
   it('shows recall, false-positive rate and coverage together, under both regimes', async () => {
-    renderAt('/mars')
+    renderAt('/mars/explore')
     await loaded()
     for (const name of [/fixed threshold/i, /validation-calibrated/i]) {
       const group = within(panel()).getByRole('region', { name })
@@ -91,14 +91,14 @@ describe('framing', () => {
   })
 
   it('keeps the mixed-results caveat, verbatim, on screen', async () => {
-    renderAt('/mars')
+    renderAt('/mars/explore')
     expect(panel().querySelector('[data-caveat="mars_mixed_results"]')).toHaveTextContent(mixed.text)
     fireEvent.click(within(panel()).getByRole('radio', { name: 'All five sites' }))
     expect(panel().querySelector('[data-caveat="mars_mixed_results"]')).toHaveTextContent(mixed.text)
   })
 
   it('site scope: bars show the seed mean from the site file', async () => {
-    renderAt('/mars?site=site_03')
+    renderAt('/mars/explore?site=site_03')
     await loaded()
     const f = siteFile('site_03')
     const slope = panel().querySelector('[data-metric="RMSE_mean_slope_5m"]')!
@@ -108,7 +108,7 @@ describe('framing', () => {
   })
 
   it('five-site scope: bars show the audited headline mean ± SD, and the scope is in the URL', async () => {
-    renderAt('/mars?site=site_01')
+    renderAt('/mars/explore?site=site_01')
     await loaded()
     fireEvent.click(within(panel()).getByRole('radio', { name: 'All five sites' }))
     expect(screen.getByTestId('location').textContent).toContain('scope=all')
@@ -122,7 +122,7 @@ describe('framing', () => {
 
 describe('Mars caveats in the explorer', () => {
   it('renders every Mars and shared caveat, verbatim', () => {
-    renderAt('/mars')
+    renderAt('/mars/explore')
     const all = (caveatsFile as CaveatsFile).caveats.filter((c) => c.world === 'mars' || c.world === 'both')
     expect(all.length).toBeGreaterThan(5)
     for (const c of all) {
