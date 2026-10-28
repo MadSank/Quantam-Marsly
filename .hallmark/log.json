@@ -1,5 +1,29 @@
 [
  {
+  "shape": "app screen",
+  "theme": "vantage",
+  "axes": "dark/grotesk-sans/steel",
+  "hero": "none (app screen)",
+  "nav": "edge-aligned top bar, world switch",
+  "footer": "caveat line",
+  "imagery": "project HiRISE previews; HiRISE DTM contours; Viking MDIM 2.1 globe",
+  "photos": [],
+  "entry": "none",
+  "fingerprint": "strip-on-contours",
+  "sections": [
+   "readout: name, coordinates, tiles",
+   "rail | strip with globe locator",
+   "site details drawer"
+  ],
+  "signature": "the HiRISE strip on contours traced from the same site DTM, with a pinned globe locator",
+  "waived": [],
+  "prompt": "Mars site explorer: rail, pan/zoom HiRISE strip, site facts",
+  "scope": "app",
+  "mode": "redesign",
+  "depth": "full",
+  "date": "2026-10-28"
+ },
+ {
   "shape": "split-studio",
   "theme": "vantage",
   "axes": "dark/grotesk-sans/steel",

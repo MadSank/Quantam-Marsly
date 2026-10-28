@@ -50,7 +50,7 @@ export function Rail({ label, items, selected, to }: Props) {
               <Link className="rail-item" to={to(item.id)} aria-current={current ? 'true' : undefined} replace>
                 {item.thumb && (
                   <span className="rail-thumb">
-                    <img src={dataUrl(item.thumb.src)} width={item.thumb.width} height={item.thumb.height} alt={item.thumb.alt} loading="lazy" />
+                    <img src={dataUrl(item.thumb.src)} width={item.thumb.width} height={item.thumb.height} alt={item.thumb.alt} />
                   </span>
                 )}
                 <span className="rail-text">

@@ -87,6 +87,16 @@ export interface MarsTilesFile extends Stamp {
   pred: Record<'cnn' | 'qcnn', Record<string, TileTargets>>
 }
 
+/** mars/contours/<site_id>.json, from scripts/export_contours.py; page decoration only. */
+export interface MarsContoursFile extends Stamp {
+  site_id: string
+  dtm_product_id: string
+  width: number
+  height: number
+  interval_m: number
+  levels: Array<{ elevation_m: number; index: boolean; d: string }>
+}
+
 // ---------------------------------------------------------------- Moon
 
 export type MoonModel = 'cnn' | 'hybrid_qcnn' | 'frozen_embedding_mlp'

@@ -21,7 +21,20 @@ export function rotationForLongitude(longitude: number): number {
   return (-(longitude + 90) * Math.PI) / 180
 }
 
-/** Unit vector toward (lat, lon) on the sphere, before rotation; for Phase 2 pins. */
+export interface GlobeTarget {
+  lat: number
+  lon: number
+}
+
+/**
+ * Mesh rotation (Euler XYZ: y applied first, then x) that turns (lat, lon) to face the
+ * viewer: y brings the longitude to the front, then x tilts its latitude onto the equator.
+ */
+export function orientationFor(latitude: number, longitude: number): { x: number; y: number } {
+  return { x: (latitude * Math.PI) / 180, y: rotationForLongitude(longitude) }
+}
+
+/** Unit vector toward (lat, lon) on the sphere, before rotation; for pins. */
 export function surfacePoint(latitude: number, longitude: number): [number, number, number] {
   const lat = (latitude * Math.PI) / 180
   const phi = ((longitude + 180) * Math.PI) / 180

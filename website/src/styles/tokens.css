@@ -45,6 +45,8 @@
   --font-display: 'Geologica', ui-sans-serif, system-ui, sans-serif;
   --font-body: 'Geologica', ui-sans-serif, system-ui, sans-serif;
   --font-numeric: var(--font-body);
+  /* Readouts only (coordinates, product IDs): data, never labels. */
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
   --tracking-display: -0.035em;
   --display-weight: 300;
   --text-xs: 0.8125rem;
@@ -108,6 +110,15 @@
   --truth-safe: #9bc27a;
   --truth-unsafe: #d9573a;
   --focus: #ffd08a;
+
+  /* Explorer atmosphere: DTM contours, vignette and grain behind the content. */
+  --contour: #c8962e;
+  --contour-opacity: 0.14;
+  --contour-index-opacity: 0.26;
+  --vignette: #0a0503;
+  --vignette-strength: 72%;
+  --texture-opacity: 0.05;
+  --pin: #ffd08a;
 }
 
 [data-world='moon'] {

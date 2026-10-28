@@ -116,3 +116,54 @@ describe('Mars explorer', () => {
     expect(screen.getByRole('link', { name: 'Mars' })).toHaveAttribute('aria-current', 'page')
   })
 })
+
+describe('Mars explorer readout and site details drawer', () => {
+  const toggle = () => screen.getByRole('button', { name: /Site details/ })
+  const drawer = () => document.getElementById(toggle().getAttribute('aria-controls')!)!
+
+  it('shows only the compact fact strip by default', () => {
+    renderAt('/mars?site=site_05')
+    const readout = screen.getByRole('region', { name: 'Site readout' })
+    expect(readout).toHaveTextContent('Huo Hsing Vallis')
+    expect(readout).toHaveTextContent('26.43° N')
+    expect(readout).toHaveTextContent('66.60° E')
+    expect(readout).toHaveTextContent('7,690')
+    expect(toggle()).toHaveAttribute('aria-expanded', 'false')
+    expect(drawer()).not.toHaveAttribute('data-open')
+    expect(drawer()).toHaveAttribute('inert')
+  })
+
+  it('opens with the button, moves focus in, and Close returns focus', () => {
+    renderAt('/mars')
+    fireEvent.click(toggle())
+    expect(toggle()).toHaveAttribute('aria-expanded', 'true')
+    expect(drawer()).toHaveAttribute('data-open')
+    expect(drawer()).not.toHaveAttribute('inert')
+    expect(drawer()).toHaveFocus()
+    expect(within(drawer()).getByText(sites[0].dtm_product_id)).toBeInTheDocument()
+    within(drawer()).getByRole('button', { name: 'Close' }).focus()
+    fireEvent.click(within(drawer()).getByRole('button', { name: 'Close' }))
+    expect(drawer()).not.toHaveAttribute('data-open')
+    expect(toggle()).toHaveFocus()
+  })
+
+  it('toggles with the i key and closes with Escape, returning focus', () => {
+    renderAt('/mars')
+    fireEvent.keyDown(document.body, { key: 'i' })
+    expect(drawer()).toHaveAttribute('data-open')
+    fireEvent.keyDown(drawer(), { key: 'Escape' })
+    expect(drawer()).not.toHaveAttribute('data-open')
+    expect(toggle()).toHaveFocus()
+    fireEvent.keyDown(document.body, { key: 'i' })
+    fireEvent.keyDown(document.body, { key: 'i' })
+    expect(drawer()).not.toHaveAttribute('data-open')
+  })
+
+  it('keeps the required caveats outside the drawer', () => {
+    renderAt('/mars')
+    for (const text of [/No quantum advantage claimed; circuits simulated/, /^Display stretch only$/]) {
+      const el = screen.getByText(text)
+      expect(drawer().contains(el)).toBe(false)
+    }
+  })
+})

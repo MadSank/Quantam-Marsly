@@ -1,36 +1,111 @@
-/* Explorer shell shared by /mars and /moon: header, rail | image panel | side panel, footer.
- * Reads only the semantic tokens, so each world's [data-world] block themes it. */
+/* Hallmark · shape: app screen (explorer: rail | strip, readout above, details in a drawer) · genre: modern-minimal · theme: Vantage (carried from the landing), Mars world tokens · job: explore a site's strip · redesign: full (app) · step 6b
+ * signature: the HiRISE strip on a ground of contour lines traced from the same site's DTM, with a globe locator pinned to the site · imagery: the project's HiRISE previews and DTM contours; Viking MDIM 2.1 globe (public domain) · texture: grain only, light specks at 0.05
+ * axes: dark/grotesk-sans/steel · posture: restrained · motion: drawer slide, contour cross-fade and the locator's ease to a new site; reduced motion jumps · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S5 R4 V5 · weakest: H, an app screen has no hero; the readout carries the name, coordinates and tile count and nothing else */
+/* Hallmark · dropped facts-title · the side panel split into the readout (its h1 needs no id) and the details drawer, labelled by its own generated id; nothing queried it */
+
+/* Explorer shell shared by /mars and /moon. Reads only the semantic tokens, so each
+ * world's [data-world] block themes it. */
 
 .explorer {
+  position: relative;
+  isolation: isolate;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
   height: 100dvh;
   min-height: 560px;
+  overflow: clip;
 }
 
-/* ---------------------------------------------------------------- header and footer */
+.explorer > :not(.atmosphere) {
+  position: relative;
+  z-index: var(--z-base);
+}
+
+/* ---------------------------------------------------------------- atmosphere */
+
+.atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: clip;
+  pointer-events: none;
+}
+
+.contours {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: contours-in var(--dur-long) var(--ease-out) both;
+}
+
+@keyframes contours-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.contour {
+  fill: none;
+  stroke: var(--contour);
+  stroke-width: 1;
+  stroke-opacity: var(--contour-opacity);
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.contour--index {
+  stroke-width: 1.5;
+  stroke-opacity: var(--contour-index-opacity);
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 75% 70% at 50% 45%,
+    transparent 40%,
+    color-mix(in oklab, var(--vignette) var(--vignette-strength), transparent) 100%
+  );
+}
+
+/* Light specks on the dark ground (texture.md § 1, white-speck matrix). */
+.grain {
+  position: absolute;
+  inset: 0;
+  opacity: var(--texture-opacity);
+  background-size: 200px 200px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 9 -4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+
+/* ---------------------------------------------------------------- header */
 
 .world-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-lg);
-  min-height: 64px;
+  min-height: 56px;
   padding-inline: var(--space-lg);
-  border-bottom: var(--rule-hair) solid var(--rule);
 }
 
 .world-header .wordmark {
   white-space: nowrap;
   font-weight: 400;
-  font-size: var(--text-md);
+  font-size: var(--text-sm);
+  color: var(--text-2);
   text-decoration: none;
+}
+
+.world-header .wordmark:hover {
+  color: var(--text);
 }
 
 .world-nav {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .world-switch {
@@ -47,7 +122,7 @@
 .caveat-chip {
   display: inline-flex;
   align-items: center;
-  min-height: 36px;
+  min-height: 32px;
   padding-inline: var(--space-md);
   border-radius: var(--radius-pill);
   font-size: var(--text-sm);
@@ -64,6 +139,11 @@
   color: var(--text);
 }
 
+.world-switch a:active,
+.caveat-chip:active {
+  color: var(--text-muted);
+}
+
 .world-switch a[aria-current='page'] {
   background: var(--accent);
   color: var(--accent-ink);
@@ -72,6 +152,104 @@
 .caveat-chip {
   border: var(--rule-hair) solid var(--border);
 }
+
+/* ---------------------------------------------------------------- readout (the compact fact strip) */
+
+.readout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-xs) var(--space-xl);
+  padding: var(--space-sm) var(--space-lg) var(--space-md);
+  border-bottom: var(--rule-hair) solid var(--rule);
+}
+
+.readout-name {
+  max-width: none;
+  font-size: clamp(1.75rem, 1.2vw + 1.1rem, 2.5rem);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.readout-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-lg);
+  margin: 0;
+}
+
+.readout-facts div {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-xs);
+}
+
+.readout-facts dt {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.readout-facts dd {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  letter-spacing: 0;
+}
+
+.readout-facts .mono span + span {
+  margin-left: 0.6ch;
+}
+
+.details-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 36px;
+  margin-left: auto;
+  padding-inline: var(--space-md) var(--space-xs);
+  border: var(--rule-hair) solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 400;
+  cursor: pointer;
+  transition: background-color var(--dur-short) var(--ease-out);
+}
+
+.details-toggle:hover {
+  background: var(--surface-2);
+}
+
+.details-toggle:active {
+  background: var(--surface);
+  color: var(--text-2);
+}
+
+.details-toggle[aria-expanded='true'] {
+  border-color: var(--accent-2);
+}
+
+kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding-inline: var(--space-2xs);
+  border: var(--rule-hair) solid var(--border);
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-2);
+}
+
+/* ---------------------------------------------------------------- footer */
 
 .world-footer {
   padding: var(--space-xs) var(--space-lg);
@@ -84,15 +262,17 @@
   color: var(--text-2);
 }
 
-/* ---------------------------------------------------------------- three columns */
+.world-footer a:hover {
+  color: var(--text);
+}
+
+/* ---------------------------------------------------------------- rail | strip */
 
 .explorer-main {
   display: grid;
-  grid-template-columns: 232px minmax(0, 1fr) 300px;
+  grid-template-columns: 232px minmax(0, 1fr);
   min-height: 0;
 }
-
-/* ---------------------------------------------------------------- rail */
 
 .rail {
   min-height: 0;
@@ -123,12 +303,16 @@
 }
 
 .rail-item:hover {
-  background: var(--surface);
+  background: color-mix(in oklab, var(--surface) 80%, transparent);
   color: var(--text);
 }
 
-.rail-item[aria-current='true'] {
+.rail-item:active {
   background: var(--surface-2);
+}
+
+.rail-item[aria-current='true'] {
+  background: color-mix(in oklab, var(--surface-2) 90%, transparent);
   color: var(--text);
   box-shadow: inset 2px 0 0 var(--accent);
 }
@@ -139,7 +323,6 @@
   height: 72px;
   overflow: hidden;
   border-radius: 2px;
-  background: var(--bg);
 }
 
 .rail-thumb img {
@@ -170,13 +353,15 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ---------------------------------------------------------------- image panel and pan/zoom */
-
 .image-panel {
+  position: relative;
   display: grid;
   min-width: 0;
   min-height: 0;
+  overflow: clip;
 }
+
+/* ---------------------------------------------------------------- pan/zoom */
 
 .panzoom {
   display: grid;
@@ -188,10 +373,28 @@
   position: relative;
   overflow: hidden;
   min-height: 0;
-  background: color-mix(in oklab, var(--bg) 70%, black);
   cursor: grab;
   touch-action: none;
   user-select: none;
+}
+
+/* Hairline corner ticks frame the instrument view (Vantage). */
+.panzoom-viewport::after {
+  content: '';
+  position: absolute;
+  inset: var(--space-sm);
+  pointer-events: none;
+  --t: linear-gradient(var(--accent-2), var(--accent-2));
+  background:
+    var(--t) top left / var(--tick) 1px no-repeat,
+    var(--t) top left / 1px var(--tick) no-repeat,
+    var(--t) top right / var(--tick) 1px no-repeat,
+    var(--t) top right / 1px var(--tick) no-repeat,
+    var(--t) bottom left / var(--tick) 1px no-repeat,
+    var(--t) bottom left / 1px var(--tick) no-repeat,
+    var(--t) bottom right / var(--tick) 1px no-repeat,
+    var(--t) bottom right / 1px var(--tick) no-repeat;
+  opacity: 0.7;
 }
 
 .panzoom-viewport[data-dragging] {
@@ -228,7 +431,8 @@
   gap: var(--space-2xs);
 }
 
-.panzoom-buttons button {
+.panzoom-buttons button,
+.drawer-close {
   min-width: 44px;
   min-height: 36px;
   padding-inline: var(--space-sm);
@@ -243,8 +447,15 @@
   transition: background-color var(--dur-short) var(--ease-out);
 }
 
-.panzoom-buttons button:hover:not(:disabled) {
+.panzoom-buttons button:hover:not(:disabled),
+.drawer-close:hover {
   background: var(--surface-2);
+}
+
+.panzoom-buttons button:active:not(:disabled),
+.drawer-close:active {
+  background: var(--surface);
+  color: var(--text-2);
 }
 
 .panzoom-buttons button:disabled {
@@ -271,7 +482,6 @@
   position: absolute;
   inset: 0;
   max-width: none;
-  image-rendering: auto;
 }
 
 .strip-placeholder {
@@ -287,18 +497,21 @@
   opacity: 1;
 }
 
-.scale-bar {
+.hud-foot {
   position: absolute;
-  left: var(--space-md);
-  bottom: var(--space-md);
+  left: var(--space-lg);
+  bottom: var(--space-lg);
+  display: flex;
+  align-items: end;
+  gap: var(--space-md);
+  pointer-events: none;
+}
+
+.scale-bar {
   display: grid;
   gap: var(--space-2xs);
-  padding: var(--space-2xs) var(--space-xs);
-  border-radius: var(--radius-card);
-  background: color-mix(in oklab, var(--bg) 78%, transparent);
   font-size: var(--text-xs);
   color: var(--text);
-  pointer-events: none;
 }
 
 .scale-bar-line {
@@ -308,28 +521,75 @@
   border-top: 0;
 }
 
-/* ---------------------------------------------------------------- side panel */
+.hud-note {
+  font-size: var(--text-xs);
+  color: var(--text-2);
+}
 
-.facts {
+/* ---------------------------------------------------------------- globe locator */
+
+.locator {
+  position: absolute;
+  top: var(--space-lg);
+  right: var(--space-lg);
+  pointer-events: none;
+  transition: opacity var(--dur-short) var(--ease-out);
+}
+
+.locator .locator-globe {
+  position: relative;
+  width: 104px;
+  aspect-ratio: 1;
+}
+
+.image-panel:has(.drawer[data-open]) .locator {
+  opacity: 0;
+}
+
+/* ---------------------------------------------------------------- site details drawer */
+
+.drawer {
+  position: absolute;
+  inset: 0 0 0 auto;
+  z-index: var(--z-raised);
   display: grid;
   align-content: start;
   gap: var(--space-md);
-  min-height: 0;
-  overflow-y: auto;
+  width: min(360px, 92%);
   padding: var(--space-lg);
-  border-left: var(--rule-hair) solid var(--rule);
+  overflow-y: auto;
+  border-left: var(--rule-hair) solid var(--border);
+  background: color-mix(in oklab, var(--surface) 96%, transparent);
+  transform: translateX(105%);
+  visibility: hidden;
+  transition:
+    transform var(--dur-short) var(--ease-out),
+    visibility 0s linear var(--dur-short);
 }
 
-.facts-kicker {
-  font-size: var(--text-xs);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--accent-2);
+.drawer[data-open] {
+  transform: none;
+  visibility: visible;
+  transition:
+    transform var(--dur-short) var(--ease-out),
+    visibility 0s;
 }
 
-.facts h1 {
+.drawer:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.drawer h2 {
   font-size: var(--text-title);
-  line-height: 1.15;
+  text-wrap: balance;
 }
 
 .facts-list {
@@ -346,6 +606,12 @@
   font-size: var(--text-sm);
 }
 
+/* Product IDs are long single tokens: give them the full row under their label. */
+.facts-list .facts-row-id {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3xs);
+}
+
 .facts-list dt {
   color: var(--text-muted);
 }
@@ -353,30 +619,48 @@
 .facts-list dd {
   margin: 0;
   color: var(--text);
-}
-
-/* Product IDs are long single tokens: give them the full row under their label. */
-.facts-list .facts-row-id {
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-3xs);
-}
-
-.facts-id {
   overflow-wrap: anywhere;
-  font-size: var(--text-xs);
 }
 
 .facts-note {
   font-size: var(--text-xs);
   line-height: 1.5;
-  color: var(--text-muted);
+  color: var(--text-2);
+}
+
+/* ---------------------------------------------------------------- focus */
+
+.world-header a:focus-visible,
+.world-footer a:focus-visible,
+.rail-item:focus-visible,
+.details-toggle:focus-visible,
+.panzoom-buttons button:focus-visible,
+.drawer-close:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .contours {
+    animation: none;
+  }
+
+  .drawer,
+  .drawer[data-open],
+  .locator,
+  .strip-image,
+  .panzoom-content[data-smooth] {
+    transition: none;
+  }
 }
 
 /* ---------------------------------------------------------------- narrow screens (full pass in step 12) */
 
 @media (max-width: 75rem) {
   .explorer-main {
-    grid-template-columns: 200px minmax(0, 1fr) 260px;
+    grid-template-columns: 200px minmax(0, 1fr);
   }
 
   .rail-item {
@@ -416,8 +700,8 @@
     height: 70dvh;
   }
 
-  .facts {
-    border-left: 0;
+  .readout-product {
+    display: none;
   }
 
   .world-header .wordmark {

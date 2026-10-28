@@ -36,6 +36,13 @@ It also checks the exported images:
 
 `export_images.py` decodes the JP2 strips at reduced resolution (about 2.5 minutes in total). The two scripts can run in either order, because `export_data.py` keeps the image fields that `export_images.py` writes.
 
+The `/mars` background contours come from each site's HiRISE DTM. They are decoration only, and no number on the page is read from them. They need the root venv, which has rasterio:
+
+```bash
+.venv/Scripts/python.exe website/scripts/export_contours.py
+.venv/Scripts/python.exe -m pytest website/scripts/tests/test_export_contours.py
+```
+
 `export_data.py` also refuses to write a caveat unless its text is a verbatim quote of `FINAL_READINESS_AUDIT.md` or `visualization_app/README.md`.
 
 ## Design checks (Hallmark)
