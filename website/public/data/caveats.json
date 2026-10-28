@@ -1,10 +1,9 @@
 {
  "source": [
   "FINAL_READINESS_AUDIT.md",
-  "visualization_app/README.md",
-  "experiments/moon/README.md"
+  "visualization_app/README.md"
  ],
- "generated_at": "2026-10-27T18:49:55+00:00",
+ "generated_at": "2026-10-28T13:09:53+00:00",
  "caveats": [
   {
    "id": "safe_proxy",
@@ -99,7 +98,7 @@
    "world": "moon",
    "title": "Descriptive evidence only",
    "source": "FINAL_READINESS_AUDIT.md",
-   "text": "Three seeds on one supplied split are descriptive evidence, not proof of a general advantage.",
+   "text": "Ten seeds on one supplied split are descriptive evidence, not proof of a general advantage.",
    "quote_parts": 1
   },
   {
@@ -107,7 +106,7 @@
    "world": "moon",
    "title": "Seeds are not independent test samples",
    "source": "FINAL_READINESS_AUDIT.md",
-   "text": "The three-seed mean ± SD is not a confidence interval. The same fixed test partition is reused across seeds, so seeds reflect initialization/training variation, not independent test samples.",
+   "text": "The 10-seed mean ± SD is not a confidence interval. The same fixed test partition is reused across seeds, so seeds reflect initialization/training variation, not independent test samples.",
    "quote_parts": 1
   },
   {
@@ -121,17 +120,17 @@
   {
    "id": "moon_reproducibility",
    "world": "moon",
-   "title": "Hybrid and MLP results did not reproduce exactly",
-   "source": "experiments/moon/README.md",
-   "text": "The hybrid QCNN head and frozen-embedding MLP results did not reproduce exactly in a locked-test re-run, most likely because of a different random initialisation, so the ranking between hybrid, MLP and CNN on the Moon should not be treated as robust.",
-   "quote_parts": 1
+   "title": "Ten deterministic seeds; no model clearly ahead",
+   "source": "FINAL_READINESS_AUDIT.md",
+   "text": "The Moon results come from 10 deterministic seeds on one supplied split. The spread across seeds is large, and the ranges of the three models overlap almost entirely, so no model is clearly ahead. The frozen-embedding MLP control matches or exceeds the hybrid QCNN head on all three mean metrics, so the hybrid's results do not indicate any quantum contribution.",
+   "quote_parts": 3
   },
   {
    "id": "moon_test_embeddings",
    "world": "moon",
-   "title": "Test-embedding timing in the completed run",
+   "title": "Test data stays locked until evaluation",
    "source": "FINAL_READINESS_AUDIT.md",
-   "text": "Test embeddings were computed before fitting the QCNN/MLP heads, but were not used for gradient updates, validation selection, or threshold selection; the saved audit confirms final metrics came from saved predictions.",
+   "text": "In this run, test data is loaded and embedded only after every model for a seed has been fitted and selected.",
    "quote_parts": 1
   }
  ]

@@ -90,3 +90,35 @@ No new experiment is necessary for a descriptive report if these constraints are
 - Read-only Mars pair check performed for this audit: all 15 fold/seed prediction pairs had identical ordered tile IDs, safe labels, and terrain targets; 45,699 rows checked.
 
 **Final verdict: READY AFTER DOCUMENTATION FIXES.**
+
+## Addendum (2026-10-28): Moon results superseded by a deterministic 10-seed run
+
+This addendum supersedes the Moon results in §1 and the Moon items of §2 and §3 that describe the completed three-seed run. The text above is kept unchanged as the record of that run.
+
+**Why the three-seed run is superseded.** Its hybrid QCNN head and frozen-embedding MLP results could not be reproduced. A locked-test re-run of the same seeds reproduced the CNN bit for bit but not the two heads, which already differed at initialisation (initial QCNN gradient norms 0.198 / 0.378 / 0.209 against the reported 0.413 / 0.523 / 0.381). The head initialisation depended on the global random-number state when the heads were created, and that state was shifted by data-loader iteration, so the reported head results came from an initialisation that cannot be recreated. The checkpoint replay showed that the reported predictions do come from the saved, validation-selected weights; the problem is reproducibility, not a data leak.
+
+**What replaced it.** The Moon trainer (`experiments\moon\train.py`) was made deterministic: deterministic CUDA kernels, and a separate named random stream for each model initialisation and each data loader. A seed run twice with it is bit-identical (results and every checkpoint tensor). In this run, test data is loaded and embedded only after every model for a seed has been fitted and selected. The same supplied split, configuration and 779-image test set were then run for 10 seeds, 42 to 51 (`data\raw\moon\lrocnet\experiment_lunar_cnn_qcnn\runs_deterministic_10seed_20261028`, config `experiments\moon\configs\deterministic_10seed.yaml`). `verify_results.py` recomputed every metric from the saved logits and confirmed identical ordered test IDs and labels across all 10 seeds and 3 models. The seed numbers 42 to 44 do not correspond to the fits of the superseded run, because initialisation now draws from the named streams.
+
+The reported Moon results are now this 10-seed run. Mean ± sample SD across seeds 42 to 51 on the same test partition:
+
+| Model | Accuracy | Balanced accuracy | Macro-F1 |
+|---|---:|---:|---:|
+| CNN | 0.518 ± 0.053 | 0.558 ± 0.063 | 0.454 ± 0.051 |
+| Hybrid CNN–QCNN | 0.506 ± 0.060 | 0.591 ± 0.066 | 0.476 ± 0.055 |
+| Frozen-embedding MLP | 0.536 ± 0.041 | 0.604 ± 0.064 | 0.489 ± 0.059 |
+| Train-majority baseline | 0.684 ± 0.000 | 0.333 ± 0.000 | 0.271 ± 0.000 |
+
+Range (min–max) of the per-seed values:
+
+| Model | Accuracy | Balanced accuracy | Macro-F1 |
+|---|---:|---:|---:|
+| CNN | 0.425–0.588 | 0.449–0.680 | 0.368–0.540 |
+| Hybrid CNN–QCNN | 0.424–0.624 | 0.472–0.660 | 0.409–0.580 |
+| Frozen-embedding MLP | 0.463–0.616 | 0.446–0.683 | 0.350–0.579 |
+| Train-majority baseline | 0.684–0.684 | 0.333–0.333 | 0.271–0.271 |
+
+**Interpretation.** The Moon results come from 10 deterministic seeds on one supplied split. The spread across seeds is large, and the ranges of the three models overlap almost entirely, so no model is clearly ahead. The frozen-embedding MLP control matches or exceeds the hybrid QCNN head on all three mean metrics, so the hybrid's results do not indicate any quantum contribution. Ten seeds on one supplied split are descriptive evidence, not proof of a general advantage. The 10-seed mean ± SD is not a confidence interval. The same fixed test partition is reused across seeds, so seeds reflect initialization/training variation, not independent test samples.
+
+**What still applies.** The split sizes, class imbalance and majority baseline, the parameter counts (59,347 trainable during CNN fitting, 195 after encoder freeze, 568 for the hybrid head, 547 for the MLP head; the deterministic run records both CNN counts directly), the frozen-embedding training-regime limitation, the non-comparable timings and the unverified provenance in §2 apply unchanged to the 10-seed run. The §2 note on test-embedding timing and §3 item 5 describe only the superseded run.
+
+Evidence: `runs_deterministic_10seed_20261028\results_verification\results_audit.md`, `results_audit.json` and `recomputed_metrics.csv`; per-seed `runs_deterministic_10seed_20261028\logs\seed_*\results.json`; the reproducibility record in `experiments\moon\README.md` ("Code history").

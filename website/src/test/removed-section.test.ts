@@ -17,6 +17,9 @@ const BANNED: Array<[string, RegExp]> = [
   ['t95 / t95_low / t95_high', /\bt95(_low|_high)?\b/i],
   ['t interval / t-interval', /\bt[ -]intervals?\b/i],
   ['cross zero', /\bcross(es|ing)? zero\b/i],
+  // No paired comparisons in either world: per-model values only (Moon addendum, same rule as Mars).
+  ['paired', /\bpaired\b/i],
+  ['difference statistics as data keys', /"([a-z]+_)*(diff|differences?)(_[a-z]+)*"\s*:/i],
 ]
 
 describe('removed statistical section stays removed', () => {

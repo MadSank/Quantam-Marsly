@@ -42,13 +42,11 @@ from data_loading.paths import (  # noqa: E402
     MARS_METRICS_DIR,
     MARS_RUNS_DIR,
     MARS_METADATA_PARQUET,
-    MOON_LOGS_DIR,
+    MOON_EXPERIMENT_ROOT,
     MOON_PROVENANCE_MANIFEST,
-    MOON_RECOMPUTED_METRICS_CSV,
-    MOON_METRICS_CSV,
 )
 
-SEEDS = [42, 43, 44]
+SEEDS = [42, 43, 44]  # Mars seeds; the Moon seed list comes from its run (moon_seeds)
 SITE_NAMES = {
     "site_01": "Northern Mid-Latitude Crater",
     "site_02": "Kaiser Crater",
@@ -62,11 +60,16 @@ REGIMES = {"fixed": "fixed_threshold", "validation_calibrated": "validation_cali
 DROPPED_AGGREGATE_COLUMNS = {"t95_low", "t95_high"}
 TILE_DECIMALS = 3
 MOON_MODELS = ["cnn", "hybrid_qcnn", "frozen_embedding_mlp"]
-MOON_DF_PREFIX = {"cnn": "cnn", "hybrid_qcnn": "hybrid", "frozen_embedding_mlp": "mlp"}
+# Reported Moon results: the deterministic 10-seed run (FINAL_READINESS_AUDIT.md, Addendum 2026-10-28).
+# The Streamlit app still reads the superseded three-seed run; this export reads the new folder directly.
+MOON_RUN = MOON_EXPERIMENT_ROOT / "runs_deterministic_10seed_20261028"
+MOON_LOGS_DIR = MOON_RUN / "logs"
+MOON_METRICS_CSV = MOON_RUN / "metrics.csv"
+MOON_RECOMPUTED_METRICS_CSV = MOON_RUN / "results_verification" / "recomputed_metrics.csv"
+MOON_SUMMARY_JSON = MOON_RUN / "summary.json"
 
 AUDIT = REPO_ROOT / "FINAL_READINESS_AUDIT.md"
 APP_README = APP_DIR / "README.md"
-MOON_CODE_HISTORY = REPO_ROOT / "experiments" / "moon" / "README.md"  # "Code history" section
 
 # Every caveat is a verbatim quote (or verbatim "parts" joined with a space); export fails
 # if any quoted text is not found in its source.
@@ -110,25 +113,26 @@ CAVEATS: list[dict[str, Any]] = [
      "text": "This can support a frozen-embedding head comparison, not a clean end-to-end "
              "CNN-versus-QCNN attribution."},
     {"id": "moon_mixed_results", "world": "moon", "title": "Descriptive evidence only", "source": "audit",
-     "text": "Three seeds on one supplied split are descriptive evidence, not proof of a general advantage."},
+     "text": "Ten seeds on one supplied split are descriptive evidence, not proof of a general advantage."},
     {"id": "moon_seeds", "world": "moon", "title": "Seeds are not independent test samples", "source": "audit",
-     "text": "The three-seed mean ± SD is not a confidence interval. The same fixed test partition is reused "
+     "text": "The 10-seed mean ± SD is not a confidence interval. The same fixed test partition is reused "
              "across seeds, so seeds reflect initialization/training variation, not independent test samples."},
     {"id": "moon_provenance", "world": "moon", "title": "Unverified provenance", "source": "audit",
      "text": "The provenance audit did not verify class annotation criteria, original split-generation "
              "methodology, source-image identity, or geographic/site identity."},
-    {"id": "moon_reproducibility", "world": "moon", "title": "Hybrid and MLP results did not reproduce exactly",
-     "source": "moon_code_history",
-     "text": "The hybrid QCNN head and frozen-embedding MLP results did not reproduce exactly in a locked-test re-run, "
-             "most likely because of a different random initialisation, so the ranking between hybrid, MLP and CNN "
-             "on the Moon should not be treated as robust."},
-    {"id": "moon_test_embeddings", "world": "moon", "title": "Test-embedding timing in the completed run",
+    {"id": "moon_reproducibility", "world": "moon", "title": "Ten deterministic seeds; no model clearly ahead",
      "source": "audit",
-     "text": "Test embeddings were computed before fitting the QCNN/MLP heads, but were not used for gradient "
-             "updates, validation selection, or threshold selection; the saved audit confirms final metrics "
-             "came from saved predictions."},
+     "parts": ["The Moon results come from 10 deterministic seeds on one supplied split.",
+               "The spread across seeds is large, and the ranges of the three models overlap almost entirely, "
+               "so no model is clearly ahead.",
+               "The frozen-embedding MLP control matches or exceeds the hybrid QCNN head on all three mean metrics, "
+               "so the hybrid's results do not indicate any quantum contribution."]},
+    {"id": "moon_test_embeddings", "world": "moon", "title": "Test data stays locked until evaluation",
+     "source": "audit",
+     "text": "In this run, test data is loaded and embedded only after every model for a seed has been fitted "
+             "and selected."},
 ]
-CAVEAT_SOURCES = {"audit": AUDIT, "app_readme": APP_README, "moon_code_history": MOON_CODE_HISTORY}
+CAVEAT_SOURCES = {"audit": AUDIT, "app_readme": APP_README}
 
 
 # ---------------------------------------------------------------- helpers
@@ -317,9 +321,24 @@ def export_mars(written: list[Path]) -> None:
 
 # ---------------------------------------------------------------- Moon
 
+def moon_seeds() -> list[int]:
+    """The seed list from the run's own summary, in run order."""
+    return [int(s) for s in json.loads(MOON_SUMMARY_JSON.read_text(encoding="utf-8"))["config"]["seeds"]]
+
+
+def load_moon_seed(seed: int) -> dict[str, Any]:
+    return json.loads((MOON_LOGS_DIR / f"seed_{seed}" / "results.json").read_text(encoding="utf-8"))
+
+
+def softmax_rows(logits: np.ndarray) -> np.ndarray:
+    e = np.exp(logits - logits.max(axis=1, keepdims=True))
+    return e / e.sum(axis=1, keepdims=True)
+
+
 def export_moon(written: list[Path]) -> None:
-    results = {seed: moon_data.load_moon_results(seed) for seed in SEEDS}
-    base = results[SEEDS[0]]
+    seeds = moon_seeds()
+    results = {seed: load_moon_seed(seed) for seed in seeds}
+    base = results[seeds[0]]
     for seed, r in results.items():
         assert r["test"]["sample_ids"] == base["test"]["sample_ids"], f"seed {seed}: test order differs"
         assert r["test"]["ground_truth"] == base["test"]["ground_truth"], f"seed {seed}: labels differ"
@@ -334,31 +353,41 @@ def export_moon(written: list[Path]) -> None:
     }
     assert [split_counts["test"][c] for c in classes] == base["test"]["class_distribution"]
 
-    recomputed = moon_data.load_moon_recomputed_metrics()
+    recomputed = pd.read_csv(MOON_RECOMPUTED_METRICS_CSV)
     models = {
         m: {row["metric"]: {"mean": clean(row["mean"]), "sd": clean(row["sample_sd"])}
             for _, row in recomputed[recomputed["model"] == m].iterrows()}
         for m in MOON_MODELS + ["majority_train_baseline"]
     }
-    per_seed_df = moon_data.load_moon_metrics()
+    # Per-seed values for the results panel. Only per-model values: no paired differences are exported.
+    per_seed_df = pd.read_csv(MOON_METRICS_CSV)
     per_seed = [{c: clean(v) for c, v in r.items() if c not in ("test_class_counts",)}
                 for _, r in per_seed_df.iterrows()]
+    ranges = {
+        m: {k: {"min": clean(g[k].min()), "max": clean(g[k].max())} for k in ("accuracy", "balanced_accuracy", "macro_f1")}
+        for m, g in per_seed_df.groupby("model", sort=False)
+    }
 
     pc = base["parameter_counts"]
     summary = {
-        **stamp([MOON_RECOMPUTED_METRICS_CSV, MOON_METRICS_CSV, MOON_PROVENANCE_MANIFEST]
-                + [MOON_LOGS_DIR / f"seed_{s}" / "results.json" for s in SEEDS]),
+        **stamp([MOON_RECOMPUTED_METRICS_CSV, MOON_METRICS_CSV, MOON_SUMMARY_JSON, MOON_PROVENANCE_MANIFEST]
+                + [MOON_LOGS_DIR / f"seed_{s}" / "results.json" for s in seeds]),
+        "run": rel(MOON_RUN),
+        "seeds": seeds,
         "classes": classes,
         "models": MOON_MODELS,
         "split_counts": split_counts,
         "split_sizes": {k: sum(v.values()) for k, v in split_counts.items()},
         "metrics": models,
+        "ranges": ranges,
         "per_seed": per_seed,
         "parameter_counts": {
             "cnn": {
-                "trainable_during_training": int(pc["cnn"]["trainable_during_training"]),
-                "trainable_recorded_post_freeze": int(pc["cnn"]["trainable_recorded_post_freeze"]),
-                "note": pc["cnn"]["correction_note"],
+                "trainable_during_training": int(pc["cnn_during_fit"]["trainable"]),
+                "trainable_recorded_post_freeze": int(pc["cnn_classifier_after_encoder_freeze"]["trainable"]),
+                "note": "59,347 parameters are trainable while the CNN is fitted. After the encoder is frozen "
+                        "for the head stage, only its 195-parameter classifier remains trainable. "
+                        "The run records both counts.",
             },
             "hybrid_head": int(pc["hybrid_head"]["trainable"]),
             "mlp_head": int(pc["frozen_mlp_head"]["trainable"]),
@@ -367,7 +396,7 @@ def export_moon(written: list[Path]) -> None:
             "comparable": False,
             "caveat_id": "moon_timing",
             "milliseconds_per_image": {
-                m: {str(s): clean(results[s]["test"]["inference"][m]["milliseconds_per_image"]) for s in SEEDS}
+                m: {str(s): clean(results[s]["test"]["inference"][m]["milliseconds_per_image"]) for s in seeds}
                 for m in MOON_MODELS
             },
         },
@@ -376,27 +405,30 @@ def export_moon(written: list[Path]) -> None:
     write_json(path, summary)
     written.append(path)
 
-    frames = {seed: moon_data.get_moon_predictions_df(seed) for seed in SEEDS}
+    index = {sid: i for i, sid in enumerate(base["test"]["sample_ids"])}
+    probs = {seed: {m: softmax_rows(np.asarray(results[seed]["test"]["logits"][m], dtype=np.float64)) for m in MOON_MODELS}
+             for seed in seeds}
     images = image_fields()["moon"]
     for cls in classes:
         sub_ids = sorted(s for s, t in zip(base["test"]["sample_ids"], base["test"]["ground_truth"])
                          if moon_data.CLASS_IDX_TO_NAME[t] == cls)
         crops = []
         for i, sample_id in enumerate(sub_ids):
+            j = index[sample_id]
             entry: dict[str, Any] = {"sample_id": sample_id, "img": i, "truth": cls, "pred": {}}
             for model in MOON_MODELS:
-                p = MOON_DF_PREFIX[model]
                 entry["pred"][model] = {}
-                for seed in SEEDS:
-                    row = frames[seed].set_index("sample_id").loc[sample_id]
-                    probs = [round(float(row[f"{p}_prob_{c}"]), 4) for c in classes]
-                    entry["pred"][model][str(seed)] = {"label": row[f"{p}_pred_name"],
-                                                      "conf": round(float(row[f"{p}_confidence"]), 4),
-                                                      "probs": probs}
+                for seed in seeds:
+                    pr = probs[seed][model][j]
+                    label = int(results[seed]["test"]["predictions"][model][j])
+                    assert label == int(np.argmax(pr)), f"{sample_id} {model} {seed}: prediction is not the argmax"
+                    entry["pred"][model][str(seed)] = {"label": moon_data.CLASS_IDX_TO_NAME[label],
+                                                      "conf": round(float(pr.max()), 4),
+                                                      "probs": [round(float(v), 4) for v in pr]}
             crops.append(entry)
         path = OUT_DIR / "moon" / "classes" / f"{cls}.json"
-        write_json(path, {**stamp([MOON_LOGS_DIR / f"seed_{s}" / "results.json" for s in SEEDS]),
-                          "class": cls, "classes": classes, "seeds": SEEDS,
+        write_json(path, {**stamp([MOON_LOGS_DIR / f"seed_{s}" / "results.json" for s in seeds]),
+                          "class": cls, "classes": classes, "seeds": seeds,
                           "sprite_order": "crops[i].img is the cell index in this class's sprite sheet",
                           "sprite": images.get(cls, {}).get("sprite"), "thumb": images.get(cls, {}).get("thumb"),
                           "crops": crops},

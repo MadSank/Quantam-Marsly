@@ -42,7 +42,7 @@ describe('caveats.json', () => {
         'These results therefore do not identify a clear overall winner.',
     )
     expect(byId.get('moon_mixed_results')!.text).toBe(
-      'Three seeds on one supplied split are descriptive evidence, not proof of a general advantage.',
+      'Ten seeds on one supplied split are descriptive evidence, not proof of a general advantage.',
     )
   })
 
@@ -56,11 +56,17 @@ describe('caveats.json', () => {
     expect(byId.get('moon_timing')!.text).toMatch(/not an apples-to-apples/)
   })
 
-  it('flags the Moon ranking as not robust, citing the Code history', () => {
+  it('quotes the audit addendum: 10 deterministic seeds, large spread, no model clearly ahead', () => {
     const c = byId.get('moon_reproducibility')!
-    expect(c.text).toMatch(/did not reproduce exactly in a locked-test re-run/)
-    expect(c.text).toMatch(/should not be treated as robust/)
-    expect(c.source).toBe('experiments/moon/README.md')
+    expect(c.source).toBe('FINAL_READINESS_AUDIT.md')
+    expect(c.text).toMatch(/come from 10 deterministic seeds/)
+    expect(c.text).toMatch(/spread across seeds is large/)
+    expect(c.text).toMatch(/no model is clearly ahead/)
+    expect(c.text).toMatch(/do not indicate any quantum contribution/)
+  })
+
+  it('no Moon caveat still describes the superseded three-seed run', () => {
+    for (const c of caveats.filter((c) => c.world === 'moon')) expect(c.text).not.toMatch(/three seeds|three-seed/i)
   })
 
   it.todo('renders every caveat on About (step 10)')

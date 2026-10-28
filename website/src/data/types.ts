@@ -102,12 +102,19 @@ export interface MarsContoursFile extends Stamp {
 export type MoonModel = 'cnn' | 'hybrid_qcnn' | 'frozen_embedding_mlp'
 export type MoonClass = 'ejecta' | 'oldcrater' | 'none'
 
+export type MoonMetricKey = 'accuracy' | 'balanced_accuracy' | 'macro_f1'
+
 export interface MoonSummary extends Stamp {
+  /** Run folder the Moon results come from (the deterministic 10-seed run). */
+  run: string
+  seeds: number[]
   classes: MoonClass[]
   models: MoonModel[]
   split_counts: Record<'train' | 'val' | 'test', Record<MoonClass, number>>
   split_sizes: Record<'train' | 'val' | 'test', number>
   metrics: Record<MoonModel | 'majority_train_baseline', Record<string, { mean: number; sd: number }>>
+  /** Per-seed min and max of each metric, per model. */
+  ranges: Record<MoonModel | 'majority_train_baseline', Record<MoonMetricKey, { min: number; max: number }>>
   per_seed: Array<Record<string, number | string>>
   parameter_counts: {
     cnn: { trainable_during_training: number; trainable_recorded_post_freeze: number; note: string }

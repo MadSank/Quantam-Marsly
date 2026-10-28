@@ -156,11 +156,32 @@ def test_moon_summary_matches_sources():
     assert summary["timing"]["comparable"] is False
 
 
+def test_moon_summary_is_the_ten_seed_run():
+    summary = load("moon/summary.json")
+    assert summary["run"].endswith("runs_deterministic_10seed_20261028")
+    assert summary["seeds"] == ex.moon_seeds() == list(range(42, 52))
+    per_seed = pd.read_csv(ex.MOON_METRICS_CSV)
+    assert len(summary["per_seed"]) == len(per_seed) == 40
+    for row, cell in zip(per_seed.to_dict("records"), summary["per_seed"]):
+        for k in ("seed", "model", "accuracy", "balanced_accuracy", "macro_f1"):
+            assert same(row[k], cell[k])
+    for model, g in per_seed.groupby("model"):
+        for k in ("accuracy", "balanced_accuracy", "macro_f1"):
+            assert same(g[k].min(), summary["ranges"][model][k]["min"])
+            assert same(g[k].max(), summary["ranges"][model][k]["max"])
+
+
+def test_moon_export_has_no_paired_statistics():
+    text = (ex.OUT_DIR / "moon" / "summary.json").read_text(encoding="utf-8").lower()
+    assert "paired" not in text and "diff" not in text
+
+
 def test_moon_crops_match_results():
     classes = load("moon/summary.json")["classes"]
+    seeds = ex.moon_seeds()
     results = {seed: json.loads((ex.MOON_LOGS_DIR / f"seed_{seed}" / "results.json").read_text(encoding="utf-8"))
-               for seed in ex.SEEDS}
-    test = results[ex.SEEDS[0]]["test"]
+               for seed in seeds}
+    test = results[seeds[0]]["test"]
     truth = dict(zip(test["sample_ids"], test["ground_truth"]))
     index = {sid: i for i, sid in enumerate(test["sample_ids"])}
     total = 0
@@ -171,7 +192,7 @@ def test_moon_crops_match_results():
         for c in crops:
             assert classes[truth[c["sample_id"]]] == cls == c["truth"]
             for model in ex.MOON_MODELS:
-                for seed in ex.SEEDS:
+                for seed in seeds:
                     p = c["pred"][model][str(seed)]
                     logits = np.array(results[seed]["test"]["logits"][model][index[c["sample_id"]]])
                     probs = np.exp(logits - logits.max())

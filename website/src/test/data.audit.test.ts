@@ -45,11 +45,13 @@ describe('Mars safe-proxy decisions (audit §1, percent to 2 dp)', () => {
   })
 })
 
-describe('Moon metrics (audit §1, mean ± sample SD, 3 dp)', () => {
+// The reported Moon results are the deterministic 10-seed run (audit Addendum, 2026-10-28);
+// the three-seed figures in audit §1 are superseded.
+describe('Moon metrics (audit addendum, 10 seeds, mean ± sample SD, 3 dp)', () => {
   const table: Array<[string, number, number, number, number, number, number]> = [
-    ['cnn', 0.53, 0.035, 0.558, 0.053, 0.465, 0.024],
-    ['hybrid_qcnn', 0.529, 0.039, 0.608, 0.006, 0.497, 0.026],
-    ['frozen_embedding_mlp', 0.451, 0.037, 0.587, 0.021, 0.44, 0.028],
+    ['cnn', 0.518, 0.053, 0.558, 0.063, 0.454, 0.051],
+    ['hybrid_qcnn', 0.506, 0.06, 0.591, 0.066, 0.476, 0.055],
+    ['frozen_embedding_mlp', 0.536, 0.041, 0.604, 0.064, 0.489, 0.059],
     ['majority_train_baseline', 0.684, 0, 0.333, 0, 0.271, 0],
   ]
   it.each(table)('%s', (model, acc, accSd, bal, balSd, f1, f1Sd) => {
@@ -60,6 +62,38 @@ describe('Moon metrics (audit §1, mean ± sample SD, 3 dp)', () => {
     close(m.balanced_accuracy.sd, balSd, 0.0005)
     close(m.macro_f1.mean, f1, 0.0005)
     close(m.macro_f1.sd, f1Sd, 0.0005)
+  })
+
+  it('comes from seeds 42 to 51', () => {
+    expect(moon.seeds).toEqual([42, 43, 44, 45, 46, 47, 48, 49, 50, 51])
+    expect(moon.per_seed).toHaveLength(10 * 4)
+  })
+})
+
+describe('Moon per-seed ranges (audit addendum, min–max, 3 dp)', () => {
+  const table: Array<[string, [number, number], [number, number], [number, number]]> = [
+    ['cnn', [0.425, 0.588], [0.449, 0.68], [0.368, 0.54]],
+    ['hybrid_qcnn', [0.424, 0.624], [0.472, 0.66], [0.409, 0.58]],
+    ['frozen_embedding_mlp', [0.463, 0.616], [0.446, 0.683], [0.35, 0.579]],
+    ['majority_train_baseline', [0.684, 0.684], [0.333, 0.333], [0.271, 0.271]],
+  ]
+  it.each(table)('%s', (model, acc, bal, f1) => {
+    const r = moon.ranges[model as keyof MoonSummary['ranges']]
+    for (const [key, [lo, hi]] of [['accuracy', acc], ['balanced_accuracy', bal], ['macro_f1', f1]] as const) {
+      close(r[key].min, lo, 0.0005)
+      close(r[key].max, hi, 0.0005)
+    }
+  })
+
+  it('agree with the exported per-seed values', () => {
+    for (const [model, r] of Object.entries(moon.ranges)) {
+      const rows = moon.per_seed.filter((p) => p.model === model)
+      for (const [key, { min, max }] of Object.entries(r)) {
+        const values = rows.map((p) => p[key] as number)
+        expect(Math.min(...values)).toBe(min)
+        expect(Math.max(...values)).toBe(max)
+      }
+    }
   })
 })
 
