@@ -10,6 +10,7 @@ import { tileAt } from '../components/overlay/draw'
 import { OverlayControls, OverlayLegend, TileInspector, TileOverlay } from '../components/overlay/Overlay'
 import { niceScaleBar } from '../components/panzoom/math'
 import { PanZoomViewport } from '../components/panzoom/PanZoomViewport'
+import { ResultsPanel, type Scope } from '../components/results/ResultsPanel'
 import { Rail } from '../components/Rail'
 import { WorldFooter, WorldHeader } from '../components/WorldChrome'
 import type { MarsSite, MarsSitesFile, MarsTilesFile } from '../data/types'
@@ -187,6 +188,7 @@ export function MarsExplorer() {
   const model: ModelKey = params.get('model') === 'qcnn' ? 'qcnn' : 'cnn'
   const seed = seeds.includes(params.get('seed') ?? '') ? params.get('seed')! : seeds[0]
   const showTruth = params.get('truth') === '1'
+  const scope: Scope = params.get('scope') === 'all' ? 'all' : 'site'
   const setParam = (key: string, value: string | null) =>
     setParams(
       (prev) => {
@@ -324,6 +326,13 @@ export function MarsExplorer() {
             )}
             <DetailsDrawer site={site} open={detailsOpen} onClose={close} id={drawerId} drawerRef={drawer} />
           </section>
+          <ResultsPanel
+            site={site}
+            sites={sites}
+            seed={seed}
+            scope={scope}
+            onScope={(s) => setParam('scope', s === 'all' ? 'all' : null)}
+          />
         </main>
         <WorldFooter />
       </div>

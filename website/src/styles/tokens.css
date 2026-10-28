@@ -105,8 +105,9 @@
   --accent: #d2691e;
   --accent-ink: #1a0f0a;
   --accent-2: #c8962e;
-  --model-cnn: #e8a15a;
-  --model-qcnn: #7fb2c4;
+  /* Validated with the dataviz palette check on --bg (dark): L and chroma in band, CVD ΔE 18.7. */
+  --model-cnn: #ca8038;
+  --model-qcnn: #3f98c2;
   --truth-safe: #9bc27a;
   --truth-unsafe: #d9573a;
   --focus: #ffd08a;

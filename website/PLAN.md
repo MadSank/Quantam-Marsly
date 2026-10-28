@@ -284,8 +284,8 @@ The page root carries `data-world="mars|moon"`, and shared components read only 
 | `--text-muted` | `#C29A7C` | `#9AA3AE` |
 | `--accent` | `#D2691E` rust | `#E6E9EE` silver |
 | `--accent-2` | `#C8962E` ochre | `#7E8896` slate |
-| `--model-cnn` (warm) | `#E8A15A` sand-amber | `#E8C58F` pale amber |
-| `--model-qcnn` (cool) | `#7FB2C4` dusty teal | `#8FB7E8` steel blue |
+| `--model-cnn` (warm) | `#CA8038` amber (was `#E8A15A`; step 8 dataviz check) | `#E8C58F` pale amber |
+| `--model-qcnn` (cool) | `#3F98C2` teal-blue (was `#7FB2C4`; step 8 dataviz check) | `#8FB7E8` steel blue |
 | `--model-mlp` | — | `#B9A6E0` lavender |
 | `--truth-safe` / `--truth-unsafe` | `#9BC27A` / `#D9573A` | `#9BC27A` / `#E06A5A` |
 | `--focus` | `#FFD08A` | `#FFFFFF` |
