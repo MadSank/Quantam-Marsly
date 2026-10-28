@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import caveatsFile from '../../public/data/caveats.json'
+import imageManifest from '../../public/data/img/manifest.json'
 import summaryFile from '../../public/data/moon/summary.json'
 import { CropSprite } from '../components/moon/CropSprite'
 import { CLASS_NAMES, CLASS_TAGS, modelFromUrl, MOON_CLASSES, MOON_MODELS } from '../components/moon/moonData'
@@ -16,7 +17,11 @@ import '../styles/moon.css'
 const summary = summaryFile as unknown as MoonSummary
 const fmt = new Intl.NumberFormat('en-GB')
 const CELL = 88 // crop size in the mosaic, CSS px
+const GAP = 8 // mosaic gap, CSS px (--space-xs)
 const provenance = (caveatsFile as CaveatsFile).caveats.find((c) => c.id === 'moon_provenance')!
+
+// The class thumbnails (a 3 × 3 crop mosaic each) from export_images.py.
+const classThumbs = imageManifest.moon as unknown as Record<MoonClass, { thumb: { src: string; width: number; height: number } }>
 
 const fileName = (sampleId: string) => sampleId.split('/').pop() ?? sampleId
 
@@ -143,7 +148,7 @@ function Mosaic({ file, cls, modelKey, seed, labels, selected, onSelect }: {
   // One tab stop for the whole mosaic; arrows, Home and End move between crops (roving tabindex).
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     const n = file.crops.length
-    const cols = Math.max(1, Math.floor((grid.current?.clientWidth ?? CELL) / (CELL + 6)))
+    const cols = Math.max(1, Math.floor(((grid.current?.clientWidth ?? CELL) + GAP) / (CELL + GAP)))
     const moves: Record<string, number> = {
       ArrowRight: focusIndex + 1,
       ArrowLeft: focusIndex - 1,
@@ -301,7 +306,7 @@ export function MoonExplorer() {
             <div>
               <dt>Seeds</dt>
               <dd className="num">
-                {summary.seeds.length} ({summary.seeds[0]}–{summary.seeds[summary.seeds.length - 1]})
+                {summary.seeds.length}, from {summary.seeds[0]} to {summary.seeds[summary.seeds.length - 1]}
               </dd>
             </div>
             <div className="readout-product">
@@ -323,6 +328,7 @@ export function MoonExplorer() {
                 id: c,
                 label: CLASS_NAMES[c],
                 detail: `${fmt.format(summary.split_counts.test[c])} test crops`,
+                thumb: classThumbs[c]?.thumb && { ...classThumbs[c].thumb, alt: '' },
               }))}
             />
             <MoonLegend cls={cls} file={file} error={error} modelKey={model.key} seed={seed} />

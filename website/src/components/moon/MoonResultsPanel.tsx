@@ -26,7 +26,7 @@ function rowsFor(def: MetricDef, seed: string): Row[] {
 
 /**
  * Moon results over all 779 test crops from the deterministic 10-seed run (audit Addendum):
- * per model, the mean ± SD, every seed as a dot, the min–max range, and the majority baseline
+ * per model, the mean ± SD, every seed as a dot, the lowest and highest seed, and the majority baseline
  * as a reference line. The reproducibility caveat stays pinned beside the metrics.
  */
 export function MoonResultsPanel({ seed }: { seed: string }) {
@@ -40,7 +40,7 @@ export function MoonResultsPanel({ seed }: { seed: string }) {
             <h2 id={titleId}>Results</h2>
           </div>
           <p className="results-sub">
-            All {summary.split_sizes.test} test crops. Bars are the mean of {seeds.length} deterministic seeds ({seeds[0]}–
+            All {summary.split_sizes.test} test crops. Bars are the mean of {seeds.length} deterministic seeds ({seeds[0]} to{' '}
             {seeds[seeds.length - 1]}), ± sample SD; dots are single seeds; the small figures are the lowest and highest seed.
           </p>
           <ul className="results-legend" aria-label="Models">

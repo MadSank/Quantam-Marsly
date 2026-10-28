@@ -153,7 +153,7 @@ describe('Moon explorer: results panel', () => {
       expect(Number(rows[i].querySelector('[data-value]')!.getAttribute('data-value'))).toBe(summary.metrics[m][key].mean)
       expect(rows[i].querySelector('.metric-sd')).toHaveTextContent(`± ${summary.metrics[m][key].sd.toFixed(3)}`)
       const r = summary.ranges[m][key as 'accuracy']
-      expect(rows[i].querySelector('.metric-range')).toHaveTextContent(`${r.min.toFixed(3)}–${r.max.toFixed(3)}`)
+      expect(rows[i].querySelector('.metric-range')).toHaveTextContent(`${r.min.toFixed(3)} to ${r.max.toFixed(3)}`)
       expect(rows[i].querySelectorAll('.metric-dot')).toHaveLength(10)
       expect(rows[i].querySelectorAll('.metric-dot[data-active]')).toHaveLength(1)
     })

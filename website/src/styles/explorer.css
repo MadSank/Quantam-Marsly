@@ -324,6 +324,11 @@ kbd {
   box-shadow: inset 2px 0 0 var(--accent);
 }
 
+/* An item without a thumbnail gives its text the whole row. */
+.rail-item:not(:has(.rail-thumb)) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .rail-thumb {
   display: grid;
   place-items: center;
@@ -1046,7 +1051,7 @@ kbd {
   left: 0;
   width: 8px;
   height: 8px;
-  margin: -4px 0 0 -4px;
+  margin: calc(var(--space-2xs) * -1) 0 0 calc(var(--space-2xs) * -1);
   border-radius: 50%;
   background: var(--text);
   box-shadow: 0 0 0 2px var(--bg);

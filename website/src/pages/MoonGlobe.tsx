@@ -34,7 +34,7 @@ const fmt = new Intl.NumberFormat('en-GB')
 // The near side, face on.
 const OVERVIEW: GlobeView = viewFor(0, 0, 1)
 const SAMPLES = 4 // crops per card: the first four of the class by file name (a fixed rule, not a selection)
-const CARD_CROP = 64
+const CARD_CROP = 52
 // The cards sit on the right; the flat map leaves them room.
 const MAP_INSETS = { top: 120, right: 388, bottom: 96, left: 24 }
 
@@ -58,7 +58,6 @@ function ClassCards({ files, current }: { files: MoonClassFile[] | null; current
                   .slice(0, SAMPLES)
                   .map((c) => <CropSprite key={c.sample_id} sprite={file.sprite!} index={c.img} size={CARD_CROP} alt={`${CLASS_NAMES[cls]} test crop ${c.sample_id.split('/').pop()}`} />)}
             </div>
-            <p className="class-card-note">First four test crops by file name.</p>
             <Link className="button-primary" to={{ pathname: '/moon/explore', search: `?class=${cls}` }}>
               Explore class
             </Link>
@@ -158,7 +157,10 @@ export function MoonGlobe() {
               {flat ? 'The flat map has no pins: the crops have no verified locations.' : 'Drag to turn the Moon; scroll or pinch to zoom. Arrow keys turn it, + and − zoom.'}
             </p>
           </div>
-          <p className="moon-globe-note">{LOCATION_NOTE}</p>
+          <div className="moon-globe-note">
+            <p>{LOCATION_NOTE}</p>
+            <p className="moon-globe-note-sub">Each card shows the first four test crops of its class by file name.</p>
+          </div>
           <ClassCards files={files} current={current} />
           <div className="moon-globe-side">
             <div className="view-toggle" role="radiogroup" aria-label="View">

@@ -19,7 +19,7 @@
 .mosaic {
   display: grid;
   grid-template-columns: repeat(auto-fill, 88px);
-  gap: 6px;
+  gap: var(--space-xs);
   justify-content: start;
 }
 
@@ -38,8 +38,11 @@
   outline-offset: 1px;
 }
 
+/* Right: a heavier solid line. Wrong: a lighter dashed one. They differ in weight and pattern, not hue. */
 .crop[data-correct] {
   outline-style: solid;
+  outline-width: 3px;
+  outline-offset: 0;
 }
 
 .crop:hover {
@@ -54,6 +57,12 @@
   box-shadow:
     0 0 0 4px var(--bg),
     0 0 0 6px var(--focus);
+}
+
+.crop:disabled,
+.moon-explorer .seed-select select:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .crop:focus-visible {
@@ -74,7 +83,7 @@
   position: absolute;
   left: 3px;
   bottom: 3px;
-  padding: 0 4px;
+  padding: 0 var(--space-2xs);
   border-radius: 2px;
   background: color-mix(in oklab, var(--bg) 82%, transparent);
   font-size: 0.6875rem;
@@ -127,6 +136,8 @@
 
 .crop-key[data-correct] {
   outline-style: solid;
+  outline-width: 3px;
+  outline-offset: -3px;
 }
 
 .moon-counts td {
@@ -159,12 +170,15 @@
   bottom: var(--space-lg);
   z-index: var(--z-raised);
   display: grid;
-  align-content: center;
+  /* Centred when the cards fit; scrolls (never spills past header or footer) when they do not. */
+  align-content: safe center;
   gap: var(--space-sm);
   width: 340px;
   margin: 0;
   padding: 0;
+  overflow-y: auto;
   list-style: none;
+  scrollbar-width: thin;
 }
 
 .class-card {
@@ -208,7 +222,8 @@
   border-radius: 2px;
 }
 
-.class-card-note {
+.moon-globe-note-sub {
+  margin-top: var(--space-2xs);
   font-size: var(--text-xs);
   color: var(--text-muted);
 }

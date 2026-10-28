@@ -410,6 +410,7 @@
   height: 160px;
   object-fit: contain;
   background: var(--bg);
+  color: var(--text);
 }
 
 .site-card-body {

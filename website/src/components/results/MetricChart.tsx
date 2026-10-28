@@ -94,7 +94,7 @@ export function MetricChart({ def, rows, pointNoun, reference }: Props) {
               {r.sd !== null && <span className="metric-sd num"> ± {fmtSd(r.sd)}</span>}
               {r.range && r.range.min !== null && r.range.max !== null && (
                 <span className="metric-range num">
-                  {formatMetric(def, r.range.min)}–{formatMetric(def, r.range.max)}
+                  {formatMetric(def, r.range.min)} to {formatMetric(def, r.range.max)}
                 </span>
               )}
             </span>
