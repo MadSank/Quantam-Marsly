@@ -18,6 +18,11 @@ function load(rel: string): Promise<unknown> {
   return request
 }
 
+/** Start loading a JSON file into the session cache without rendering it (e.g. the next site's). */
+export function prefetchJson(rel: string): void {
+  load(rel).catch(() => {})
+}
+
 /** Several JSON files at once; data is null until all of them have loaded. */
 export function useJsonAll<T>(rels: readonly string[] | null): JsonState<T[]> {
   const key = rels ? rels.join('\n') : null

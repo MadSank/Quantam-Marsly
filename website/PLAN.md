@@ -463,6 +463,13 @@ These rules are built into the components:
     - Performance: lazy-load data, and lazy-load the `/lab` route.
     - Lighthouse pass.
     - Deep-zoom pyramid for site_01 and site_05 if the budget allows. Report its size.
+    - Done.
+      - Phones (375 and 390 wide) have no sideways page scroll on any page. Rails scroll sideways, panels stack, and model toggles use short labels. Globe callouts show only their number on a narrow stage. Touch controls are at least 44 px tall.
+      - Each globe page shows a pre-rendered still of its opening view (`img/globe/<world>_view_still.webp`) before three.js loads.
+      - The Mars explorer prefetches the next site's tiles and preview while idle.
+      - Metric-matched fallback fonts stop the web-font swap from shifting the layout.
+      - Live-region announcements on site, class, model, seed and fold changes; a table view for every chart; the globe locator comes earlier in the focus order.
+      - Not built: the deep-zoom pyramid. site_01's preview is already at native resolution (6,109 × 7,735 px), so a pyramid would add only tiling, at about 6 MB. site_05 at full resolution would be about 34 MB. Either one breaks the 25 MB budget (public/data is 20.5 MB).
 13. **Phase 2 globe (planned, not built now).** The textures and the sphere component were pulled forward into the step 5 landing redesign:
     - **Textures (downloaded with approval, kept in gitignored `data/raw/textures/`):**
       - Mars: USGS Viking MDIM 2.1 colorized mosaic, 1 km/px JPG (21339×10670, 36.7 MB, public domain).

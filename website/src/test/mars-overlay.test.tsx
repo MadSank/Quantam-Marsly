@@ -54,7 +54,7 @@ describe('Mars overlay controls', () => {
   it('offers both models in fixed order, CNN selected by default', () => {
     renderAt('/mars/explore')
     const radios = within(screen.getByRole('radiogroup', { name: 'Model' })).getAllByRole('radio')
-    expect(radios.map((r) => r.textContent)).toEqual(['CNN', 'Hybrid CNN–QCNN'])
+    expect(radios.map((r) => r.getAttribute('aria-label'))).toEqual(['CNN', 'Hybrid CNN–QCNN'])
     expect(radios[0]).toHaveAttribute('aria-checked', 'true')
     expect(document.querySelector('[data-winner]')).toBeNull()
   })

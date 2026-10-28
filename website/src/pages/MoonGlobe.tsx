@@ -8,6 +8,7 @@ import { FlatOnError } from '../components/globeview/FlatOnError'
 import { flatMapRect, viewFor, type GlobeView } from '../components/globeview/projection'
 import { useGlobeControls } from '../components/globeview/useGlobeControls'
 import { useSize } from '../components/globeview/useSize'
+import { ViewStill } from '../components/globeview/ViewStill'
 import { webglAvailable } from '../components/globeview/webgl'
 import { CropSprite } from '../components/moon/CropSprite'
 import { CLASS_NAMES, LOCATION_NOTE, MOON_CLASSES } from '../components/moon/moonData'
@@ -26,7 +27,7 @@ import '../styles/moon.css'
 const GlobeSphere = lazy(() => import('../components/globeview/GlobeSphere'))
 
 const summary = summaryFile as unknown as MoonSummary
-const colourTexture = (imageManifest.globe as unknown as Record<'moon', { textures: Record<'2k', { src: string }>; credit: string }>).moon
+const colourTexture = (imageManifest.globe as unknown as Record<'moon', { textures: Record<'2k', { src: string }>; view_still: { src: string; width: number; height: number }; credit: string }>).moon
 const caveats = (caveatsFile as CaveatsFile).caveats
 const FOOTER_CAVEATS = ['moon_reproducibility', 'moon_provenance', 'no_quantum_advantage'].map((id) => caveats.find((c) => c.id === id)!)
 const fmt = new Intl.NumberFormat('en-GB')
@@ -128,6 +129,7 @@ export function MoonGlobe() {
             }}
             {...(flat ? {} : controls.handlers)}
           >
+            {!flat && measured && <ViewStill still={colourTexture.view_still} size={size} zoom={controls.view.zoom} />}
             {flat ? (
               <img
                 className="flat-map"
@@ -154,7 +156,14 @@ export function MoonGlobe() {
               )
             )}
             <p id="moon-globe-help" className="globe-help">
-              {flat ? 'The flat map has no pins: the crops have no verified locations.' : 'Drag to turn the Moon; scroll or pinch to zoom. Arrow keys turn it, + and − zoom.'}
+              {flat ? (
+                'The flat map has no pins: the crops have no verified locations.'
+              ) : (
+                <>
+                  <span className="help-fine">Drag to turn the Moon; scroll or pinch to zoom. Arrow keys turn it, + and − zoom.</span>
+                  <span className="help-touch">Drag to turn the Moon; pinch to zoom.</span>
+                </>
+              )}
             </p>
           </div>
           <div className="moon-globe-note">

@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router'
 import caveatsFile from '../../public/data/caveats.json'
 import imageManifest from '../../public/data/img/manifest.json'
 import summaryFile from '../../public/data/moon/summary.json'
+import { Announcer } from '../components/Announcer'
 import { CropSprite } from '../components/moon/CropSprite'
 import { CLASS_NAMES, CLASS_TAGS, modelFromUrl, MOON_CLASSES, MOON_MODELS } from '../components/moon/moonData'
 import { MoonResultsPanel } from '../components/moon/MoonResultsPanel'
@@ -41,9 +42,14 @@ function MoonControls({ model, seed, seeds, labels, onModel, onSeed, onLabels }:
     <div className="overlay-controls">
       <div className="model-toggle" role="radiogroup" aria-label="Model">
         {MOON_MODELS.map((m) => (
-          <button key={m.key} type="button" role="radio" aria-checked={m.url === model} data-model={m.data} onClick={() => onModel(m.url)}>
+          <button key={m.key} type="button" role="radio" aria-checked={m.url === model} data-model={m.data} aria-label={m.label} onClick={() => onModel(m.url)}>
             <span className="swatch swatch--fill" aria-hidden="true" />
-            {m.label}
+            <span className="label-long" aria-hidden="true">
+              {m.label}
+            </span>
+            <span className="label-short" aria-hidden="true">
+              {m.short}
+            </span>
           </button>
         ))}
       </div>
@@ -93,8 +99,6 @@ function MoonLegend({ cls, file, error, modelKey, seed }: {
         <p className="legend-status" role="alert">
           The crops could not be loaded. Reload the page to try again.
         </p>
-      ) : !file ? (
-        <p className="legend-status">Loading crops…</p>
       ) : null}
       <ul className="moon-legend-rows">
         <li>
@@ -106,7 +110,8 @@ function MoonLegend({ cls, file, error, modelKey, seed }: {
           Dashed outline: predicted another class (wrong)
         </li>
       </ul>
-      <table className="legend-matrix moon-counts">
+      {/* While the crops load the counts read "…", so the legend keeps its height. */}
+      <table className="legend-matrix moon-counts" aria-busy={!file && !error}>
         <caption className="visually-hidden">Predictions for the crops in this class</caption>
         <thead>
           <tr>
@@ -121,7 +126,7 @@ function MoonLegend({ cls, file, error, modelKey, seed }: {
                 {CLASS_TAGS[c]}
                 {c === cls ? ' (right)' : ''}
               </th>
-              <td className="num">{file ? fmt.format(counts[c]) : ''}</td>
+              <td className="num">{file ? fmt.format(counts[c]) : error ? '' : '…'}</td>
             </tr>
           ))}
         </tbody>
@@ -292,6 +297,8 @@ export function MoonExplorer() {
 
   return (
     <WorldLayout world="moon">
+      {/* Outside the explorer grid, so the live region takes no grid row. */}
+      <Announcer message={`${CLASS_NAMES[cls]}, ${n} test crops. ${model.label}, seed ${seed}.`} />
       <div className="explorer moon-explorer">
         <WorldHeader world="moon" />
         <section className="readout" aria-label="Class readout">
@@ -335,6 +342,10 @@ export function MoonExplorer() {
           </div>
           <section className="image-panel moon-panel" aria-label={`${CLASS_NAMES[cls]} crops`}>
             <div className="moon-panel-scroll">
+              {/* Above the mosaic, so the crops load in below it without moving it. */}
+              <p className="moon-provenance">
+                <strong>{provenance.title}.</strong> {provenance.text}
+              </p>
               {file && (
                 <Mosaic
                   key={cls}
@@ -347,9 +358,6 @@ export function MoonExplorer() {
                   onSelect={(index) => setPicked({ cls, index })}
                 />
               )}
-              <p className="moon-provenance">
-                <strong>{provenance.title}.</strong> {provenance.text}
-              </p>
             </div>
             <div className="panzoom-controls">
               <MoonControls

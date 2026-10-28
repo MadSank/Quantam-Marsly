@@ -1,5 +1,28 @@
 @import './tokens.css';
 
+/* Until Geologica arrives (Google Fonts, display=swap), text is set in Arial scaled to
+   Geologica's width and line metrics, so the swap does not reflow the page (Lighthouse CLS).
+   Measured in Chromium from the loaded font: widths 107.38% of Arial; ascent 0.98 em,
+   descent 0.28 em, no line gap. */
+@font-face {
+  font-family: 'Geologica Fallback';
+  src: local('Arial'), local('Helvetica'), local('Liberation Sans');
+  size-adjust: 107.38%;
+  ascent-override: 91.27%;
+  descent-override: 26.08%;
+  line-gap-override: 0%;
+}
+
+/* The same for JetBrains Mono (readouts): Courier New has its advance width, so only the line
+   metrics are matched (ascent 1.02 em, descent 0.30 em). */
+@font-face {
+  font-family: 'JetBrains Mono Fallback';
+  src: local('Courier New'), local('Liberation Mono');
+  ascent-override: 102%;
+  descent-override: 30%;
+  line-gap-override: 0%;
+}
+
 /* Base rules from the Hallmark scaffold (base.css), on the plan's token names. */
 
 *,
@@ -126,5 +149,34 @@ img {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Two lengths of one label or hint; CSS picks one. Buttons carry the full label as aria-label, so
+   the name never depends on the screen. Phones get the short model labels; touch screens get
+   touch wording. */
+.label-short,
+.help-touch {
+  display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .help-fine {
+    display: none;
+  }
+
+  .help-touch {
+    display: inline;
+  }
+}
+
+@media (max-width: 30rem) {
+  .label-long,
+  .chip-more {
+    display: none;
+  }
+
+  .label-short {
+    display: inline;
   }
 }

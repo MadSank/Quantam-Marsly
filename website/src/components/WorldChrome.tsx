@@ -21,7 +21,9 @@ export function WorldHeader({ world }: { world: World }) {
           ))}
         </ul>
         <Link to="/about" className="caveat-chip">
-          Caveats and method
+          <span>
+            Caveats<span className="chip-more"> and method</span>
+          </span>
         </Link>
       </nav>
     </header>

@@ -2,12 +2,14 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import sitesFile from '../../public/data/mars/sites.json'
 import imageManifest from '../../public/data/img/manifest.json'
+import { Announcer } from '../components/Announcer'
 import { Atmosphere } from '../components/Atmosphere'
 import { Globe } from '../components/globe/Globe'
 import type { GlobeSpec } from '../components/globe/spec'
 import type { ModelKey } from '../components/overlay/draw'
 import { tileAt } from '../components/overlay/draw'
 import { OverlayControls, OverlayLegend, TileInspector, TileOverlay } from '../components/overlay/Overlay'
+import { modelLabel } from '../components/overlay/style'
 import { niceScaleBar } from '../components/panzoom/math'
 import { PanZoomViewport } from '../components/panzoom/PanZoomViewport'
 import { ResultsPanel, type Scope } from '../components/results/ResultsPanel'
@@ -15,7 +17,7 @@ import { Rail } from '../components/Rail'
 import { WorldFooter, WorldHeader } from '../components/WorldChrome'
 import type { MarsSite, MarsSitesFile, MarsTilesFile } from '../data/types'
 import { dataUrl } from '../lib/dataUrl'
-import { useJson } from '../lib/useJson'
+import { prefetchJson, useJson } from '../lib/useJson'
 import { WorldLayout } from '../theme/WorldLayout'
 import '../styles/explorer.css'
 
@@ -51,7 +53,8 @@ function StripImage({ site }: { site: MarsSite }) {
   const size = { width: site.native_width_px, height: site.native_height_px }
   return (
     <>
-      {site.thumb && <img className="strip-placeholder" src={dataUrl(site.thumb.src)} alt="" style={size} draggable={false} />}
+      {/* A CSS background, not an <img>: it is a deliberately stretched, blurred stand-in. */}
+      {site.thumb && <div className="strip-placeholder" style={{ ...size, backgroundImage: `url(${dataUrl(site.thumb.src)})` }} />}
       {site.preview && (
         <img
           className="strip-image"
@@ -184,6 +187,27 @@ export function MarsExplorer() {
 
   // Overlay state lives in the URL: ?model=cnn|qcnn&seed=42&truth=1.
   const { data: tiles, error: tilesError } = useJson<MarsTilesFile>(`mars/tiles/${site.site_id}.json`)
+
+  // Once this site's tiles are in, fetch the next site's tiles and preview while the browser is
+  // idle, so stepping through the rail in order does not wait on the network.
+  useEffect(() => {
+    if (!tiles) return
+    const next = sites[(sites.indexOf(site) + 1) % sites.length]
+    const run = () => {
+      prefetchJson(`mars/tiles/${next.site_id}.json`)
+      if (next.preview) {
+        const img = new Image()
+        img.fetchPriority = 'low'
+        img.src = dataUrl(next.preview.src)
+      }
+    }
+    const idle = window.requestIdleCallback?.(run, { timeout: 3000 })
+    const timer = idle === undefined ? window.setTimeout(run, 1500) : undefined
+    return () => {
+      if (idle !== undefined) window.cancelIdleCallback(idle)
+      if (timer !== undefined) window.clearTimeout(timer)
+    }
+  }, [tiles, site])
   const seeds = (tiles?.seeds ?? [42, 43, 44]).map(String)
   const model: ModelKey = params.get('model') === 'qcnn' ? 'qcnn' : 'cnn'
   const seed = seeds.includes(params.get('seed') ?? '') ? params.get('seed')! : seeds[0]
@@ -248,6 +272,10 @@ export function MarsExplorer() {
 
   return (
     <WorldLayout world="mars">
+      {/* Outside the explorer grid, so the live region takes no grid row. */}
+      <Announcer
+        message={`${site.name}, test site ${sites.indexOf(site) + 1} of ${sites.length}, ${site.n_tiles.toLocaleString('en-US')} tiles. ${modelLabel(model)}, seed ${seed}.`}
+      />
       <div className="explorer">
         <Atmosphere siteId={site.site_id} />
         <WorldHeader world="mars" />
@@ -268,6 +296,11 @@ export function MarsExplorer() {
             <OverlayLegend tiles={tiles} error={tilesError} model={model} seed={seed} showTruth={showTruth} />
           </div>
           <section className="image-panel" aria-label={`${site.name} strip`}>
+            {/* First in the panel's focus order, as it sits at the panel's top; drawn above the image. */}
+            <Link className="locator" to={{ pathname: '/mars', search: `?site=${site.site_id}` }}>
+              <Globe spec={marsGlobe} resolution="1k" target={target} pinToken="--pin" className="locator-globe" />
+              <span className="locator-label">Back to globe</span>
+            </Link>
             <PanZoomViewport
               key={site.site_id}
               content={{ width: site.native_width_px, height: site.native_height_px }}
@@ -318,10 +351,6 @@ export function MarsExplorer() {
             >
               <StripImage site={site} />
             </PanZoomViewport>
-            <Link className="locator" to={{ pathname: '/mars', search: `?site=${site.site_id}` }}>
-              <Globe spec={marsGlobe} resolution="1k" target={target} pinToken="--pin" className="locator-globe" />
-              <span className="locator-label">Back to globe</span>
-            </Link>
             {tiles && selected !== null && (
               <TileInspector tiles={tiles} index={selected} seed={seed} model={model} onClose={() => setPicked(null)} />
             )}

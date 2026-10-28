@@ -50,7 +50,10 @@ export function Rail({ label, items, selected, to }: Props) {
               <Link className="rail-item" to={to(item.id)} aria-current={current ? 'true' : undefined} replace>
                 {item.thumb && (
                   <span className="rail-thumb">
-                    <img src={dataUrl(item.thumb.src)} width={item.thumb.width} height={item.thumb.height} alt={item.thumb.alt} />
+                    <img src={dataUrl(item.thumb.src)} width={item.thumb.width} height={item.thumb.height} alt={item.thumb.alt} decoding="async"
+                      // The first two are on screen at every width; the rest wait until scrolled to (phones).
+                      loading={i < 2 ? undefined : 'lazy'}
+                    />
                   </span>
                 )}
                 <span className="rail-text">

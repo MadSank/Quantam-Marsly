@@ -248,6 +248,13 @@
     "src": "img/globe/mars_still.webp",
     "width": 1024,
     "height": 1024
+   },
+   "view_still": {
+    "src": "img/globe/mars_view_still.webp",
+    "width": 768,
+    "height": 768,
+    "lat": 10.0,
+    "lon_e": 20.0
    }
   },
   "moon": {
@@ -282,6 +289,13 @@
     "src": "img/globe/moon_still.webp",
     "width": 1024,
     "height": 1024
+   },
+   "view_still": {
+    "src": "img/globe/moon_view_still.webp",
+    "width": 768,
+    "height": 768,
+    "lat": 0.0,
+    "lon_e": 0.0
    }
   }
  }

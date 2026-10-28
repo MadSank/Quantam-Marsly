@@ -93,7 +93,7 @@
 
 .moon-provenance {
   max-width: 72ch;
-  margin-top: var(--space-lg);
+  margin-bottom: var(--space-md);
   font-size: var(--text-xs);
   line-height: 1.5;
   color: var(--text-muted);

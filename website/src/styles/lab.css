@@ -275,7 +275,7 @@
   padding: var(--space-2xs) var(--space-3xs);
   border-radius: 2px;
   text-align: center;
-  color: var(--text);
+  color: var(--heat-ink-light);
   background: color-mix(in oklch, var(--heat-lo), var(--heat-hi) calc(var(--t) * 100%));
 }
 
@@ -286,13 +286,12 @@
 
 .heatmap-gate {
   font-size: 0.6875rem;
-  color: var(--text-muted);
+  color: inherit;
 }
 
 /* Strong cells get dark ink so the printed value stays readable. */
-.heatmap-table td[data-strong],
-.heatmap-table td[data-strong] .heatmap-gate {
-  color: var(--accent-ink);
+.heatmap-table td[data-strong] {
+  color: var(--heat-ink-dark);
 }
 
 .heatmap-legend {
@@ -664,4 +663,55 @@
   .segmented button {
     transition: none;
   }
+}
+
+/* Phones: the parameter table keeps readable columns and scrolls sideways inside its frame. */
+@media (max-width: 30rem) {
+  .lab-params {
+    min-width: 34rem;
+  }
+}
+
+@media (pointer: coarse) {
+  .segmented button {
+    min-height: 44px;
+  }
+}
+
+.curve-table summary {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.curve-table summary:hover {
+  color: var(--text);
+}
+
+.curve-table-scroll {
+  max-height: 240px;
+  overflow: auto;
+  margin-top: var(--space-xs);
+}
+
+.curve-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-xs);
+}
+
+.curve-table th,
+.curve-table td {
+  padding: var(--space-3xs) var(--space-xs) var(--space-3xs) 0;
+  border-bottom: var(--rule-hair) solid var(--rule);
+  font-weight: 400;
+  text-align: left;
+}
+
+.curve-table thead th {
+  color: var(--text-muted);
+}
+
+.curve-table td.num {
+  text-align: right;
 }

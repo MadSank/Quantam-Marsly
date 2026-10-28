@@ -565,3 +565,38 @@
     height: 70dvh;
   }
 }
+
+/* A narrow stage (Callouts sets data-compact) shows only each callout's number; the site list
+   above the globe names every site. */
+.callouts[data-compact] .callout-name {
+  display: none;
+}
+
+/* Phones: the hint wraps inside the stage. */
+@media (max-width: 30rem) {
+  .globe-help {
+    left: var(--space-md);
+    right: var(--space-md);
+    translate: none;
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+/* The pre-rendered opening view paints first and fades out as the live sphere fades in. */
+.globe-view-still {
+  position: absolute;
+  max-width: none;
+  pointer-events: none;
+  transition: opacity var(--dur-long) var(--ease-out);
+}
+
+.globe-stage[data-ready] .globe-view-still {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .globe-view-still {
+    transition: none;
+  }
+}

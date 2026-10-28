@@ -497,6 +497,7 @@ kbd {
 }
 
 .strip-placeholder {
+  background-size: 100% 100%;
   filter: blur(2px);
 }
 
@@ -1248,6 +1249,7 @@ kbd {
 
 .locator {
   position: absolute;
+  z-index: 2;
   top: var(--space-lg);
   right: var(--space-lg);
   display: grid;
@@ -1470,5 +1472,75 @@ kbd {
 
   .world-header .wordmark {
     display: none;
+  }
+}
+
+/* Phones: the zoom bar wraps, and the globe locator gives way to the image (the header's world
+   switch leads back to the globe). */
+@media (max-width: 30rem) {
+  .panzoom-controls {
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-md);
+  }
+
+  .locator {
+    display: none;
+  }
+
+  .world-header {
+    padding-inline: var(--space-md);
+  }
+}
+
+/* Touch screens: every control in the explorers and globes is at least 44 px tall. */
+@media (pointer: coarse) {
+  .model-toggle button,
+  .panzoom-buttons button,
+  .world-switch a,
+  .caveat-chip,
+  .seed-select select,
+  .truth-toggle {
+    min-height: 44px;
+  }
+}
+
+/* Desktop readout: name, facts and the details button in fixed columns, so a font swap or a
+   longer site name rewraps inside the facts column instead of moving the button to a new row
+   (which shifted the whole explorer; Lighthouse CLS). */
+@media (min-width: 52.0625rem) {
+  .readout {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: baseline;
+  }
+
+  .readout-name {
+    white-space: nowrap;
+  }
+
+  /* One row of facts at any font: the product ID, the longest fact, gives way with an ellipsis
+     (it is also in Site details and on the About page). */
+  .readout-facts {
+    flex-wrap: nowrap;
+    min-width: 0;
+  }
+
+  .readout-facts > div {
+    flex: none;
+  }
+
+  .readout-facts > .readout-product {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  .readout-product dd {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .details-toggle {
+    margin-left: 0;
   }
 }

@@ -154,6 +154,7 @@
 /* Hero: the line beside the headline, baselines aligned, then the doors. */
 .landing-main {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 /* The hero fills the space between nav and colophon and centres the doors in it. */
@@ -373,6 +374,18 @@
 }
 
 @media (max-width: 40rem) {
+  /* Phones: the wordmark takes its own row and the nav wraps under it. */
+  .landing-nav {
+    flex-wrap: wrap;
+    row-gap: 0;
+    padding-block: var(--space-xs);
+  }
+
+  .landing-nav nav {
+    flex-wrap: wrap;
+    gap: 0 var(--space-md);
+  }
+
   .door-body {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:

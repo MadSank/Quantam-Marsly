@@ -1,5 +1,6 @@
 import { useEffect, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router'
+import { Announcer } from '../components/Announcer'
 import { CurveChart, type CurveSeries } from '../components/lab/CurveChart'
 import { RotationHeatmap } from '../components/lab/RotationHeatmap'
 import { MOON_MODELS } from '../components/moon/moonData'
@@ -260,13 +261,13 @@ export default function Lab() {
                 </p>
                 <div className="cnn-grid">
                   <figure className="lab-figure">
-                    <img src={dataUrl('lab/mars_cnn_conv1.png')} alt="The 64 first-layer filters, 7 by 7 pixels each, in an 8 by 8 grid" width={238} height={238} />
+                    <img src={dataUrl('lab/mars_cnn_conv1.png')} alt="The 64 first-layer filters, 7 by 7 pixels each, in an 8 by 8 grid" width={238} height={238} loading="lazy" decoding="async" />
                     <figcaption>
                       The 64 first-layer filters (7 × 7), image channel only, each scaled to its own range.
                     </figcaption>
                   </figure>
                   <figure className="lab-figure">
-                    <img src={dataUrl(features.input.png)} alt={`Test tile ${features.tile_id}`} width={238} height={238} />
+                    <img src={dataUrl(features.input.png)} alt={`Test tile ${features.tile_id}`} width={238} height={238} loading="lazy" decoding="async" />
                     <figcaption>
                       Test tile <span className="mono">{features.tile_id}</span> ({sites.sites.find((s) => s.site_id === features.site_id)?.name},
                       the fold {features.fold} test site), image channel after training-fold normalisation. Black
@@ -283,7 +284,7 @@ export default function Lab() {
                   {features.stages.map((s) => (
                     <li key={s.name}>
                       <figure className="lab-figure">
-                        <img src={dataUrl(s.png)} alt={`${STAGE_NAMES[s.name]}: ${s.channels_shown} of ${s.shape[0]} channels, ${s.shape[1]} by ${s.shape[2]}`} width={262} height={262} />
+                        <img src={dataUrl(s.png)} alt={`${STAGE_NAMES[s.name]}: ${s.channels_shown} of ${s.shape[0]} channels, ${s.shape[1]} by ${s.shape[2]}`} width={262} height={262} loading="lazy" decoding="async" />
                         <figcaption>
                           <span className="feature-name">{STAGE_NAMES[s.name]}</span>
                           <span className="mono">{shape(s.shape)}</span>
@@ -398,6 +399,9 @@ export default function Lab() {
                   The hybrid’s curve starts from a CNN that had already been trained.
                 </p>
 
+                <Announcer
+                  message={`Mars curves: fold ${fold}, ${sites.sites.find((s) => s.fold === fold)?.name}, seed ${marsSeed}. Moon curves: seed ${moonSeed}.`}
+                />
                 <div className="curve-block" data-topic="mars">
                   <div className="curve-controls">
                     <h3>Mars</h3>
@@ -487,12 +491,15 @@ export default function Lab() {
         </main>
       </div>
 
-      <footer className="about-footer container">
-        <p>No quantum advantage claimed; circuits simulated.</p>
-        <p>
-          <Link to="/about">Method and caveats</Link> <Link to="/mars">Explore Mars</Link> <Link to="/moon">Explore the Moon</Link>
-        </p>
-      </footer>
+      {/* Shown once the sections are in, so it does not jump down the page as they load. */}
+      {(files || error) && (
+        <footer className="about-footer container">
+          <p>No quantum advantage claimed; circuits simulated.</p>
+          <p>
+            <Link to="/about">Method and caveats</Link> <Link to="/mars">Explore Mars</Link> <Link to="/moon">Explore the Moon</Link>
+          </p>
+        </footer>
+      )}
     </div>
   )
 }

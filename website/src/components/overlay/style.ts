@@ -4,8 +4,8 @@
 
 /** The two Mars models, always in this order: CNN first, then the hybrid. */
 export const MODELS = [
-  { key: 'cnn', label: 'CNN', token: '--model-cnn' },
-  { key: 'qcnn', label: 'Hybrid CNN–QCNN', token: '--model-qcnn' },
+  { key: 'cnn', label: 'CNN', short: 'CNN', token: '--model-cnn' },
+  { key: 'qcnn', label: 'Hybrid CNN–QCNN', short: 'Hybrid', token: '--model-qcnn' },
 ] as const
 
 export type ModelKey = (typeof MODELS)[number]['key']

@@ -309,6 +309,49 @@ def render_still(texture: Image.Image, front_longitude: float, light: tuple[floa
     return Image.fromarray(rgba, "RGBA")
 
 
+# The globe pages' opening views (MarsGlobe/MoonGlobe OVERVIEW) and their sphere's lighting
+# (src/components/globeview/GlobeSphere.tsx). The still paints first and cross-fades to the live
+# sphere, so it uses the same view, light and rotation maths (projection.ts); relief is left out.
+VIEW_STILLS: dict[str, tuple[float, float]] = {"mars": (10.0, 20.0), "moon": (0.0, 0.0)}  # (lat, lon_e)
+VIEW_LIGHT = (-0.55, 0.5, 0.67)
+VIEW_AMBIENT = 0.14
+VIEW_DIFFUSE = 1.05
+VIEW_STILL_PX = 768
+
+
+def render_view_still(texture: Image.Image, lat0: float, lon0: float) -> Image.Image:
+    """The globe page's sphere at view (lat0, lon0), zoom 1: inverse of projection.ts rotate()."""
+    tex = _srgb_to_linear(np.asarray(texture.convert("RGB"), dtype=np.float32) / 255.0)
+    th, tw = tex.shape[:2]
+    n = VIEW_STILL_PX
+    ys, xs = np.mgrid[0:n, 0:n].astype(np.float32)
+    x = (xs + 0.5) / n * 2 - 1
+    y = 1 - (ys + 0.5) / n * 2
+    r2 = x * x + y * y
+    inside = r2 <= 1.0
+    z = np.sqrt(np.clip(1 - r2, 0, 1))
+    yaw = -np.radians(lon0 + 90)  # rotationForLongitude
+    pitch = np.radians(lat0)
+    cp, sp, cy, sy = np.cos(pitch), np.sin(pitch), np.cos(yaw), np.sin(yaw)
+    # v' = Rx(pitch) Ry(yaw) v, so v = Ry(-yaw) Rx(-pitch) v'
+    y1 = y * cp + z * sp
+    z1 = -y * sp + z * cp
+    vx = x * cy - z1 * sy
+    vz = x * sy + z1 * cy
+    lat = np.arcsin(np.clip(y1, -1, 1))
+    lon = np.degrees(np.arctan2(vz, -vx)) - 180.0  # surfacePoint: phi = lon + 180
+    tx = (((lon + 180.0) / 360.0) % 1.0) * (tw - 1)
+    ty = (0.5 - lat / np.pi) * (th - 1)
+    albedo = tex[ty.round().astype(int), tx.round().astype(int)]
+    lvec = np.asarray(VIEW_LIGHT, dtype=np.float32)
+    lvec /= np.linalg.norm(lvec)
+    lambert = np.clip(x * lvec[0] + y * lvec[1] + z * lvec[2], 0, None)
+    rgb = _linear_to_srgb(albedo * (VIEW_AMBIENT + VIEW_DIFFUSE * lambert)[..., None])
+    edge = np.clip((1 - np.sqrt(r2)) * n / 2, 0, 1)
+    rgba = np.dstack([rgb * 255, np.where(inside, edge, 0) * 255]).round().astype(np.uint8)
+    return Image.fromarray(rgba, "RGBA")
+
+
 def export_globes(written: list[Path]) -> dict[str, Any]:
     out: dict[str, Any] = {}
     for world, spec in GLOBES.items():
@@ -329,6 +372,13 @@ def export_globes(written: list[Path]) -> dict[str, Any]:
         save_webp(still, still_path)
         written.append(still_path)
         entry["still"] = {"src": data_rel(still_path), "width": STILL_PX, "height": STILL_PX}
+        lat0, lon0 = VIEW_STILLS[world]
+        view_still = render_view_still(src.resize((4096, 2048), Image.Resampling.LANCZOS), lat0, lon0)
+        view_path = IMG_DIR / "globe" / f"{world}_view_still.webp"
+        save_webp(view_still, view_path)
+        written.append(view_path)
+        entry["view_still"] = {"src": data_rel(view_path), "width": VIEW_STILL_PX, "height": VIEW_STILL_PX,
+                               "lat": lat0, "lon_e": lon0}
         out[world] = entry
         print(f"{world} globe: {src.size} -> textures {GLOBE_SIZES}, still {STILL_PX}px")
     return out

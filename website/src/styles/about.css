@@ -304,3 +304,24 @@
     gap: 0;
   }
 }
+
+/* Phones: the wordmark takes its own row and the links wrap under it. */
+@media (max-width: 30rem) {
+  .about-header {
+    flex-wrap: wrap;
+    row-gap: 0;
+    padding-block: var(--space-xs);
+  }
+
+  .about-nav {
+    flex-wrap: wrap;
+    gap: 0 var(--space-md);
+  }
+
+  .about-nav a,
+  .about-header .wordmark {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}

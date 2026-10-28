@@ -10,6 +10,7 @@ import { latLabel, lonLabel, siteDescription } from '../components/globeview/for
 import { FLAT_INSETS, flatMapRect, projectEquirect, projectOrtho, viewFor, zoomForFootprint, type GlobeView } from '../components/globeview/projection'
 import { useGlobeControls } from '../components/globeview/useGlobeControls'
 import { useSize } from '../components/globeview/useSize'
+import { ViewStill } from '../components/globeview/ViewStill'
 import { webglAvailable } from '../components/globeview/webgl'
 import { MotionToggle } from '../components/motion'
 import { useMotion } from '../components/motionContext'
@@ -24,7 +25,7 @@ import '../styles/globe.css'
 const GlobeSphere = lazy(() => import('../components/globeview/GlobeSphere'))
 
 const sites = (sitesFile as MarsSitesFile).sites
-const colourTexture = (imageManifest.globe as unknown as Record<'mars', { textures: Record<'2k', { src: string }>; credit: string }>).mars
+const colourTexture = (imageManifest.globe as unknown as Record<'mars', { textures: Record<'2k', { src: string }>; view_still: { src: string; width: number; height: number }; credit: string }>).mars
 const caveats = (caveatsFile as CaveatsFile).caveats
 const FOOTER_CAVEATS = ['no_quantum_advantage', 'mars_terrain_proxy'].map((id) => caveats.find((c) => c.id === id)!)
 const fmt = new Intl.NumberFormat('en-GB')
@@ -243,6 +244,7 @@ export function MarsGlobe() {
             }}
             {...(flat ? {} : controls.handlers)}
           >
+            {!flat && measured && <ViewStill still={colourTexture.view_still} size={size} zoom={controls.view.zoom} />}
             {flat ? (
               <img
                 className="flat-map"
@@ -276,13 +278,19 @@ export function MarsGlobe() {
                 footprints={!flat && controls.view.zoom >= FOOTPRINT_ZOOM}
                 layout={flat ? 'flat' : 'globe'}
                 avoid={avoid}
+                width={size.width}
                 onSelect={select}
               />
             )}
             <p id="globe-help" className="globe-help">
               {flat
                 ? 'Choose a site from the list or a pin.'
-                : 'Drag to turn the globe; scroll or pinch to zoom. Arrow keys turn it, + and − zoom, Esc goes back.'}
+                : (
+                  <>
+                    <span className="help-fine">Drag to turn the globe; scroll or pinch to zoom. Arrow keys turn it, + and − zoom, Esc goes back.</span>
+                    <span className="help-touch">Drag to turn the globe; pinch to zoom. Tap a pin to open its site.</span>
+                  </>
+                )}
             </p>
           </div>
           <SiteCard site={selected} onBack={back} headingRef={heading} cardRef={cardRef} />

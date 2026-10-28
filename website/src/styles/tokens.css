@@ -42,11 +42,11 @@
   --shadow-float-hover: 0 28px 56px -20px oklch(4% 0.01 255 / 0.95);
 
   /* Type. */
-  --font-display: 'Geologica', ui-sans-serif, system-ui, sans-serif;
-  --font-body: 'Geologica', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Geologica', 'Geologica Fallback', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Geologica', 'Geologica Fallback', ui-sans-serif, system-ui, sans-serif;
   --font-numeric: var(--font-body);
   /* Readouts only (coordinates, product IDs): data, never labels. */
-  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --font-mono: 'JetBrains Mono', 'JetBrains Mono Fallback', ui-monospace, 'Cascadia Mono', Consolas, monospace;
   --tracking-display: -0.035em;
   --display-weight: 300;
   --text-xs: 0.8125rem;
@@ -168,6 +168,10 @@
      charts use warm, cool and purple for them), so the sign is printed, not coloured. */
   --heat-lo: oklch(24% 0.014 235);
   --heat-hi: oklch(84% 0.03 235);
+  /* Cell ink: white up to L 0.56 and a steel near-black beyond it, the only pair that keeps
+     every cell at 4.5:1 or more (the ramp's mid steps fail with the shell's text colours). */
+  --heat-ink-light: oklch(100% 0 0);
+  --heat-ink-dark: oklch(8% 0.01 235);
 
   /* Shiki's CSS-variables theme mapped onto the shell's tokens (scripts/highlight.mjs); no green or
      red, which are kept for ground truth. */

@@ -66,7 +66,7 @@ describe('Moon explorer: class rail, mosaic and controls', () => {
   it('offers the three models in fixed order and ten seeds; choices live in the URL', async () => {
     renderAt('/moon/explore?class=oldcrater')
     const radios = within(screen.getByRole('radiogroup', { name: 'Model' })).getAllByRole('radio')
-    expect(radios.map((r) => r.textContent)).toEqual(['CNN', 'Hybrid CNN–QCNN', 'Frozen-embedding MLP'])
+    expect(radios.map((r) => r.getAttribute('aria-label'))).toEqual(['CNN', 'Hybrid CNN–QCNN', 'Frozen-embedding MLP'])
     const seed = screen.getByRole('combobox', { name: 'Seed' })
     expect([...seed.querySelectorAll('option')].map((o) => o.value)).toEqual(summary.seeds.map(String))
     fireEvent.click(radios[2])

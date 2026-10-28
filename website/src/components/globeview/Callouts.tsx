@@ -15,6 +15,8 @@ const FLAT_OFFSETS: Record<string, [number, number]> = { ...OFFSETS, site_01: [-
 const DEFAULT_OFFSET: [number, number] = [70, -60]
 const LABEL_H = 30 // label box height, px
 const labelWidth = (name: string) => 44 + name.length * 8.2 // index, padding and name at --text-sm
+const COMPACT_WIDTH = 480 // below this stage width labels show only their number (globe.css) and sit closer
+const COMPACT_LABEL_W = 44
 
 export interface Rect {
   left: number
@@ -26,8 +28,8 @@ export interface Rect {
 const hits = (a: Rect, b: Rect) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom
 
 /** The label's box for a pin at (x, y) and offset dx, dy. */
-function labelRect(x: number, y: number, dx: number, dy: number, name: string): Rect {
-  const w = labelWidth(name)
+function labelRect(x: number, y: number, dx: number, dy: number, name: string, compact = false): Rect {
+  const w = compact ? COMPACT_LABEL_W : labelWidth(name)
   const anchor = x + dx + Math.sign(dx) * ELBOW
   return { left: dx < 0 ? anchor - w : anchor, right: dx < 0 ? anchor : anchor + w, top: y + dy - LABEL_H / 2, bottom: y + dy + LABEL_H / 2 }
 }
@@ -67,6 +69,8 @@ interface Props {
   layout?: 'globe' | 'flat'
   /** Areas labels must stay out of (the site list, the open card), in stage pixels. */
   avoid?: Rect[]
+  /** Stage width in pixels: labels stay inside it, and a narrow stage gets compact labels. */
+  width?: number
   onSelect: (siteId: string) => void
 }
 
@@ -76,8 +80,10 @@ interface Props {
  * hidden. Pointer only: the site list beside the globe is the keyboard and screen-reader route
  * to the same actions.
  */
-export function Callouts({ sites, project, selected, footprints, layout = 'globe', avoid = [], onSelect }: Props) {
+export function Callouts({ sites, project, selected, footprints, layout = 'globe', avoid = [], width, onSelect }: Props) {
   const table = layout === 'flat' ? FLAT_OFFSETS : OFFSETS
+  const compact = width !== undefined && width < COMPACT_WIDTH
+  const scale = compact ? 0.5 : 1
   // Every visible pin, so a label never covers another site's pin.
   const pins = sites.flatMap((s) => {
     const p = project(s.center.lat, s.center.lon_e)
@@ -86,18 +92,20 @@ export function Callouts({ sites, project, selected, footprints, layout = 'globe
   // A label tries its preferred diagonal, then the mirrored ones, and takes the first that lands
   // in no panel and on no other pin; failing that, the least bad (a panel costs more than a pin).
   const offsetFor = (s: MarsSite, x: number, y: number): [number, number] => {
-    const [dx, dy] = table[s.site_id] ?? DEFAULT_OFFSET
+    const [tx, ty] = table[s.site_id] ?? DEFAULT_OFFSET
+    const [dx, dy] = [tx * scale, ty * scale]
     const others = pins.filter((p) => p.id !== s.site_id).map((p) => p.rect)
     const cost = ([ox, oy]: [number, number]) => {
-      const r = labelRect(x, y, ox, oy, s.name)
-      return 3 * avoid.filter((a) => hits(r, a)).length + others.filter((o) => hits(r, o)).length
+      const r = labelRect(x, y, ox, oy, s.name, compact)
+      const outside = width !== undefined && (r.left < 0 || r.right > width) ? 4 : 0
+      return outside + 3 * avoid.filter((a) => hits(r, a)).length + others.filter((o) => hits(r, o)).length
     }
     const options: Array<[number, number]> = [[dx, dy], [-dx, dy], [dx, -dy], [-dx, -dy]]
     return options.reduce((best, o) => (cost(o) < cost(best) ? o : best))
   }
   const drape = footprints && selected ? sites.find((s) => s.site_id === selected) : undefined
   return (
-    <div className="callouts" aria-hidden="true">
+    <div className="callouts" aria-hidden="true" data-compact={compact || undefined}>
       {drape && <Drape site={drape} project={project} />}
       <svg className="callout-lines">
         {footprints &&

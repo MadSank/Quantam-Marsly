@@ -93,10 +93,16 @@ export function OverlayControls({ model, seed, seeds, showTruth, onModel, onSeed
             role="radio"
             aria-checked={m.key === model}
             data-model={m.key}
+            aria-label={m.label}
             onClick={() => onModel(m.key)}
           >
             <span className="swatch swatch--fill" aria-hidden="true" />
-            {m.label}
+            <span className="label-long" aria-hidden="true">
+              {m.label}
+            </span>
+            <span className="label-short" aria-hidden="true">
+              {m.short}
+            </span>
           </button>
         ))}
       </div>
@@ -150,11 +156,10 @@ export function OverlayLegend({ tiles, error, model, seed, showTruth }: LegendPr
         <p className="legend-status" role="alert">
           Tile predictions could not be loaded. Reload the page to try again.
         </p>
-      ) : !tiles ? (
-        <p className="legend-status">Loading tile predictions…</p>
       ) : null}
-      {/* A 2 × 2 key: prediction by row, proxy label by column; each cell names itself for screen readers. */}
-      <table className="legend-matrix">
+      {/* A 2 × 2 key: prediction by row, proxy label by column; each cell names itself for screen readers.
+          While the predictions load the counts read "…", so the key keeps its height. */}
+      <table className="legend-matrix" aria-busy={!tiles && !error}>
         <caption className="visually-hidden">Tile encodings and tile counts</caption>
         <thead>
           <tr>
@@ -180,7 +185,7 @@ export function OverlayLegend({ tiles, error, model, seed, showTruth }: LegendPr
                         aria-hidden="true"
                       />
                       <span className="visually-hidden legend-label">{LABELS[outcome]}</span>
-                      <span className="legend-count num">{counts ? fmt.format(counts[outcome]) : ''}</span>
+                      <span className="legend-count num">{counts ? fmt.format(counts[outcome]) : error ? '' : '…'}</span>
                     </span>
                   </td>
                 )

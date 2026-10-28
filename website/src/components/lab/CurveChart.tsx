@@ -63,7 +63,7 @@ export function CurveChart({ title, direction, series, format }: Props) {
         </span>
         <span className="curve-direction">{direction}</span>
       </figcaption>
-      <svg viewBox={`0 0 ${W} ${H}`} className="curve-plot" role="img" aria-label={`${title} per epoch`} onPointerLeave={() => setHover(null)}>
+      <svg viewBox={`0 0 ${W} ${H}`} className="curve-plot" role="img" aria-label={`${title} per epoch; values in the table view below`} onPointerLeave={() => setHover(null)}>
         {ticks.map((t) => (
           <g key={t} className="curve-grid">
             <line x1={PAD.left} x2={W - PAD.right} y1={y(t)} y2={y(t)} />
@@ -103,7 +103,8 @@ export function CurveChart({ title, direction, series, format }: Props) {
           />
         ))}
       </svg>
-      <p className="curve-readout" aria-live="polite">
+      {/* Pointer readout only; the table below carries the same values for every reader. */}
+      <p className="curve-readout" aria-hidden="true">
         {hover === null ? (
           'Epoch on the horizontal axis. Point at the chart for values.'
         ) : (
@@ -120,6 +121,38 @@ export function CurveChart({ title, direction, series, format }: Props) {
           </>
         )}
       </p>
+      <details className="curve-table">
+        <summary>Table view: {title.toLowerCase()} per epoch</summary>
+        <div className="curve-table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Epoch</th>
+                {series.map((s) => (
+                  <th key={s.key} scope="col">
+                    {s.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {epochs.map((e) => (
+                <tr key={e}>
+                  <th scope="row">{e}</th>
+                  {series.map((s) => {
+                    const i = s.epoch.indexOf(e)
+                    return (
+                      <td key={s.key} className="num">
+                        {i < 0 ? 'stopped' : format(s.values[i])}
+                      </td>
+                    )
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </details>
     </figure>
   )
 }

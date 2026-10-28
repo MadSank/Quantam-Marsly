@@ -27,7 +27,7 @@ export function RotationHeatmap({ rotations, caption }: Props) {
                 return (
                   <td
                     key={i}
-                    data-strong={t > 0.45 || undefined}
+                    data-strong={t > 0.54 || undefined}
                     style={{ '--t': t.toFixed(3) } as CSSProperties}
                     title={`${layer.labels[i]} gate ${i + 1}: ${v.toFixed(4)} rad`}
                   >
