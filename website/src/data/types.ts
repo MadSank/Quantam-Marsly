@@ -36,7 +36,8 @@ export interface MarsSite {
   native_height_px: number
   native_width_px: number
   tile_size_native_px: number
-  preview: (ImageRef & { scale_from_native: { x: number; y: number } }) | null
+  /** `phone`: a half-resolution copy for previews over 2 MB, chosen through srcset on phones. */
+  preview: (ImageRef & { scale_from_native: { x: number; y: number }; phone?: ImageRef }) | null
   thumb: ImageRef | null
 }
 

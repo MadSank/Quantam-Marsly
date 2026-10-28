@@ -99,6 +99,11 @@
     "scale_from_native": {
      "x": 1.0,
      "y": 1.0
+    },
+    "phone": {
+     "src": "img/mars/site_01_preview_half.webp",
+     "width": 3054,
+     "height": 3868
     }
    },
    "thumb": {
@@ -317,6 +322,11 @@
     "scale_from_native": {
      "x": 0.4689301729660474,
      "y": 0.46893317702227433
+    },
+    "phone": {
+     "src": "img/mars/site_03_preview_half.webp",
+     "width": 1464,
+     "height": 2000
     }
    },
    "thumb": {
@@ -519,6 +529,11 @@
     "scale_from_native": {
      "x": 0.2896322715533145,
      "y": 0.289582277564613
+    },
+    "phone": {
+     "src": "img/mars/site_05_preview_half.webp",
+     "width": 1178,
+     "height": 4000
     }
    },
    "thumb": {

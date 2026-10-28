@@ -110,6 +110,9 @@ def resize_long(img: Image.Image, long_edge: int) -> Image.Image:
     return img.resize((max(1, round(w * scale)), max(1, round(h * scale))), Image.Resampling.LANCZOS)
 
 
+PHONE_PREVIEW_MIN_BYTES = 2_000_000
+
+
 def export_mars(written: list[Path]) -> dict[str, Any]:
     sites_path = OUT_DIR / "mars" / "sites.json"
     sites_doc = json.loads(sites_path.read_text(encoding="utf-8"))
@@ -138,12 +141,21 @@ def export_mars(written: list[Path]) -> dict[str, Any]:
         written += [preview_path, thumb_path]
 
         pw, ph = preview.size
+        preview_entry = {"src": data_rel(preview_path), "width": pw, "height": ph,
+                         "scale_from_native": {"x": pw / native_w, "y": ph / native_h}}
+        # Phones get a half-resolution copy of any preview over PHONE_PREVIEW_MIN_BYTES, served
+        # through srcset (MarsExplorer StripImage); same stretch, same grid, half the pixels.
+        if preview_path.stat().st_size > PHONE_PREVIEW_MIN_BYTES:
+            half = preview.resize((round(pw / 2), round(ph / 2)), Image.Resampling.LANCZOS)
+            half_path = IMG_DIR / "mars" / f"{sid}_preview_half.webp"
+            save_webp(half, half_path)
+            written.append(half_path)
+            preview_entry["phone"] = {"src": data_rel(half_path), "width": half.size[0], "height": half.size[1]}
         out[sid] = {
             "source": rel(src),
             "band": int(row["ortho_band"]),
             "display_stretch": {"percentiles": list(STRETCH_PERCENTILES), "note": "display stretch only"},
-            "preview": {"src": data_rel(preview_path), "width": pw, "height": ph,
-                        "scale_from_native": {"x": pw / native_w, "y": ph / native_h}},
+            "preview": preview_entry,
             "thumb": {"src": data_rel(thumb_path), "width": thumb.size[0], "height": thumb.size[1]},
         }
         site["preview"] = out[sid]["preview"]

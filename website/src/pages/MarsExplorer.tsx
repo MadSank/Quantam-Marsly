@@ -48,6 +48,12 @@ function useSite(): [MarsSite, URLSearchParams] {
   return [site, params]
 }
 
+// The strip is drawn at its native pixel size and scaled by the pan/zoom transform, so `sizes`
+// states the intent rather than a layout width. On phones (the 52rem single-column layout) the
+// strip fits about 1,000 CSS px at most, which keeps the half-resolution copy chosen up to 3×
+// screens; elsewhere the full preview is always chosen, so zooming in keeps every pixel.
+const previewSizes = (width: number) => `(max-width: 52rem) 1000px, ${width}px`
+
 function StripImage({ site }: { site: MarsSite }) {
   const [loaded, setLoaded] = useState(false)
   const size = { width: site.native_width_px, height: site.native_height_px }
@@ -59,6 +65,10 @@ function StripImage({ site }: { site: MarsSite }) {
         <img
           className="strip-image"
           src={dataUrl(site.preview.src)}
+          {...(site.preview.phone && {
+            srcSet: `${dataUrl(site.preview.phone.src)} ${site.preview.phone.width}w, ${dataUrl(site.preview.src)} ${site.preview.width}w`,
+            sizes: previewSizes(site.preview.width),
+          })}
           width={site.preview.width}
           height={site.preview.height}
           alt={`HiRISE orthoimage ${site.ortho_product_id}, ${site.name}`}
