@@ -1,9 +1,41 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { useMotion } from '../motionContext'
 import { clampView, fitView, limitsFor, panBy, zoomAt, type Size, type View } from './math'
 
 const PADDING = 16
 const STEP = 1.5 // zoom factor per key press or button
 const PAN_FRACTION = 0.15 // arrow keys pan by this share of the viewport (Shift: three times as far)
+const TWEEN_MS = 220 // --dur-short; discrete moves (keys, buttons) ease, continuous ones (drag, wheel) do not
+const TAP_SLOP = 4 // a press that moves less than this many pixels is a tap, not a drag
+
+/**
+ * The view on screen. Discrete moves ease in JavaScript rather than by a CSS transition, so
+ * anything drawn from the view (the tile overlay canvas) stays aligned frame by frame.
+ */
+function useShownView(target: View, smooth: boolean): View {
+  const [frame, setFrame] = useState<View | null>(null)
+  const last = useRef(target)
+
+  useLayoutEffect(() => {
+    if (!smooth || typeof requestAnimationFrame !== 'function') {
+      last.current = target
+      return
+    }
+    const from = last.current
+    const start = performance.now()
+    let raf = requestAnimationFrame(function step(now) {
+      const t = Math.min(1, (now - start) / TWEEN_MS)
+      const k = 1 - (1 - t) ** 3
+      const v = t < 1 ? { scale: from.scale + (target.scale - from.scale) * k, x: from.x + (target.x - from.x) * k, y: from.y + (target.y - from.y) * k } : target
+      last.current = v
+      setFrame(t < 1 ? v : null)
+      if (t < 1) raf = requestAnimationFrame(step)
+    })
+    return () => cancelAnimationFrame(raf)
+  }, [target, smooth])
+
+  return frame ?? target
+}
 
 interface Props {
   /** Content size in content units (for Mars strips: native ortho pixels). */
@@ -13,8 +45,14 @@ interface Props {
   label: string
   /** Drawn inside the transformed layer, at content size. */
   children: ReactNode
-  /** Drawn above the content, untransformed (scale bars, notices). */
-  hud?: (view: View) => ReactNode
+  /** Drawn above the content, untransformed (overlays, scale bars, notices), from the view on screen. */
+  hud?: (view: View, viewport: Size) => ReactNode
+  /** Extra controls in the control row, before the zoom readout. */
+  toolbar?: ReactNode
+  /** A click or tap without dragging, in content coordinates. */
+  onTap?: (point: { x: number; y: number }) => void
+  /** Keys the host handles while the viewer has focus (e.g. Enter to inspect the centre). */
+  onKey?: (e: React.KeyboardEvent, centre: { x: number; y: number }) => boolean
   className?: string
 }
 
@@ -23,7 +61,7 @@ interface Props {
  * and the keyboard does both (+/− zoom, arrows pan, 0 resets). Until the reader moves the
  * view it stays fitted to the viewport, including across resizes.
  */
-export function PanZoomViewport({ content, maxScale, label, children, hud, className }: Props) {
+export function PanZoomViewport({ content, maxScale, label, children, hud, toolbar, onTap, onKey, className }: Props) {
   const ref = useRef<HTMLDivElement>(null)
   const helpId = useId()
   const [viewport, setViewport] = useState<Size>({ width: 0, height: 0 })
@@ -31,6 +69,8 @@ export function PanZoomViewport({ content, maxScale, label, children, hud, class
   const [touched, setTouched] = useState(false)
   const [smooth, setSmooth] = useState(false)
   const [announcement, setAnnouncement] = useState('')
+  const { reduced } = useMotion()
+  const shown = useShownView(view, smooth && !reduced)
 
   const limits = limitsFor(content, viewport, maxScale, PADDING)
   const ready = viewport.width > 0 && viewport.height > 0
@@ -82,6 +122,11 @@ export function PanZoomViewport({ content, maxScale, label, children, hud, class
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.altKey || e.ctrlKey || e.metaKey) return
+    const centreContent = { x: (viewport.width / 2 - view.x) / view.scale, y: (viewport.height / 2 - view.y) / view.scale }
+    if (onKey?.(e, centreContent)) {
+      e.preventDefault()
+      return
+    }
     const far = e.shiftKey ? 3 : 1
     const dx = viewport.width * PAN_FRACTION * far
     const dy = viewport.height * PAN_FRACTION * far
@@ -138,6 +183,7 @@ export function PanZoomViewport({ content, maxScale, label, children, hud, class
 
   // Pointer drag (one pointer) and pinch (two pointers).
   const pointers = useRef(new Map<number, { x: number; y: number }>())
+  const press = useRef<{ x: number; y: number; moved: boolean } | null>(null)
   const [dragging, setDragging] = useState(false)
 
   const local = (e: React.PointerEvent) => {
@@ -148,7 +194,9 @@ export function PanZoomViewport({ content, maxScale, label, children, hud, class
   const onPointerDown = (e: React.PointerEvent) => {
     if (e.button !== 0) return
     e.currentTarget.setPointerCapture(e.pointerId)
-    pointers.current.set(e.pointerId, local(e))
+    const p = local(e)
+    pointers.current.set(e.pointerId, p)
+    press.current = pointers.current.size === 1 ? { ...p, moved: false } : null
     setDragging(true)
   }
 
@@ -157,6 +205,7 @@ export function PanZoomViewport({ content, maxScale, label, children, hud, class
     const prev = map.get(e.pointerId)
     if (!prev) return
     const now = local(e)
+    if (press.current && Math.hypot(now.x - press.current.x, now.y - press.current.y) > TAP_SLOP) press.current.moved = true
     if (map.size === 1) {
       apply((v) => panBy(v, now.x - prev.x, now.y - prev.y, content, viewport, limits), { smooth: false })
     } else if (map.size === 2) {
@@ -176,8 +225,14 @@ export function PanZoomViewport({ content, maxScale, label, children, hud, class
   }
 
   const onPointerEnd = (e: React.PointerEvent) => {
+    const tap = e.type === 'pointerup' && press.current && !press.current.moved && pointers.current.size === 1
     pointers.current.delete(e.pointerId)
     if (pointers.current.size === 0) setDragging(false)
+    if (tap && onTap) {
+      const p = local(e)
+      onTap({ x: (p.x - view.x) / view.scale, y: (p.y - view.y) / view.scale })
+    }
+    if (pointers.current.size === 0) press.current = null
   }
 
   return (
@@ -203,21 +258,20 @@ export function PanZoomViewport({ content, maxScale, label, children, hud, class
       >
         <div
           className="panzoom-content"
-          data-smooth={smooth || undefined}
           data-scale={view.scale}
           style={{
             width: content.width,
             height: content.height,
-            transform: `translate3d(${view.x}px, ${view.y}px, 0) scale(${view.scale})`,
+            transform: `translate3d(${shown.x}px, ${shown.y}px, 0) scale(${shown.scale})`,
             visibility: ready ? undefined : 'hidden',
           }}
-          onTransitionEnd={() => setSmooth(false)}
         >
           {children}
         </div>
-        {hud?.(view)}
+        {ready && hud?.(shown, viewport)}
       </div>
       <div className="panzoom-controls">
+        {toolbar}
         <div className="panzoom-buttons" role="group" aria-label="Zoom">
           <button type="button" onClick={() => zoomBy(STEP)} disabled={view.scale >= limits.max - 1e-9} aria-label="Zoom in">
             +

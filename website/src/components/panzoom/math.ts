@@ -63,6 +63,7 @@ export function panBy(view: View, dx: number, dy: number, content: Size, viewpor
 
 /** A 1-2-5 length (in content units × unitSize) whose bar is close to `targetPx` on screen. */
 export function niceScaleBar(scale: number, unitSize: number, targetPx = 120): { length: number; px: number } {
+  if (!(scale > 0 && Number.isFinite(scale))) return { length: 0, px: 0 }
   const perPx = unitSize / scale
   const raw = targetPx * perPx
   const pow = 10 ** Math.floor(Math.log10(raw))

@@ -3,9 +3,14 @@ import { dataUrl } from './dataUrl'
 
 const cache = new Map<string, Promise<unknown>>()
 
-/** Fetch a JSON file under public/data once per session; null while loading or on failure. */
-export function useJson<T>(rel: string | null): T | null {
-  const [state, setState] = useState<{ rel: string; data: T } | null>(null)
+export interface JsonState<T> {
+  data: T | null
+  error: boolean
+}
+
+/** Fetch a JSON file under public/data once per session. A failed load is retried on the next mount. */
+export function useJson<T>(rel: string | null): JsonState<T> {
+  const [state, setState] = useState<{ rel: string; data: T | null; error: boolean } | null>(null)
 
   useEffect(() => {
     if (!rel) return
@@ -17,13 +22,13 @@ export function useJson<T>(rel: string | null): T | null {
       cache.set(rel, request)
     }
     request.then(
-      (data) => live && setState({ rel, data: data as T }),
-      () => {},
+      (data) => live && setState({ rel, data: data as T, error: false }),
+      () => live && setState({ rel, data: null, error: true }),
     )
     return () => {
       live = false
     }
   }, [rel])
 
-  return state && state.rel === rel ? state.data : null
+  return state && state.rel === rel ? { data: state.data, error: state.error } : { data: null, error: false }
 }

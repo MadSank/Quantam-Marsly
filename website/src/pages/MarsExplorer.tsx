@@ -5,12 +5,16 @@ import imageManifest from '../../public/data/img/manifest.json'
 import { Atmosphere } from '../components/Atmosphere'
 import { Globe } from '../components/globe/Globe'
 import type { GlobeSpec } from '../components/globe/spec'
+import type { ModelKey } from '../components/overlay/draw'
+import { tileAt } from '../components/overlay/draw'
+import { OverlayControls, OverlayLegend, TileInspector, TileOverlay } from '../components/overlay/Overlay'
 import { niceScaleBar } from '../components/panzoom/math'
 import { PanZoomViewport } from '../components/panzoom/PanZoomViewport'
 import { Rail } from '../components/Rail'
 import { WorldFooter, WorldHeader } from '../components/WorldChrome'
-import type { MarsSite, MarsSitesFile } from '../data/types'
+import type { MarsSite, MarsSitesFile, MarsTilesFile } from '../data/types'
 import { dataUrl } from '../lib/dataUrl'
+import { useJson } from '../lib/useJson'
 import { WorldLayout } from '../theme/WorldLayout'
 import '../styles/explorer.css'
 
@@ -170,10 +174,37 @@ function isTyping(target: EventTarget | null): boolean {
 
 export function MarsExplorer() {
   const [site, params] = useSite()
+  const [, setParams] = useSearchParams()
   const to = (id: string) => {
     const next = new URLSearchParams(params)
     next.set('site', id)
     return { search: `?${next}` }
+  }
+
+  // Overlay state lives in the URL: ?model=cnn|qcnn&seed=42&truth=1.
+  const { data: tiles, error: tilesError } = useJson<MarsTilesFile>(`mars/tiles/${site.site_id}.json`)
+  const seeds = (tiles?.seeds ?? [42, 43, 44]).map(String)
+  const model: ModelKey = params.get('model') === 'qcnn' ? 'qcnn' : 'cnn'
+  const seed = seeds.includes(params.get('seed') ?? '') ? params.get('seed')! : seeds[0]
+  const showTruth = params.get('truth') === '1'
+  const setParam = (key: string, value: string | null) =>
+    setParams(
+      (prev) => {
+        const next = new URLSearchParams(prev)
+        if (value === null) next.delete(key)
+        else next.set(key, value)
+        return next
+      },
+      { replace: true },
+    )
+
+  // The inspected tile belongs to one site; switching site clears it.
+  const [picked, setPicked] = useState<{ site: string; index: number } | null>(null)
+  const selected = tiles && picked?.site === site.site_id ? picked.index : null
+  const pickAt = (point: { x: number; y: number }) => {
+    if (!tiles) return
+    const index = tileAt(tiles, point.x, point.y)
+    setPicked(index === null ? null : { site: site.site_id, index })
   }
   const maxScale = OVERZOOM * (site.preview?.scale_from_native.x ?? 1)
   const target = useMemo(() => ({ lat: site.center.lat, lon: site.center.lon_e }), [site])
@@ -205,6 +236,8 @@ export function MarsExplorer() {
         e.preventDefault()
         setDetailsOpen(false)
         trigger.current?.focus()
+      } else if (e.key === 'Escape') {
+        setPicked(null)
       }
     }
     window.addEventListener('keydown', onKey)
@@ -218,33 +251,66 @@ export function MarsExplorer() {
         <WorldHeader world="mars" />
         <Readout site={site} detailsOpen={detailsOpen} onToggle={toggle} triggerRef={trigger} drawerId={drawerId} />
         <main className="explorer-main">
-          <Rail
-            label="Sites"
-            selected={site.site_id}
-            to={to}
-            items={sites.map((s) => ({
-              id: s.site_id,
-              label: s.name,
-              detail: `${fmt.format(s.n_tiles)} tiles`,
-              thumb: s.thumb && { ...s.thumb, alt: '' },
-            }))}
-          />
+          <div className="sidebar">
+            <Rail
+              label="Sites"
+              selected={site.site_id}
+              to={to}
+              items={sites.map((s) => ({
+                id: s.site_id,
+                label: s.name,
+                detail: `${fmt.format(s.n_tiles)} tiles`,
+                thumb: s.thumb && { ...s.thumb, alt: '' },
+              }))}
+            />
+            <OverlayLegend tiles={tiles} error={tilesError} model={model} seed={seed} showTruth={showTruth} />
+          </div>
           <section className="image-panel" aria-label={`${site.name} strip`}>
             <PanZoomViewport
               key={site.site_id}
               content={{ width: site.native_width_px, height: site.native_height_px }}
               maxScale={maxScale}
               label={`${site.name} orthoimage strip`}
-              hud={(view) => {
+              onTap={pickAt}
+              onKey={(e, centre) => {
+                if (e.key !== 'Enter') return false
+                pickAt(centre)
+                return true
+              }}
+              toolbar={
+                <OverlayControls
+                  model={model}
+                  seed={seed}
+                  seeds={seeds}
+                  showTruth={showTruth}
+                  onModel={(m) => setParam('model', m)}
+                  onSeed={(s) => setParam('seed', s)}
+                  onTruth={(on) => setParam('truth', on ? '1' : null)}
+                />
+              }
+              hud={(view, viewport) => {
                 const bar = niceScaleBar(view.scale, site.native_resolution_m)
                 return (
-                  <div className="hud-foot">
-                    <div className="scale-bar" aria-hidden="true">
-                      <span className="scale-bar-line" style={{ width: bar.px }} />
-                      <span className="num">{formatLength(bar.length)}</span>
+                  <>
+                    {tiles && (
+                      <TileOverlay
+                        tiles={tiles}
+                        model={model}
+                        seed={seed}
+                        view={view}
+                        viewport={viewport}
+                        showTruth={showTruth}
+                        selected={selected}
+                      />
+                    )}
+                    <div className="hud-foot">
+                      <div className="scale-bar" aria-hidden="true">
+                        <span className="scale-bar-line" style={{ width: bar.px }} />
+                        <span className="num">{formatLength(bar.length)}</span>
+                      </div>
+                      <p className="hud-note">Display stretch only</p>
                     </div>
-                    <p className="hud-note">Display stretch only</p>
-                  </div>
+                  </>
                 )
               }}
             >
@@ -253,6 +319,9 @@ export function MarsExplorer() {
             <div className="locator">
               <Globe spec={marsGlobe} resolution="1k" target={target} pinToken="--pin" className="locator-globe" />
             </div>
+            {tiles && selected !== null && (
+              <TileInspector tiles={tiles} index={selected} seed={seed} model={model} onClose={() => setPicked(null)} />
+            )}
             <DetailsDrawer site={site} open={detailsOpen} onClose={close} id={drawerId} drawerRef={drawer} />
           </section>
         </main>

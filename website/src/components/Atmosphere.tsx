@@ -7,7 +7,7 @@ import { useJson } from '../lib/useJson'
  * decorative: hidden from assistive technology and from pointer input.
  */
 export function Atmosphere({ siteId }: { siteId: string }) {
-  const contours = useJson<MarsContoursFile>(`mars/contours/${siteId}.json`)
+  const { data: contours } = useJson<MarsContoursFile>(`mars/contours/${siteId}.json`)
 
   return (
     <div className="atmosphere" aria-hidden="true">
