@@ -1,0 +1,172 @@
+{
+ "world": "mars",
+ "source": "the head's conv_weights (3 x 12) and pool_weights (2 x 3) from the seed-42 checkpoint",
+ "layers": [
+  {
+   "name": "Convolution stage 1",
+   "kind": "angles",
+   "shape": [
+    12
+   ],
+   "values": [
+    [
+     -0.04253,
+     -0.01321,
+     -0.03214,
+     0.00752,
+     -0.04967,
+     0.02729,
+     -0.05712,
+     -0.21677,
+     0.0372,
+     -0.03589,
+     0.03682,
+     -0.02422
+    ]
+   ],
+   "labels": [
+    "RY",
+    "RZ",
+    "RY",
+    "RZ",
+    "RY",
+    "RZ",
+    "RY",
+    "RZ",
+    "RY",
+    "RZ",
+    "RY",
+    "RZ"
+   ]
+  },
+  {
+   "name": "Convolution stage 2",
+   "kind": "angles",
+   "shape": [
+    12
+   ],
+   "values": [
+    [
+     -0.06658,
+     -0.06742,
+     -0.06532,
+     0.18328,
+     -0.03459,
+     -0.02207,
+     -0.0552,
+     -0.04091,
+     0.0413,
+     -0.01843,
+     0.1432,
+     -0.1114
+    ]
+   ],
+   "labels": [
+    "RY",
+    "RZ",
+    "RY",
+    "RZ",
+    "RY",
+    "RZ",
+    "RY",
+    "RZ",
+    "RY",
+    "RZ",
+    "RY",
+    "RZ"
+   ]
+  },
+  {
+   "name": "Convolution stage 3",
+   "kind": "angles",
+   "shape": [
+    12
+   ],
+   "values": [
+    [
+     0.02993,
+     -0.02593,
+     -0.11847,
+     -0.15368,
+     0.2058,
+     0.04463,
+     -0.23709,
+     0.06743,
+     0.10582,
+     0.06445,
+     0.02478,
+     0.11049
+    ]
+   ],
+   "labels": [
+    "RY",
+    "RZ",
+    "RY",
+    "RZ",
+    "RY",
+    "RZ",
+    "RY",
+    "RZ",
+    "RY",
+    "RZ",
+    "RY",
+    "RZ"
+   ]
+  },
+  {
+   "name": "Pooling stage 1",
+   "kind": "angles",
+   "shape": [
+    3
+   ],
+   "values": [
+    [
+     -0.00227,
+     0.07111,
+     -0.05377
+    ]
+   ],
+   "labels": [
+    "RZ",
+    "RY",
+    "RY"
+   ]
+  },
+  {
+   "name": "Pooling stage 2",
+   "kind": "angles",
+   "shape": [
+    3
+   ],
+   "values": [
+    [
+     -0.09552,
+     -0.02552,
+     0.0458
+    ]
+   ],
+   "labels": [
+    "RZ",
+    "RY",
+    "RY"
+   ]
+  }
+ ],
+ "readout": {
+  "scale": [
+   1.05378,
+   1.03667,
+   1.04843
+  ],
+  "bias": [
+   -0.04023,
+   0.00049,
+   -0.03727
+  ]
+ },
+ "value_range": [
+  -0.23709,
+  0.2058
+ ],
+ "unit": "radians"
+}

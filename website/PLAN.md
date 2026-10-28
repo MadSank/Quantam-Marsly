@@ -451,6 +451,12 @@ These rules are built into the components:
     - Build the six `/lab` sections and enable `lab.test.tsx`.
     - Report the `lab/` size against the ~3 MB budget.
     - Before building, recheck the training-curve inventory listed in Findings and report any gaps.
+    - Done. `lab/` is about 0.7 MB. The curve inventory has no gaps: Mars has 15 runs × 2 models, and Moon has 10 seeds × 3 models from the adopted deterministic run. Changes from the schema above:
+      - Mars and Moon draw the same circuit, so the two drawings came out byte-identical. They are exported once, as `lab/qcnn_circuit.svg`, with theme hooks (`currentColor` and `--circuit-fill`).
+      - Moon curve keys use the site's model keys: `cnn`, `hybrid_qcnn`, `frozen_embedding_mlp`.
+      - `img/manifest.json` stays with `export_images.py`. `highlight.mjs` also renders each Moon `history_note` to HTML with `marked` at build time.
+      - The pipeline diagram is an ordered list of linked stages rather than an SVG.
+      - The Lab charts use the validated Moon colour set: the neutral root set fails the CVD check.
 12. **Polish:**
     - Responsive layout: rail becomes a horizontal scroller on phones; image and results panels stack.
     - Accessibility: focus order, live-region announcements, table fallbacks for charts.

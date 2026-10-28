@@ -1,0 +1,12 @@
+{
+ "world": "moon",
+ "in_dim": 64,
+ "out_dim": 8,
+ "encoding": "angle: theta = (tanh(z) + 1) * pi / 2, one RY per qubit",
+ "notes": [
+  "The trained CNN encoder is frozen; its 64-number embedding of the crop is the input.",
+  "A linear layer maps those 64 numbers to 8 (the bottleneck, 520 parameters).",
+  "Each of the 8 values goes through tanh and is rescaled to an angle between 0 and pi.",
+  "Each angle sets one RY rotation on one of the 8 qubits (angle encoding)."
+ ]
+}

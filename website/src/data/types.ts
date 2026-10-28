@@ -189,3 +189,82 @@ export interface AboutFile extends Stamp {
   method: AboutMethod[]
   sources: AboutSource[]
 }
+
+// ---------------------------------------------------------------- Lab (export_internals.py)
+
+export interface LabParams extends Stamp {
+  mars: {
+    cnn: { total: number; trainable: number; head: number }
+    hybrid: { total: number; trainable: number; frozen_backbone: number; bottleneck: number; qcnn_head: number }
+  }
+  moon: {
+    cnn: { trainable_during_training: number; trainable_post_freeze: number }
+    hybrid_head: number
+    mlp_head: number
+    hybrid_bottleneck: number
+    hybrid_qcnn: number
+  }
+}
+
+export interface LabFeatures extends Stamp {
+  tile_id: string
+  site_id: string
+  fold: number
+  seed: number
+  input: { png: string; channel: string }
+  input_channels: string[]
+  stages: Array<{ name: string; shape: number[]; channels_shown: number; png: string }>
+  bottleneck_angles: number[]
+}
+
+export interface LabRotations {
+  world: 'mars' | 'moon'
+  source: string
+  layers: Array<{ name: string; kind: string; shape: number[]; values: number[][]; labels: string[] }>
+  readout: { scale: number[]; bias: number[] }
+  value_range: [number, number]
+  unit: string
+}
+
+export interface LabProjection {
+  world: 'mars' | 'moon'
+  in_dim: number
+  out_dim: number
+  encoding: string
+  notes: string[]
+}
+
+export interface LabCurve {
+  epoch: number[]
+  train_loss: number[]
+  val_loss?: number[]
+  val_macro_f1?: number[]
+}
+
+export interface LabCurves extends Stamp {
+  epoch_base: number
+  mars: Record<string, Record<'cnn' | 'qcnn', LabCurve>>
+  moon: Record<string, Record<MoonModel, LabCurve>>
+}
+
+export interface LabExcerpt {
+  id: string
+  title: string
+  world: 'mars' | 'moon' | 'both'
+  stage: string | null
+  path: string
+  symbol: string
+  start: number
+  end: number
+  note: string
+  permalink: string
+  code: string
+  html: string | null
+  history_note?: { text: string; permalink: string; html?: string }
+}
+
+export interface LabExcerpts extends Stamp {
+  commit: string
+  repo: string
+  excerpts: LabExcerpt[]
+}

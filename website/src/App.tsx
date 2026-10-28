@@ -1,4 +1,5 @@
 import { MotionConfig } from 'motion/react'
+import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router'
 import { MotionProvider } from './components/motion'
 import { About } from './pages/About'
@@ -7,6 +8,9 @@ import { MarsExplorer } from './pages/MarsExplorer'
 import { MarsGlobe } from './pages/MarsGlobe'
 import { MoonExplorer } from './pages/MoonExplorer'
 import { MoonGlobe } from './pages/MoonGlobe'
+
+// The Lab is a reviewer's page with its own figures and code; it loads only when visited.
+const Lab = lazy(() => import('./pages/Lab'))
 
 // Explorer links from before the globe view (step 8b) carried their state on /mars; send any
 // that hold explorer parameters on to /mars/explore with every parameter kept.
@@ -39,6 +43,14 @@ export function App() {
           <Route path="/moon" element={<MoonEntry />} />
           <Route path="/moon/explore" element={<MoonExplorer />} />
           <Route path="/about" element={<About />} />
+          <Route
+            path="/lab"
+            element={
+              <Suspense fallback={<div className="about" />}>
+                <Lab />
+              </Suspense>
+            }
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </MotionProvider>

@@ -1,0 +1,32 @@
+{
+ "source": [
+  "runs/pipeline_repair_audit/retraining_seedset/runs/model1_resnet18/fold_0_seed_42/param_counts.json",
+  "runs/pipeline_repair_audit/retraining_seedset/runs/model2_qcnn/fold_0_seed_42/param_counts.json",
+  "experiments/moon/train.py"
+ ],
+ "generated_at": "2026-10-28T18:10:52+00:00",
+ "mars": {
+  "cnn": {
+   "total": 11242563,
+   "trainable": 11242563,
+   "head": 66051
+  },
+  "hybrid": {
+   "total": 4152,
+   "trainable": 4152,
+   "frozen_backbone": 11176512,
+   "bottleneck": 4104,
+   "qcnn_head": 48
+  }
+ },
+ "moon": {
+  "cnn": {
+   "trainable_during_training": 59347,
+   "trainable_post_freeze": 195
+  },
+  "hybrid_head": 568,
+  "mlp_head": 547,
+  "hybrid_bottleneck": 520,
+  "hybrid_qcnn": 48
+ }
+}

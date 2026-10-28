@@ -46,6 +46,7 @@ export function About() {
         <nav aria-label="Site" className="about-nav">
           <Link to="/mars">Mars</Link>
           <Link to="/moon">Moon</Link>
+          <Link to="/lab">Lab</Link>
           <Link to="/about" aria-current="page">
             About
           </Link>

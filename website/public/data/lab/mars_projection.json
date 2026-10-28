@@ -1,0 +1,12 @@
+{
+ "world": "mars",
+ "in_dim": 512,
+ "out_dim": 8,
+ "encoding": "angle: theta = (tanh(z) + 1) * pi / 2, one RY per qubit",
+ "notes": [
+  "The trained ResNet-18 is frozen; its 512-number embedding of the tile is the input.",
+  "A linear layer maps those 512 numbers to 8 (the bottleneck, 4,104 parameters).",
+  "Each of the 8 values goes through tanh and is rescaled to an angle between 0 and pi.",
+  "Each angle sets one RY rotation on one of the 8 qubits (angle encoding)."
+ ]
+}

@@ -1,0 +1,667 @@
+/* Hallmark · shape: Long Document with figures (About's section index and reading column, widened for figures and code) · genre: modern-minimal · theme: Vantage, neutral shell · job: see how the pipeline, models and code fit together · step 11
+ * hero: none (h1 and one lead sentence) · nav: About's header with a Lab link · footer: one caveat line and three links · imagery: the network's own filters, feature maps and circuit · signature: every figure is read from a checkpoint, every excerpt from a pushed commit
+ * axes: dark/grotesk-sans/steel · posture: restrained · motion: none · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: S, a long page; the section index and quiet rules keep it navigable */
+
+.lab [data-model='cnn'] {
+  --swatch: var(--model-cnn);
+}
+
+.lab [data-model='qcnn'] {
+  --swatch: var(--model-qcnn);
+}
+
+.lab [data-model='mlp'] {
+  --swatch: var(--model-mlp);
+}
+
+.lab-main {
+  max-width: 1040px;
+}
+
+.lab-main .about-lead,
+.lab-main .about-section-lead,
+.excerpt-note {
+  max-width: 72ch;
+}
+
+.lab-muted,
+.lab-small {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.lab a {
+  color: var(--text);
+  text-decoration-color: var(--border);
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--dur-short) var(--ease-out);
+}
+
+.lab a:hover {
+  text-decoration-color: var(--text);
+}
+
+.lab a:active {
+  color: var(--text-muted);
+}
+
+.lab a:focus-visible,
+.lab button:focus-visible,
+.lab [tabindex='0']:focus-visible,
+.lab summary:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+
+/* ---------------------------------------------------------------- pipeline */
+
+.pipeline {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: stage;
+}
+
+.pipeline-stage {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  border: var(--rule-hair) solid var(--rule);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  counter-increment: stage;
+}
+
+.pipeline-stage h3 {
+  font-size: var(--text-md);
+  font-weight: 400;
+}
+
+.pipeline-stage h3::before {
+  content: counter(stage) '  ';
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  white-space: pre;
+}
+
+.pipeline-stage p {
+  font-size: var(--text-sm);
+  color: var(--text-2);
+}
+
+/* The flow arrow sits in the gap after each stage except the row ends. */
+.pipeline-stage:not(:nth-child(3n))::after {
+  content: '→';
+  position: absolute;
+  top: 50%;
+  right: calc(var(--space-md) * -1);
+  width: var(--space-md);
+  text-align: center;
+  color: var(--text-muted);
+  transform: translateY(-50%);
+}
+
+.pipeline-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+/* ---------------------------------------------------------------- figures */
+
+.lab-figure {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+}
+
+.lab-figure img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-card);
+  image-rendering: pixelated;
+  background: var(--surface);
+}
+
+.lab-figure figcaption,
+.circuit figcaption,
+.heatmap figcaption {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.cnn-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 280px));
+  gap: var(--space-lg);
+}
+
+.feature-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.feature-strip figcaption {
+  display: grid;
+  gap: var(--space-3xs);
+}
+
+.feature-name {
+  color: var(--text-2);
+}
+
+/* ---------------------------------------------------------------- circuit and heatmaps */
+
+.circuit {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+}
+
+.circuit-scroll {
+  overflow-x: auto;
+  padding: var(--space-sm);
+  border: var(--rule-hair) solid var(--rule);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--text-2);
+}
+
+.circuit-scroll svg {
+  display: block;
+  width: auto;
+  height: 300px;
+}
+
+.hybrid-columns {
+  display: grid;
+  gap: var(--space-2xl);
+}
+
+.hybrid-world-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-xl);
+  align-items: start;
+}
+
+.heatmap-scroll {
+  overflow-x: auto;
+}
+
+.hybrid-world {
+  display: grid;
+  align-content: start;
+  gap: var(--space-md);
+  min-width: 0;
+}
+
+.projection {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.projection h4 {
+  font-size: var(--text-md);
+  font-weight: 400;
+  color: var(--text-2);
+}
+
+.projection-dims {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  font-size: var(--text-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+.projection ol {
+  display: grid;
+  gap: var(--space-2xs);
+  margin: 0;
+  padding-left: var(--space-lg);
+  font-size: var(--text-sm);
+  color: var(--text-2);
+}
+
+.projection-formula {
+  color: var(--text-2);
+}
+
+.heatmap {
+  display: grid;
+  gap: var(--space-xs);
+  min-width: 0;
+  margin: 0;
+}
+
+.heatmap-table {
+  border-collapse: separate;
+  border-spacing: 2px;
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.heatmap-table th {
+  padding-right: var(--space-xs);
+  font-weight: 400;
+  text-align: left;
+  white-space: nowrap;
+  color: var(--text-muted);
+}
+
+.heatmap-table td {
+  min-width: 34px;
+  padding: var(--space-2xs) var(--space-3xs);
+  border-radius: 2px;
+  text-align: center;
+  color: var(--text);
+  background: color-mix(in oklch, var(--heat-lo), var(--heat-hi) calc(var(--t) * 100%));
+}
+
+.heatmap-gate,
+.heatmap-value {
+  display: block;
+}
+
+.heatmap-gate {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+/* Strong cells get dark ink so the printed value stays readable. */
+.heatmap-table td[data-strong],
+.heatmap-table td[data-strong] .heatmap-gate {
+  color: var(--accent-ink);
+}
+
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.heatmap-ramp {
+  width: 140px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--heat-lo), var(--heat-hi));
+}
+
+/* ---------------------------------------------------------------- parameters */
+
+.lab-params td:last-child {
+  color: var(--text-2);
+}
+
+/* ---------------------------------------------------------------- curves */
+
+.curve-block {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.curve-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm) var(--space-lg);
+}
+
+.segmented {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+}
+
+.segmented button {
+  display: grid;
+  gap: var(--space-3xs);
+  min-height: 36px;
+  padding: var(--space-2xs) var(--space-sm);
+  border: var(--rule-hair) solid var(--rule);
+  border-radius: var(--radius-card);
+  font: inherit;
+  font-size: var(--text-sm);
+  text-align: left;
+  color: var(--text-2);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-short) var(--ease-out),
+    color var(--dur-short) var(--ease-out);
+}
+
+.segmented button:hover {
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.segmented button:active {
+  background: var(--surface);
+}
+
+.segmented button[aria-pressed='true'] {
+  border-color: var(--text-2);
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.segmented button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.segmented-sub {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.curve-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-sm);
+  color: var(--text-2);
+}
+
+.curve-legend li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.curve-swatch {
+  width: 16px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--swatch);
+}
+
+.curve-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-lg);
+}
+
+.curve {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: var(--space-md);
+  border: var(--rule-hair) solid var(--rule);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.curve-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  font-size: var(--text-sm);
+}
+
+.curve-title {
+  color: var(--text);
+}
+
+.curve-direction,
+.curve-readout {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.curve-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) var(--space-sm);
+  min-height: 1.5em;
+}
+
+.curve-value::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: var(--space-2xs);
+  border-radius: 50%;
+  background: var(--swatch);
+}
+
+.curve-plot {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.curve-grid line {
+  stroke: var(--rule);
+  stroke-width: 1;
+}
+
+.curve-grid text,
+.curve-axis {
+  font-size: 11px;
+  fill: var(--text-muted);
+}
+
+.curve-cross {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.curve-series polyline {
+  fill: none;
+  stroke: var(--swatch);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.curve-series circle {
+  fill: var(--swatch);
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+
+.curve-end {
+  font-size: 11px;
+  fill: var(--text-2);
+}
+
+.curve-hit {
+  fill: transparent;
+}
+
+/* ---------------------------------------------------------------- code */
+
+.excerpt {
+  display: grid;
+  gap: var(--space-sm);
+  padding-top: var(--space-lg);
+  border-top: var(--rule-hair) solid var(--rule);
+}
+
+.excerpt-head {
+  display: grid;
+  gap: var(--space-2xs);
+}
+
+.excerpt-head h3 {
+  font-size: var(--text-title);
+}
+
+.excerpt-path {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.excerpt-note {
+  color: var(--text-2);
+}
+
+.excerpt-code {
+  max-height: 420px;
+  overflow: auto;
+  border: var(--rule-hair) solid var(--rule);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.excerpt-code pre {
+  margin: 0;
+  padding: var(--space-sm) var(--space-md) var(--space-sm) 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+  color: var(--shiki-foreground);
+  background: transparent;
+}
+
+.excerpt-code code {
+  counter-reset: line calc(var(--line-start, 1) - 1);
+}
+
+.excerpt-code .line::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 5ch;
+  margin-right: var(--space-md);
+  padding-right: var(--space-xs);
+  text-align: right;
+  color: var(--text-muted);
+  border-right: var(--rule-hair) solid var(--rule);
+}
+
+.excerpt-link {
+  font-size: var(--text-sm);
+}
+
+.history {
+  border: var(--rule-hair) solid var(--rule);
+  border-radius: var(--radius-card);
+}
+
+.history summary {
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--text-sm);
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.history summary:hover {
+  color: var(--text);
+}
+
+.history-body {
+  display: grid;
+  gap: var(--space-sm);
+  max-height: 480px;
+  overflow: auto;
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+  font-size: var(--text-sm);
+  color: var(--text-2);
+}
+
+.history-body :is(p, ul, ol, table, h3) {
+  margin: 0 0 var(--space-sm);
+}
+
+.history-body ul,
+.history-body ol {
+  padding-left: var(--space-lg);
+}
+
+.history-body table {
+  border-collapse: collapse;
+  font-size: var(--text-xs);
+}
+
+.history-body th,
+.history-body td {
+  padding: var(--space-2xs) var(--space-xs);
+  border-bottom: var(--rule-hair) solid var(--rule);
+  font-weight: 400;
+  text-align: left;
+  vertical-align: top;
+}
+
+.history-body strong {
+  font-weight: 400;
+  color: var(--text);
+}
+
+.history-body code,
+.history-text {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+
+.history-text {
+  white-space: pre-wrap;
+}
+
+/* ---------------------------------------------------------------- narrow screens */
+
+@media (max-width: 1100px) {
+  .feature-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .hybrid-world-top,
+  .curve-pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .pipeline {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pipeline-stage::after {
+    display: none;
+  }
+
+  .feature-strip,
+  .cnn-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .circuit-scroll svg {
+    height: 220px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab a,
+  .segmented button {
+    transition: none;
+  }
+}

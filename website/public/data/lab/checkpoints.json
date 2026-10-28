@@ -1,0 +1,43 @@
+{
+ "source": [],
+ "generated_at": "2026-10-28T18:10:52+00:00",
+ "checkpoints": [
+  {
+   "model": "CNN",
+   "world": "mars",
+   "fold": 0,
+   "seed": 42,
+   "path": "runs/pipeline_repair_audit/retraining_seedset/runs/model1_resnet18/fold_0_seed_42/best_checkpoint.pt",
+   "sha256": "47a5db4bc27cc561d1d0fea10886306d9b7f74b436de0aac07011ead162ee308"
+  },
+  {
+   "model": "CNN_QCNN",
+   "world": "mars",
+   "fold": 0,
+   "seed": 42,
+   "path": "runs/pipeline_repair_audit/retraining_seedset/runs/model2_qcnn/fold_0_seed_42/best_checkpoint.pt",
+   "sha256": "53e2aa7d5c61771d0168739afdcdad65a5774b85fbdf3548b325c9b0868791ec"
+  },
+  {
+   "model": "cnn",
+   "world": "moon",
+   "seed": 42,
+   "path": "data/raw/moon/lrocnet/experiment_lunar_cnn_qcnn/runs_deterministic_10seed_20261028/checkpoints/cnn_seed_42.pt",
+   "sha256": "5aa0a706e70620e594d7647eb37945706dca63373da97350917b9363fa389598"
+  },
+  {
+   "model": "hybrid_qcnn",
+   "world": "moon",
+   "seed": 42,
+   "path": "data/raw/moon/lrocnet/experiment_lunar_cnn_qcnn/runs_deterministic_10seed_20261028/checkpoints/hybrid_seed_42.pt",
+   "sha256": "7ca35ae7b4f0e6ca2f57da62e450053362b705bb91269497753614fe4837fd04"
+  },
+  {
+   "model": "frozen_embedding_mlp",
+   "world": "moon",
+   "seed": 42,
+   "path": "data/raw/moon/lrocnet/experiment_lunar_cnn_qcnn/runs_deterministic_10seed_20261028/checkpoints/frozen_mlp_seed_42.pt",
+   "sha256": "8b8785e30959e864db2ab8d2ef9d0da49f14e67f071dd23e98e47d07839264e8"
+  }
+ ]
+}

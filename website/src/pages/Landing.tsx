@@ -120,6 +120,7 @@ export function Landing() {
         </Link>
         <nav aria-label="Site">
           <MotionToggle className="motion-toggle" />
+          <Link to="/lab">Under the hood</Link>
           <Link to="/about">About the study</Link>
         </nav>
       </header>

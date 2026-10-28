@@ -155,3 +155,31 @@
     --gap-columns: 16px;
   }
 }
+
+/* Lab page (step 11). Chart colours: the Moon world's validated categorical set, which passes the
+   CVD and normal-vision checks on this surface (the root neutral set does not). The purple sits
+   under 3:1, so every series also carries a direct label and a legend. */
+[data-page='lab'] {
+  --model-cnn: #b47825;
+  --model-qcnn: #4aa0c7;
+  --model-mlp: #93398e;
+  --circuit-fill: var(--surface);
+  /* Heatmap: one neutral steel ramp for the size of an angle. Hue is left to the models (the page's
+     charts use warm, cool and purple for them), so the sign is printed, not coloured. */
+  --heat-lo: oklch(24% 0.014 235);
+  --heat-hi: oklch(84% 0.03 235);
+
+  /* Shiki's CSS-variables theme mapped onto the shell's tokens (scripts/highlight.mjs); no green or
+     red, which are kept for ground truth. */
+  --shiki-foreground: var(--text-2);
+  --shiki-background: transparent;
+  --shiki-token-keyword: oklch(78% 0.08 300);
+  --shiki-token-function: oklch(86% 0.07 220);
+  --shiki-token-parameter: var(--text);
+  --shiki-token-constant: oklch(84% 0.06 340);
+  --shiki-token-string: oklch(86% 0.06 95);
+  --shiki-token-string-expression: oklch(86% 0.06 95);
+  --shiki-token-comment: var(--text-muted);
+  --shiki-token-punctuation: var(--text-muted);
+  --shiki-token-link: var(--text);
+}

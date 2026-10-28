@@ -1,0 +1,82 @@
+{
+ "source": [
+  "runs/pipeline_repair_audit/retraining_seedset/runs/model1_resnet18/fold_0_seed_42/best_checkpoint.pt",
+  "runs/controlled_evaluation/processed/metadata.parquet"
+ ],
+ "generated_at": "2026-10-28T18:10:52+00:00",
+ "tile_id": "site_01_r128_c4096",
+ "site_id": "site_01",
+ "fold": 0,
+ "seed": 42,
+ "input": {
+  "png": "lab/mars_cnn_input.png",
+  "channel": "calibrated image (channel 0 of 3), training-fold normalisation"
+ },
+ "input_channels": [
+  "calibrated image",
+  "DTM-valid coverage",
+  "image-valid coverage"
+ ],
+ "stages": [
+  {
+   "name": "stem",
+   "shape": [
+    64,
+    32,
+    32
+   ],
+   "channels_shown": 16,
+   "png": "lab/mars_cnn_stage_stem.png"
+  },
+  {
+   "name": "layer1",
+   "shape": [
+    64,
+    16,
+    16
+   ],
+   "channels_shown": 16,
+   "png": "lab/mars_cnn_stage_layer1.png"
+  },
+  {
+   "name": "layer2",
+   "shape": [
+    128,
+    8,
+    8
+   ],
+   "channels_shown": 16,
+   "png": "lab/mars_cnn_stage_layer2.png"
+  },
+  {
+   "name": "layer3",
+   "shape": [
+    256,
+    4,
+    4
+   ],
+   "channels_shown": 16,
+   "png": "lab/mars_cnn_stage_layer3.png"
+  },
+  {
+   "name": "layer4",
+   "shape": [
+    512,
+    2,
+    2
+   ],
+   "channels_shown": 16,
+   "png": "lab/mars_cnn_stage_layer4.png"
+  }
+ ],
+ "bottleneck_angles": [
+  0.2721,
+  1.3875,
+  3.0853,
+  0.9922,
+  0.1652,
+  3.0575,
+  1.5816,
+  3.0424
+ ]
+}
