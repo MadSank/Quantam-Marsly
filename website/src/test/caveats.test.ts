@@ -69,5 +69,4 @@ describe('caveats.json', () => {
     for (const c of caveats.filter((c) => c.world === 'moon')) expect(c.text).not.toMatch(/three seeds|three-seed/i)
   })
 
-  it.todo('renders every caveat on About (step 10)')
 })

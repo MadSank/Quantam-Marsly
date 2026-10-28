@@ -1,0 +1,306 @@
+/* Hallmark · shape: Long Document (a reference page: section index left, one reading column) · genre: modern-minimal · theme: Vantage (carried from the landing), neutral shell · job: read the method and caveats, find a source · step 10
+ * hero: none (a document; the h1 and one lead sentence open it) · nav: edge-aligned wordmark and three links · footer: one caveat line and two links · imagery: none (the explorers carry the pictures) · signature: every caveat quoted word for word with its source file named
+ * axes: dark/grotesk-sans/steel · posture: restrained · motion: none · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H3 E4 S4 R4 V3 · weakest: V, a text page by design; the section index and the quiet table carry the structure */
+
+.about {
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.about-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  min-height: 64px;
+  padding-inline: var(--space-lg);
+  border-bottom: var(--rule-hair) solid var(--rule);
+}
+
+.about-header .wordmark {
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: var(--text-2);
+  text-decoration: none;
+}
+
+.about-nav {
+  display: flex;
+  gap: var(--space-lg);
+}
+
+.about-nav a,
+.about-header .wordmark,
+.about-toc a,
+.about-footer a,
+.source a {
+  transition: color var(--dur-short) var(--ease-out);
+}
+
+.about-nav a {
+  font-size: var(--text-sm);
+  color: var(--text-2);
+  text-decoration: none;
+}
+
+.about-nav a:hover,
+.about-header .wordmark:hover,
+.about-toc a:hover,
+.about-footer a:hover,
+.source a:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+.about-nav a:active,
+.about-toc a:active,
+.about-footer a:active,
+.source a:active {
+  color: var(--text-muted);
+}
+
+.about-nav a[aria-current='page'] {
+  color: var(--text);
+}
+
+.about-layout {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: var(--gap-columns);
+  padding-block: var(--space-2xl) var(--space-3xl);
+}
+
+.about-toc ol {
+  position: sticky;
+  top: var(--space-xl);
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-toc a {
+  font-size: var(--text-sm);
+  color: var(--text-2);
+  text-decoration: none;
+}
+
+.about-main {
+  display: grid;
+  gap: var(--space-2xl);
+  max-width: 72ch;
+  min-width: 0;
+}
+
+.about-main h1 {
+  font-size: var(--text-display-s);
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+
+.about-lead {
+  margin-top: calc(var(--space-lg) * -1);
+  font-size: var(--text-lead);
+  color: var(--text-2);
+}
+
+.about-section {
+  display: grid;
+  gap: var(--space-lg);
+  padding-top: var(--space-xl);
+  border-top: var(--rule-hair) solid var(--rule);
+}
+
+.about-section h2 {
+  font-size: var(--text-section);
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+
+.about-section h2:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+}
+
+.about-section h3 {
+  font-size: var(--text-title);
+  text-wrap: balance;
+}
+
+.about-section-lead,
+.about-block p,
+.about-note {
+  color: var(--text-2);
+}
+
+.about-block {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.about-note strong,
+.caveat-title {
+  font-weight: 400;
+  color: var(--text);
+}
+
+.about-table-scroll {
+  overflow-x: auto;
+}
+
+.about-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.about-table caption {
+  margin-bottom: var(--space-sm);
+  font-size: var(--text-sm);
+  text-align: left;
+  color: var(--text-muted);
+}
+
+.about-table th,
+.about-table td {
+  padding: var(--space-xs) var(--space-sm) var(--space-xs) 0;
+  border-bottom: var(--rule-hair) solid var(--rule);
+  font-weight: 400;
+  text-align: left;
+  vertical-align: top;
+}
+
+.about-table thead th {
+  color: var(--text-muted);
+}
+
+.about-table td.num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.caveat-group {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.caveat-group ul,
+.source-list {
+  display: grid;
+  gap: var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.caveat-group li {
+  display: grid;
+  gap: var(--space-2xs);
+  padding-left: var(--space-md);
+  border-left: 2px solid var(--border);
+  color: var(--text-2);
+}
+
+.caveat-source {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+
+.source {
+  display: grid;
+  gap: var(--space-sm);
+  padding-block: var(--space-md);
+  border-bottom: var(--rule-hair) solid var(--rule);
+}
+
+.source dl {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+}
+
+.source dl div {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr);
+  gap: var(--space-sm);
+  font-size: var(--text-sm);
+}
+
+.source dt {
+  color: var(--text-muted);
+}
+
+.source dd {
+  margin: 0;
+  color: var(--text-2);
+  overflow-wrap: anywhere;
+}
+
+.source a {
+  color: var(--text);
+}
+
+.about-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding-block: var(--space-lg);
+  border-top: var(--rule-hair) solid var(--rule);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.about-footer p:last-child {
+  display: flex;
+  gap: var(--space-lg);
+}
+
+.about-footer a {
+  color: var(--text-2);
+}
+
+.about-nav a:focus-visible,
+.about-header .wordmark:focus-visible,
+.about-toc a:focus-visible,
+.about-footer a:focus-visible,
+.source a:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-nav a,
+  .about-header .wordmark,
+  .about-toc a,
+  .about-footer a,
+  .source a {
+    transition: none;
+  }
+}
+
+@media (max-width: 52rem) {
+  .about-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .about-toc ol {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+
+  .source dl div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+}

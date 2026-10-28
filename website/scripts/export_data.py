@@ -519,29 +519,121 @@ def export_caveats(written: list[Path]) -> None:
     written.append(path)
 
 
+# The About page's method text: facts restated from FINAL_READINESS_AUDIT.md (section 1 and the
+# Addendum) and the run configurations. No result figures: those live in the explorers.
+ABOUT_METHOD = [
+    {"id": "mars_task", "world": "mars", "title": "Mars: terrain proxies from HiRISE",
+     "paragraphs": [
+         "Five HiRISE sites, each an orthoimage strip with its digital terrain model, are cut into 15,233 "
+         "coverage-eligible patches at 2 m per pixel.",
+         "Each patch has three terrain proxy targets taken from the terrain model: 5 m mean slope in degrees, "
+         "roughness in metres and hazard fraction. A patch counts as safe, a derived proxy label, when its mean "
+         "slope is under 8 degrees and its hazard fraction is under 0.05. It is not an observed landing outcome.",
+     ]},
+    {"id": "mars_models", "world": "mars", "title": "Mars: the two models",
+     "paragraphs": [
+         "The CNN is a ResNet-18 trained end to end from random initialisation, with 11,242,563 trainable parameters.",
+         "The hybrid keeps that trained CNN representation frozen and fits an 8-dimensional bottleneck and an "
+         "8-qubit QCNN head on it, 4,152 trainable parameters in all. The comparison is between two pipelines, "
+         "not two architectures of equal capacity.",
+     ]},
+    {"id": "mars_evaluation", "world": "mars", "title": "Mars: how it was tested",
+     "paragraphs": [
+         "Leave one site out: in each of five folds, three sites train, one validates and one is the test site. "
+         "Every fold was run with seeds 42, 43 and 44.",
+         "Safe decisions are scored two ways: at the fixed proxy thresholds, and at a risk threshold chosen on the "
+         "validation site so that its false-positive rate is at most 5%, then applied to the test site.",
+     ]},
+    {"id": "moon_task", "world": "moon", "title": "Moon: crater classes from LROCNet",
+     "paragraphs": [
+         "LROCNet crops from the LRO Narrow Angle Camera are labelled ejecta, old crater or none. The supplied split "
+         "has 3,608 training, 613 validation and 779 test crops. The test set is 68.4% none, so balanced accuracy "
+         "and macro-F1 are reported alongside accuracy.",
+     ]},
+    {"id": "moon_models", "world": "moon", "title": "Moon: three models",
+     "paragraphs": [
+         "The CNN is trained end to end, with 59,347 trainable parameters. The hybrid QCNN head (568 trainable "
+         "parameters) and a frozen-embedding MLP control (547) are both trained on the CNN's frozen embeddings, "
+         "so the MLP is the matched classical comparison for the quantum head.",
+         "The reported results come from 10 deterministic seeds, 42 to 51, which supersede an earlier three-seed run "
+         "whose head initialisation could not be reproduced.",
+     ]},
+    {"id": "simulation", "world": "both", "title": "Quantum circuits were simulated",
+     "paragraphs": [
+         "Every quantum circuit ran on a classical simulator (PennyLane default.qubit). Nothing here ran on quantum "
+         "hardware, and no quantum advantage is claimed.",
+     ]},
+    {"id": "site", "world": "both", "title": "What this site shows",
+     "paragraphs": [
+         "Every figure, prediction and label on this site comes from saved experiment outputs. Nothing is retrained "
+         "or recomputed in the browser, and the numbers match the project's readiness audit.",
+     ]},
+]
+
+ABOUT_SOURCES = [
+    {"name": "HiRISE orthoimages and digital terrain models",
+     "provider": "NASA/JPL/University of Arizona",
+     "licence": "Public domain under the HiRISE image usage policy: no restrictions on use; credit requested.",
+     "credit": "NASA/JPL/University of Arizona",
+     "citation": "McEwen, A. S., et al. (2007). Mars Reconnaissance Orbiter's High Resolution Imaging Science "
+                 "Experiment (HiRISE). Journal of Geophysical Research: Planets, 112, E05S02. doi:10.1029/2005JE002605",
+     "url": "https://www.uahirise.org/",
+     "licence_url": "https://uahirise.org/media/usage.php",
+     "used_for": "Mars strips, terrain targets and tiles; the strip previews and contour lines"},
+    {"name": "LROCNet training imagery",
+     "provider": "NASA Jet Propulsion Laboratory, California Institute of Technology (Emily Dunkel)",
+     "licence": "Creative Commons Attribution 4.0 International (CC BY 4.0).",
+     "credit": "Dunkel, NASA JPL, California Institute of Technology; imagery from the LRO Narrow Angle Camera",
+     "citation": "Dunkel, E. (2022). Lunar Reconnaissance Orbiter Imagery for LROCNet Moon Classifier (v1.0.0) "
+                 "[Data set]. Zenodo. doi:10.5281/zenodo.7041842",
+     "url": "https://zenodo.org/records/7041842",
+     "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+     "used_for": "Moon crater classification crops. Shown resized to 128 px sprite sheets; no other changes."},
+    {"name": "Mars Viking MDIM 2.1 colorized global mosaic",
+     "provider": "NASA Ames / USGS Astrogeology Science Center",
+     "licence": "Public domain (USGS catalog: access constraints public domain, use constraints none).",
+     "credit": "NASA Ames / USGS Astrogeology Science Center",
+     "citation": "USGS Astrogeology Science Center (2009). Mars Viking Colorized Global Mosaic 232m. Originator: NASA Ames.",
+     "url": "https://astrogeology.usgs.gov/search/map/mars_viking_colorized_global_mosaic_232m",
+     "licence_url": "https://astrogeology.usgs.gov/search/map/mars_viking_colorized_global_mosaic_232m",
+     "used_for": "Mars globe and flat-map colour texture (1 km/px JPG, downscaled)"},
+    {"name": "MGS MOLA Mission Experiment Gridded Data Record (topography, 16 px/deg)",
+     "provider": "NASA Goddard Space Flight Center, MGS MOLA team, via the PDS Geosciences Node",
+     "licence": "NASA data, generally not subject to copyright in the United States; NASA credited as the source.",
+     "credit": "NASA / GSFC / MOLA Science Team",
+     "citation": "Smith, D. E., Zuber, M. T., Neumann, G. A., Guinness, E. A., & Slavney, S. (2003). Mars Global "
+                 "Surveyor Laser Altimeter Mission Experiment Gridded Data Record, MGS-M-MOLA-5-MEGDR-L3-V1.0. "
+                 "NASA Planetary Data System. doi:10.17189/1519460",
+     "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/",
+     "licence_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+     "used_for": "Mars globe relief (product MEGT90N000EB, turned into a 1k normal map)"},
+    {"name": "CGI Moon Kit (LRO LROC WAC colour mosaic)",
+     "provider": "NASA's Scientific Visualization Studio",
+     "licence": "Public domain (NASA SVS: all content is public domain unless otherwise noted).",
+     "credit": "NASA's Scientific Visualization Studio",
+     "citation": "NASA's Scientific Visualization Studio, CGI Moon Kit (lroc_color_poles_4k.tif).",
+     "url": "https://svs.gsfc.nasa.gov/4720",
+     "licence_url": "https://svs.gsfc.nasa.gov/help/",
+     "used_for": "Moon globe and flat-map colour texture (4096x2048 TIF, downscaled)"},
+    {"name": "LRO LOLA Gridded Data Record (topography, 16 px/deg)",
+     "provider": "NASA Goddard Space Flight Center, LRO LOLA team, via the PDS Geosciences Node",
+     "licence": "NASA data, generally not subject to copyright in the United States; NASA credited as the source.",
+     "credit": "NASA / GSFC / LOLA Science Team",
+     "citation": "LRO LOLA Team (producer D. E. Smith, NASA Goddard Space Flight Center). Lunar Orbiter Laser Altimeter "
+                 "Gridded Data Record, LRO-L-LOLA-4-GDR-V1.0, product LDEM_16, version 3.1 (2019-03-15). "
+                 "NASA Planetary Data System, PDS Geosciences Node.",
+     "url": "https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/cylindrical/img/",
+     "licence_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+     "used_for": "Moon globe relief (product LDEM_16, turned into a 1k normal map)"},
+]
+
+
 def export_about(written: list[Path]) -> None:
-    """Skeleton for the About page; licence/citation text is completed and confirmed in build step 10."""
-    todo = "TO CONFIRM"
+    """About page content: method (restated from the audit) and data sources with licence and citation."""
     about = {
         **stamp([AUDIT]),
-        "method": [],
-        "sources": [
-            {"name": "HiRISE orthoimages and DTMs", "provider": "NASA/JPL/University of Arizona",
-             "licence": todo, "citation": todo, "url": todo,
-             "used_for": "Mars strips, terrain targets (slope, roughness, hazard) and tiles"},
-            {"name": "LROCNet", "provider": todo, "licence": todo, "citation": todo, "url": todo,
-             "used_for": "Moon crater classification crops (ejecta, oldcrater, none)"},
-            {"name": "Mars Viking MDIM 2.1 colorized global mosaic", "provider": "NASA Ames / USGS Astrogeology Science Center",
-             "licence": "Public domain (USGS catalog: access constraints public domain, use constraints none)",
-             "citation": "USGS Astrogeology Science Center (2009). Mars Viking Colorized Global Mosaic 232m. Originator: NASA Ames.",
-             "url": "https://astrogeology.usgs.gov/search/map/mars_viking_colorized_global_mosaic_232m",
-             "used_for": "Mars globe texture (1 km/px JPG, downscaled)"},
-            {"name": "CGI Moon Kit (LRO LROC WAC colour mosaic)", "provider": "NASA's Scientific Visualization Studio",
-             "licence": todo,
-             "citation": "NASA's Scientific Visualization Studio, CGI Moon Kit (lroc_color_poles_4k.tif).",
-             "url": "https://svs.gsfc.nasa.gov/4720",
-             "used_for": "Moon globe texture (4096x2048 TIF, downscaled)"},
-        ],
+        "method": ABOUT_METHOD,
+        "sources": ABOUT_SOURCES,
     }
     path = OUT_DIR / "about.json"
     write_json(path, about)

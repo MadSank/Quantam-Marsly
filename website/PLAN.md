@@ -177,7 +177,8 @@ Two rules apply to every file:
 - The site never mentions intervals or "crossing zero".
 
 **`about.json`**
-- `{ method: [...], sources: [{ name, provider, licence, citation, url, used_for }] }`
+- `{ method: [{ id, world, title, paragraphs[] }], sources: [{ name, provider, licence, licence_url, credit, citation, url, used_for }] }`
+- The method text restates facts from the audit (section 1 and the Addendum) and the run configurations; it carries no result figures.
 - Sources to credit:
   - HiRISE ortho images and DTMs: NASA/JPL/University of Arizona.
   - LROCNet: its licence and paper citation.
@@ -444,7 +445,7 @@ These rules are built into the components:
     - **Caveats:** the footer carries the required Moon caveats verbatim: `moon_reproducibility`, `moon_provenance` and `no_quantum_advantage`.
     - **Tests:** cards from the class data, no pins, routing between globe and explorer (including old links), and the fallback without WebGL.
     - Screenshots at 1920×1080 and 1366×768.
-10. **About page:** method, the full caveat list, and data sources with licence and citation from `about.json`. Enable `sources.test.ts`, and list any `TO CONFIRM` items for you.
+10. **About page:** method, the full caveat list, and data sources with licence and citation from `about.json`. Enable `sources.test.ts`, and list any `TO CONFIRM` items for you. Done: every licence and citation was confirmed from the source's own page or label file, so none remain; the Moon timings appear here only, as separately measured and not comparable.
 11. **Lab page ("Under the hood").**
     - Write `export_internals.py` and its pytest, plus `highlight.mjs` (Shiki, prebuild).
     - Build the six `/lab` sections and enable `lab.test.tsx`.

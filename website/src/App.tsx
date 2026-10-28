@@ -1,22 +1,12 @@
 import { MotionConfig } from 'motion/react'
-import { Link, Navigate, Route, Routes, useLocation } from 'react-router'
+import { Navigate, Route, Routes, useLocation } from 'react-router'
 import { MotionProvider } from './components/motion'
+import { About } from './pages/About'
 import { Landing } from './pages/Landing'
 import { MarsExplorer } from './pages/MarsExplorer'
 import { MarsGlobe } from './pages/MarsGlobe'
 import { MoonExplorer } from './pages/MoonExplorer'
 import { MoonGlobe } from './pages/MoonGlobe'
-
-// Placeholder page; replaced by the real view in build step 10 (PLAN.md).
-
-function About() {
-  return (
-    <main>
-      <h1>About this study</h1>
-      <Link to="/">Back to worlds</Link>
-    </main>
-  )
-}
 
 // Explorer links from before the globe view (step 8b) carried their state on /mars; send any
 // that hold explorer parameters on to /mars/explore with every parameter kept.

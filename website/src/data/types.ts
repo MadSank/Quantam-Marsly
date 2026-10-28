@@ -164,3 +164,28 @@ export interface Caveat {
 export interface CaveatsFile extends Stamp {
   caveats: Caveat[]
 }
+
+// ---------------------------------------------------------------- About
+
+export interface AboutMethod {
+  id: string
+  world: 'mars' | 'moon' | 'both'
+  title: string
+  paragraphs: string[]
+}
+
+export interface AboutSource {
+  name: string
+  provider: string
+  licence: string
+  credit: string
+  citation: string
+  url: string
+  licence_url: string
+  used_for: string
+}
+
+export interface AboutFile extends Stamp {
+  method: AboutMethod[]
+  sources: AboutSource[]
+}
